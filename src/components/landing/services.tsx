@@ -208,6 +208,16 @@ export function Services() {
    *
    * Large pointer screens only: on a phone a row already fills most of the
    * viewport, so scaling it just reads as jitter.
+   *
+   * Smoothness comes from three deliberate choices:
+   *   1. Positions are measured ONCE (and on refresh), never per frame, so the
+   *      loop performs zero layout reads and can't thrash.
+   *   2. Those measurements use offsetTop/offsetHeight, which ignore transforms.
+   *      Reading getBoundingClientRect on the very element we scale would feed
+   *      this frame's output back in as next frame's input, and the rows visibly
+   *      wobble as the two chase each other.
+   *   3. Each row damps toward its target instead of snapping to it, which
+   *      absorbs any unevenness in how scroll events arrive.
    */
   useEffect(() => {
     const list = listRef.current;
@@ -220,48 +230,111 @@ export function Services() {
       const cards = gsap.utils.toArray<HTMLElement>('[data-focus-card]', list);
       if (!cards.length) return;
 
-      // quickSetter writes straight to the style without per-frame tween overhead.
-      const setters = cards.map((el) => ({
+      interface Row {
+        el: HTMLElement;
+        setScale: (v: number) => void;
+        setOpacity: (v: number) => void;
+        /** Document-space centre, transform-independent. */
+        centre: number;
+        /** Damped focus value, 0 (receded) to 1 (front and centre). */
+        value: number;
+      }
+
+      const rows: Row[] = cards.map((el) => ({
+        el,
+        // quickSetter writes straight to the style, no per-frame tween overhead.
         setScale: gsap.quickSetter(el, 'scale') as (v: number) => void,
         setOpacity: gsap.quickSetter(el, 'opacity') as (v: number) => void,
-        el,
+        centre: 0,
+        value: 0,
       }));
 
-      const update = () => {
-        const vh = window.innerHeight;
-        const viewportCentre = vh / 2;
-        // How far from centre a row must travel before it has fully receded.
-        const falloff = vh * 0.58;
+      /** Walks the offset chain — unlike getBoundingClientRect this ignores any
+       *  transform we have applied, so measurement never sees our own output. */
+      const documentTop = (el: HTMLElement) => {
+        let y = 0;
+        let node: HTMLElement | null = el;
+        while (node) {
+          y += node.offsetTop;
+          node = node.offsetParent as HTMLElement | null;
+        }
+        return y;
+      };
 
-        for (const { el, setScale, setOpacity } of setters) {
-          const rect = el.getBoundingClientRect();
-          const cardCentre = rect.top + rect.height / 2;
-          const distance = Math.min(Math.abs(cardCentre - viewportCentre) / falloff, 1);
-          const proximity = 1 - distance;
-          // smoothstep, so size eases in near the centre instead of tracking linearly
-          const eased = proximity * proximity * (3 - 2 * proximity);
-
-          setScale(0.945 + 0.055 * eased);
-          setOpacity(0.68 + 0.32 * eased);
+      const measure = () => {
+        for (const row of rows) {
+          row.centre = documentTop(row.el) + row.el.offsetHeight / 2;
         }
       };
 
-      // Lenis already bridges its scroll into ScrollTrigger.update(), so this
-      // stays in sync with the smooth-scroll loop rather than fighting it.
-      const trigger = ScrollTrigger.create({
-        trigger: list,
-        start: 'top bottom',
-        end: 'bottom top',
-        onUpdate: update,
-        onRefresh: update,
-      });
+      const targetFor = (row: Row, viewportCentre: number, falloff: number) => {
+        const distance = Math.min(Math.abs(row.centre - viewportCentre) / falloff, 1);
+        const proximity = 1 - distance;
+        // smoothstep, so size eases in near the centre instead of tracking linearly
+        return proximity * proximity * (3 - 2 * proximity);
+      };
 
-      update();
+      let lastScroll = -1;
+      let settled = false;
+
+      const render = () => {
+        const scroll = window.scrollY;
+        const vh = window.innerHeight;
+
+        // Nothing moved and every row has reached its target — skip the frame.
+        if (scroll === lastScroll && settled) return;
+        lastScroll = scroll;
+
+        const viewportCentre = scroll + vh / 2;
+        // How far from centre a row must travel before it has fully receded.
+        const falloff = vh * 0.45;
+
+        let allSettled = true;
+
+        for (const row of rows) {
+          const target = targetFor(row, viewportCentre, falloff);
+          const delta = target - row.value;
+
+          if (Math.abs(delta) < 0.0004) {
+            row.value = target;
+          } else {
+            // Frame-rate independent damping: the same visual settle time on a
+            // 60Hz panel and a 144Hz one.
+            row.value += delta * (1 - Math.pow(0.001, gsap.ticker.deltaRatio(60) / 60));
+            allSettled = false;
+          }
+
+          row.setScale(0.955 + 0.045 * row.value);
+          row.setOpacity(0.72 + 0.28 * row.value);
+        }
+
+        settled = allSettled;
+      };
+
+      measure();
+
+      // Converge instantly on first paint so nothing visibly eases in on load.
+      const vh0 = window.innerHeight;
+      const centre0 = window.scrollY + vh0 / 2;
+      for (const row of rows) {
+        row.value = targetFor(row, centre0, vh0 * 0.45);
+        row.setScale(0.955 + 0.045 * row.value);
+        row.setOpacity(0.72 + 0.28 * row.value);
+      }
+
+      // Driven by GSAP's ticker rather than a scroll callback: this runs exactly
+      // once per animation frame, in step with Lenis, whether or not a scroll
+      // event happened to fire.
+      gsap.ticker.add(render);
+      ScrollTrigger.addEventListener('refresh', measure);
+      window.addEventListener('resize', measure);
 
       return () => {
-        trigger.kill();
+        gsap.ticker.remove(render);
+        ScrollTrigger.removeEventListener('refresh', measure);
+        window.removeEventListener('resize', measure);
         // quickSetter writes inline styles that matchMedia won't revert for us.
-        gsap.set(cards, { clearProps: 'transform,opacity' });
+        gsap.set(cards, { clearProps: 'transform,scale,opacity' });
       };
     });
 
@@ -289,7 +362,7 @@ export function Services() {
         </div>
 
         {/* Single column of full-width capability rows */}
-        <div ref={listRef} className="flex flex-col gap-4 sm:gap-5">
+        <div ref={listRef} className="flex flex-col gap-3 sm:gap-4">
           {SERVICES_DATA.map((service, index) => {
             const Icon = service.icon;
             const dark = service.highlight;
@@ -301,10 +374,10 @@ export function Services() {
                 data-reveal
               >
                 {/* Layer 2 — GSAP owns this transform (scroll focus) */}
-                <div data-focus-card className="will-change-transform transform-gpu">
+                <div data-focus-card className="will-change-[transform,opacity] transform-gpu">
                   {/* Layer 3 — CSS owns this transform (hover) */}
                   <article
-                    className={`group/card block rounded-[28px] sm:rounded-[32px] border overflow-hidden relative transition-[transform,box-shadow] duration-500 ease-out lg:hover:scale-[1.018] ${
+                    className={`group/card block rounded-[28px] sm:rounded-[32px] border overflow-hidden relative transition-[scale,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] lg:hover:scale-[1.018] ${
                       dark
                         ? 'bg-ink text-ink-foreground border-butter/30 shadow-xl hover:shadow-2xl'
                         : 'bg-card text-foreground border-border/80 shadow-soft hover:shadow-xl'
@@ -318,12 +391,12 @@ export function Services() {
                       />
                     )}
 
-                    <div className="relative p-6 sm:p-8 lg:p-10 grid gap-6 sm:gap-8 lg:gap-12 lg:grid-cols-[auto_minmax(0,1.45fr)_minmax(0,1fr)] lg:items-center">
+                    <div className="relative p-5 sm:p-6 lg:px-8 lg:py-6 grid gap-5 sm:gap-6 lg:gap-8 lg:grid-cols-[auto_minmax(0,1.55fr)_minmax(0,0.95fr)_auto] lg:items-center">
                       {/* Zone 1 — icon + index */}
-                      <div className="flex lg:flex-col items-center lg:items-start gap-4 shrink-0">
+                      <div className="flex lg:flex-col items-center lg:items-start gap-3 lg:gap-2 shrink-0">
                         <div
                           style={{ animationDelay: `${index * 0.3}s` }}
-                          className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-xs animate-icon-float ${
+                          className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0 shadow-xs animate-icon-float ${
                             dark
                               ? 'bg-butter text-butter-foreground animate-icon-glow'
                               : 'bg-secondary text-foreground group-hover/card:bg-butter group-hover/card:text-butter-foreground transition-colors duration-300 animate-icon-glow-dark'
@@ -331,7 +404,7 @@ export function Services() {
                         >
                           <Icon
                             style={{ animationDelay: `${index * 0.2}s` }}
-                            className={`w-6 h-6 sm:w-7 sm:h-7 transition-transform duration-300 group-hover/card:scale-110 ${
+                            className={`w-5 h-5 sm:w-6 sm:h-6 transition-transform duration-300 group-hover/card:scale-110 ${
                               index % 6 === 0
                                 ? 'animate-icon-spin'
                                 : index % 6 === 1
@@ -358,7 +431,7 @@ export function Services() {
                       {/* Zone 2 — category, title, description, CTA */}
                       <div className="min-w-0">
                         <span
-                          className={`inline-block text-[10px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-full mb-3 ${
+                          className={`inline-block text-[9.5px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full mb-2 ${
                             dark
                               ? 'bg-white/10 text-butter border border-white/10'
                               : 'bg-secondary text-muted-foreground'
@@ -368,7 +441,7 @@ export function Services() {
                         </span>
 
                         <h3
-                          className={`font-display text-xl sm:text-2xl lg:text-[1.75rem] font-medium tracking-tight leading-snug mb-2.5 ${
+                          className={`font-display text-lg sm:text-xl lg:text-[1.35rem] font-medium tracking-tight leading-tight mb-1.5 ${
                             dark ? 'text-ink-foreground' : 'text-foreground'
                           }`}
                         >
@@ -376,52 +449,55 @@ export function Services() {
                         </h3>
 
                         <p
-                          className={`text-sm leading-relaxed mb-5 ${
+                          className={`text-[13px] leading-relaxed ${
                             dark ? 'text-ink-muted' : 'text-muted-foreground'
                           }`}
                         >
                           {service.description}
                         </p>
 
-                        <Link
-                          to={`/services?tab=${service.id}`}
-                          className={`inline-flex items-center gap-1.5 text-xs font-semibold transition-colors ${
-                            dark
-                              ? 'text-butter hover:text-ink-foreground'
-                              : 'text-foreground hover:text-butter-foreground'
-                          }`}
-                        >
-                          <span>Explore capability</span>
-                          <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover/card:translate-x-1" />
-                        </Link>
                       </div>
 
                       {/* Zone 3 — bullets */}
                       <div
-                        className={`flex flex-col gap-3 pt-5 border-t lg:pt-0 lg:border-t-0 lg:pl-10 lg:border-l ${
+                        className={`flex flex-col gap-2 pt-4 border-t lg:pt-0 lg:border-t-0 lg:pl-8 lg:border-l ${
                           dark ? 'border-white/10' : 'border-border/60'
                         }`}
                       >
                         {service.bullets.map((bullet) => (
                           <div
                             key={bullet}
-                            className={`flex items-center gap-2.5 text-xs sm:text-[13px] font-medium ${
+                            className={`flex items-center gap-2 text-[11.5px] sm:text-xs font-medium ${
                               dark ? 'text-ink-foreground' : 'text-foreground/80'
                             }`}
                           >
                             <div
-                              className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${
+                              className={`w-3.5 h-3.5 rounded-full flex items-center justify-center shrink-0 ${
                                 dark
                                   ? 'bg-butter/20 text-butter'
                                   : 'bg-butter/30 text-butter-foreground'
                               }`}
                             >
-                              <Check className="w-2.5 h-2.5 stroke-[3]" />
+                              <Check className="w-2 h-2 stroke-[3.5]" />
                             </div>
                             <span>{bullet}</span>
                           </div>
                         ))}
                       </div>
+
+                      {/* Zone 4 — CTA, pulled out of the text column so it
+                          adds no height to the row */}
+                      <Link
+                        to={`/services?tab=${service.id}`}
+                        className={`inline-flex items-center gap-1.5 text-xs font-semibold whitespace-nowrap transition-colors shrink-0 ${
+                          dark
+                            ? 'text-butter hover:text-ink-foreground'
+                            : 'text-foreground hover:text-butter-foreground'
+                        }`}
+                      >
+                        <span>Explore capability</span>
+                        <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover/card:translate-x-1" />
+                      </Link>
                     </div>
                   </article>
                 </div>

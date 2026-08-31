@@ -389,10 +389,10 @@ export function PricingPage() {
         </div>
 
         {/* Interactive Scope Estimator */}
-        <div className="rounded-[32px] bg-ink text-ink-foreground p-8 sm:p-14 text-left border border-white/5 shadow-float mb-24">
-          <div className="max-w-2xl mb-10">
+        <div className="rounded-[28px] sm:rounded-[32px] bg-ink text-ink-foreground p-5 sm:p-8 lg:p-14 text-left border border-white/5 shadow-float mb-16 sm:mb-24">
+          <div className="max-w-2xl mb-8 sm:mb-10">
             <div className="text-xs uppercase tracking-wider text-butter font-semibold mb-3 flex items-center gap-2">
-              <Calculator className="w-4 h-4" />
+              <Calculator className="w-4 h-4 shrink-0" />
               <span>Scope & Add-on Estimator</span>
             </div>
             <h2 className="font-display text-display-md font-medium text-ink-foreground mb-4">
@@ -403,18 +403,18 @@ export function PricingPage() {
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-[1.2fr_1fr] gap-10 items-start">
+          <div className="grid lg:grid-cols-[1.2fr_1fr] gap-8 lg:gap-10 items-start">
             {/* Left Options */}
             <div>
               <div className="text-xs uppercase tracking-wider text-ink-muted font-semibold mb-3">
                 1. Select Foundation Tier
               </div>
-              <div className="grid grid-cols-3 gap-3 mb-8">
+              <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-8">
                 {['Launch', 'Scale', 'Enterprise'].map((tier) => (
                   <button
                     key={tier}
                     onClick={() => setSelectedPlan(tier)}
-                    className={`py-3 px-4 rounded-2xl text-xs sm:text-sm font-medium border cursor-pointer transition-colors ${
+                    className={`py-2.5 sm:py-3 px-1.5 sm:px-4 rounded-xl sm:rounded-2xl text-[11px] sm:text-sm font-medium leading-tight border cursor-pointer transition-colors ${
                       selectedPlan === tier
                         ? 'bg-butter text-butter-foreground border-butter shadow-xs font-semibold'
                         : 'bg-ink-soft text-ink-foreground border-white/10 hover:border-white/20'
@@ -435,27 +435,30 @@ export function PricingPage() {
                     <button
                       key={addon.id}
                       onClick={() => toggleAddon(addon.id)}
-                      className={`p-4 rounded-2xl border flex items-center justify-between text-left cursor-pointer transition-colors ${
+                      className={`p-3.5 sm:p-4 rounded-2xl border flex items-start gap-3 text-left cursor-pointer transition-colors ${
                         isChecked
                           ? 'bg-ink-soft border-butter/50 text-ink-foreground'
                           : 'bg-ink-soft/50 border-white/5 text-ink-muted hover:border-white/10'
                       }`}
                     >
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`w-5 h-5 rounded-md flex items-center justify-center ${
-                            isChecked ? 'bg-butter text-butter-foreground' : 'border border-white/20'
-                          }`}
-                        >
-                          {isChecked && <Check className="w-3.5 h-3.5 stroke-[3]" />}
-                        </div>
-                        <span className="text-xs sm:text-sm font-medium text-ink-foreground">
+                      <div
+                        className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 mt-0.5 ${
+                          isChecked ? 'bg-butter text-butter-foreground' : 'border border-white/20'
+                        }`}
+                      >
+                        {isChecked && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                      </div>
+
+                      {/* Tag drops below the label on a phone instead of
+                          competing with it for the same line. */}
+                      <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 sm:gap-3">
+                        <span className="text-[13px] sm:text-sm font-medium text-ink-foreground leading-snug">
                           {addon.name}
                         </span>
+                        <span className="text-[10px] sm:text-xs font-mono font-medium text-butter bg-butter/10 px-2 sm:px-2.5 py-0.5 rounded-full shrink-0 self-start sm:self-auto whitespace-nowrap">
+                          {addon.tag}
+                        </span>
                       </div>
-                      <span className="text-xs font-mono font-medium text-butter bg-butter/10 px-2.5 py-0.5 rounded-full shrink-0 ml-3">
-                        {addon.tag}
-                      </span>
                     </button>
                   );
                 })}
@@ -463,45 +466,48 @@ export function PricingPage() {
             </div>
 
             {/* Right Summary */}
-            <div className="bg-ink-soft rounded-3xl p-8 border border-white/10">
+            <div className="bg-ink-soft rounded-3xl p-5 sm:p-8 border border-white/10">
               <h3 className="font-display text-xl font-medium text-ink-foreground mb-4">
                 Configured Squad Blueprint
               </h3>
 
-              <div className="flex items-center justify-between py-3 border-b border-white/5 text-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-0.5 sm:gap-3 py-3 border-b border-white/5 text-sm">
                 <span className="text-ink-muted">Selected Model</span>
-                <span className="font-semibold text-butter">
+                <span className="font-semibold text-butter sm:text-right">
                   {selectedPlan === 'Launch' ? 'Fixed Sprint Scope' : selectedPlan === 'Scale' ? 'Monthly Dedicated Squad' : 'Custom Enterprise Pod'}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between py-3 border-b border-white/5 text-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-0.5 sm:gap-3 py-3 border-b border-white/5 text-sm">
                 <span className="text-ink-muted">Specialized Modules</span>
-                <span className="font-semibold text-ink-foreground">
+                <span className="font-semibold text-ink-foreground sm:text-right">
                   {selectedAddons.length === 0 ? 'Core Foundation Only' : `${selectedAddons.length} Selected`}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between py-3 border-b border-white/5 text-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-0.5 sm:gap-3 py-3 border-b border-white/5 text-sm">
                 <span className="text-ink-muted">Cadence & Review</span>
-                <span className="font-semibold text-ink-foreground">
+                <span className="font-semibold text-ink-foreground sm:text-right">
                   Weekly Friday Builds
                 </span>
               </div>
 
-              <div className="flex items-center justify-between py-3 border-b border-white/5 text-sm mb-8">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-0.5 sm:gap-3 py-3 border-b border-white/5 text-sm mb-8">
                 <span className="text-ink-muted">IP Ownership</span>
-                <span className="font-semibold text-emerald-400">
+                <span className="font-semibold text-emerald-400 sm:text-right">
                   100% Repository Transfer
                 </span>
               </div>
 
               <Link
                 to="/contact"
-                className="w-full bg-butter text-butter-foreground rounded-full py-4 text-sm font-semibold flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform"
+                className="w-full bg-butter text-butter-foreground rounded-full px-5 py-4 text-[13px] sm:text-sm font-semibold flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform"
               >
-                <span>Request formal proposal for this scope</span>
-                <ArrowRight className="w-4 h-4" />
+                {/* Full sentence needs ~250px; a 375px phone leaves ~200px
+                    inside this pill, so the short form keeps it on one line. */}
+                <span className="sm:hidden">Request a proposal</span>
+                <span className="hidden sm:inline">Request formal proposal for this scope</span>
+                <ArrowRight className="w-4 h-4 shrink-0" />
               </Link>
             </div>
           </div>

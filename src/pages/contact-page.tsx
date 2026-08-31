@@ -247,13 +247,13 @@ export function ContactPage() {
               </h4>
               <div className="flex flex-col gap-4 text-xs sm:text-sm">
                 <a
-                  href="mailto:hello@myplanet.services"
+                  href="mailto:vivek@myplanetservices.com"
                   className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors group"
                 >
                   <div className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center text-foreground group-hover:bg-butter group-hover:text-butter-foreground transition-colors animate-icon-float animate-icon-glow">
                     <Mail className="w-4 h-4 animate-icon-wiggle group-hover:scale-120 transition-transform" />
                   </div>
-                  <span>hello@myplanet.services</span>
+                  <span>vivek@myplanetservices.com</span>
                 </a>
                 <a
                   href="tel:+14155550148"

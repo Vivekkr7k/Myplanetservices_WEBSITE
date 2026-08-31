@@ -1,20 +1,15 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowUpRight,
-  Check,
-  Copy,
   Sparkles,
   Zap,
   Compass,
 } from 'lucide-react';
-import { toast } from 'sonner';
 
 interface TeamMember {
   name: string;
   role: string;
   department: 'Leadership' | 'AI & Systems' | 'Design' | 'Growth';
-  email: string;
   image: string;
   blobColor: string;
   bio: string;
@@ -27,7 +22,6 @@ const TEAM_MEMBERS: TeamMember[] = [
     name: 'Vivek Kumar',
     role: 'Partner & Technology Lead',
     department: 'Leadership',
-    email: 'vivek@myplanet.services',
     image: '/teampic/vivek.jpg',
     blobColor: 'from-amber-400/35 to-butter/70',
     bio: 'Architecting scalable full-stack web & mobile apps, autonomous AI copilot swarms, and data-backed performance marketing engines.',
@@ -44,7 +38,6 @@ const TEAM_MEMBERS: TeamMember[] = [
     name: 'Mayank',
     role: 'Co-Founder & AI Architect',
     department: 'AI & Systems',
-    email: 'mayank@myplanet.services',
     image: '/teampic/mayank.jpg',
     blobColor: 'from-zinc-800 to-zinc-950',
     bio: 'Specializes in AI reasoning engines, modern cloud SaaS platforms, high-converting web experiences, and multi-channel acquisition funnels.',
@@ -60,7 +53,6 @@ const TEAM_MEMBERS: TeamMember[] = [
     name: 'Bishnu Chaudhary',
     role: 'Partner & Growth Architect',
     department: 'Growth',
-    email: 'bishnu@myplanet.services',
     image: '/teampic/bishnu.jpg',
     blobColor: 'from-butter/50 to-amber-500/40',
     bio: 'Delivering responsive web ecosystems, iOS & Android cross-platform solutions, technical search engine dominance, and revenue campaigns.',
@@ -76,7 +68,6 @@ const TEAM_MEMBERS: TeamMember[] = [
     name: 'Om Verma',
     role: 'GTM Engineer & Lead Gen Specialist',
     department: 'Growth',
-    email: 'om@myplanet.services',
     image: '/teampic/om.jpg',
     blobColor: 'from-zinc-800 to-zinc-950',
     bio: 'Architecting high-converting outbound pipelines, automated lead scoring engines, ICP market enrichment, and full-funnel GTM growth systems.',
@@ -98,37 +89,6 @@ const EXPERT_BADGES = [
 ];
 
 export function TeamSection() {
-  const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
-
-  const handleCopyEmail = (email: string) => {
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(email).catch(() => {
-          const textArea = document.createElement('textarea');
-          textArea.value = email;
-          document.body.appendChild(textArea);
-          textArea.select();
-          document.execCommand('copy');
-          document.body.removeChild(textArea);
-        });
-      } else {
-        const textArea = document.createElement('textarea');
-        textArea.value = email;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-      }
-    } catch {
-      // ignore
-    }
-    setCopiedEmail(email);
-    toast.success(`Copied ${email} to clipboard!`);
-    setTimeout(() => {
-      setCopiedEmail(null);
-    }, 2500);
-  };
-
   return (
     <section id="team" className="py-16 sm:py-24 lg:py-32 scroll-mt-12 bg-background relative overflow-hidden">
       {/* Ambient background lighting */}
@@ -189,8 +149,7 @@ export function TeamSection() {
         {/* 4-Member Portrait Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6 sm:gap-7 max-w-7xl mx-auto">
           {TEAM_MEMBERS.map((member, index) => {
-            const isDark = index % 2 === 1; // Alternating: Center card (1 - Sarah) is Black, Side cards (0 & 2) are Light
-            const isCopied = copiedEmail === member.email;
+            const isDark = index % 2 === 1; // Alternating: Center card is Black, Side cards are Light
 
             return (
               <div
@@ -270,57 +229,24 @@ export function TeamSection() {
                   </p>
                 </div>
 
-                {/* Bottom Zone: Email Handle Link + Copy Action */}
+                {/* Bottom Zone: Specialty Tags */}
                 <div
-                  className={`pt-4 border-t flex flex-col gap-2.5 ${
+                  className={`pt-4 border-t flex flex-wrap gap-1.5 ${
                     isDark ? 'border-white/10' : 'border-border/60'
                   }`}
                 >
-                  {/* Email Pill with Direct Copy Interaction */}
-                  <div className="flex items-center justify-between gap-1">
-                    <a
-                      href={`mailto:${member.email}`}
-                      className={`text-xs font-mono transition-colors truncate hover:underline ${
-                        isDark ? 'text-ink-muted hover:text-ink-foreground' : 'text-muted-foreground hover:text-foreground'
-                      }`}
-                    >
-                      {member.email}
-                    </a>
-
-                    <button
-                      type="button"
-                      onClick={() => handleCopyEmail(member.email)}
-                      className={`p-1.5 rounded-lg transition-colors cursor-pointer shrink-0 ${
+                  {member.specialties.map((spec) => (
+                    <span
+                      key={spec}
+                      className={`text-[9.5px] font-mono px-2 py-0.5 rounded-md ${
                         isDark
-                          ? 'text-ink-muted hover:text-ink-foreground hover:bg-white/10'
-                          : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
+                          ? 'bg-white/5 text-ink-muted border border-white/5'
+                          : 'bg-secondary text-muted-foreground border border-border/40'
                       }`}
-                      title={isCopied ? 'Copied!' : 'Copy email address'}
-                      aria-label={`Copy email for ${member.name}`}
                     >
-                      {isCopied ? (
-                        <Check className="w-3.5 h-3.5 text-emerald-500" />
-                      ) : (
-                        <Copy className="w-3.5 h-3.5" />
-                      )}
-                    </button>
-                  </div>
-
-                  {/* Specialty Tags */}
-                  <div className="flex flex-wrap gap-1.5">
-                    {member.specialties.map((spec) => (
-                      <span
-                        key={spec}
-                        className={`text-[9.5px] font-mono px-2 py-0.5 rounded-md ${
-                          isDark
-                            ? 'bg-white/5 text-ink-muted border border-white/5'
-                            : 'bg-secondary text-muted-foreground border border-border/40'
-                        }`}
-                      >
-                        {spec}
-                      </span>
-                    ))}
-                  </div>
+                      {spec}
+                    </span>
+                  ))}
                 </div>
               </div>
             );

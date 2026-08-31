@@ -6,6 +6,7 @@ import {
   SCALE_TIERS,
   BUNDLED_PERKS,
   calculateEstimate,
+  scaledAddonPrice,
   formatINR,
   currentQuarterLabel,
   nextKickoffDate,
@@ -194,11 +195,11 @@ export function ProjectConfigurator() {
                   {addon.label}
                 </span>
                 <span
-                  className={`text-[11px] font-mono font-medium shrink-0 ${
+                  className={`text-[11px] font-mono font-medium shrink-0 tabular-nums ${
                     isSelected ? 'text-butter-foreground' : 'text-muted-foreground'
                   }`}
                 >
-                  +{formatINR(addon.price)}
+                  +{formatINR(scaledAddonPrice(addon, tier))}
                 </span>
               </button>
             );

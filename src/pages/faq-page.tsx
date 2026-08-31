@@ -201,11 +201,11 @@ export function FaqPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 text-xs sm:text-sm">
                 <a
-                  href="mailto:hello@myplanet.services"
+                  href="mailto:vivek@myplanetservices.com"
                   className="flex items-center gap-2 text-ink-muted hover:text-butter transition-colors"
                 >
                   <Mail className="w-4 h-4 text-butter" />
-                  <span>hello@myplanet.services</span>
+                  <span>vivek@myplanetservices.com</span>
                 </a>
                 <a
                   href="tel:+14155550148"

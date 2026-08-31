@@ -341,8 +341,24 @@ const inrFormatter = new Intl.NumberFormat('en-IN', {
 
 export const formatINR = (amount: number) => inrFormatter.format(amount);
 
-/** Rounds to the nearest ₹500 so quoted figures never look machine-generated. */
-const roundToHalfK = (amount: number) => Math.round(amount / 500) * 500;
+/**
+ * Quote granularity scales with magnitude.
+ *
+ * A flat ₹500 step is right for a ₹15,000 line but wrong for a ₹2,00,000 one:
+ * six-figure numbers ending in 500 read as raw calculator output, and a client
+ * reads that as a machine guess rather than a considered price.
+ *
+ * Every component is rounded individually and the total is their exact sum, so
+ * the per-add-on figures shown in the estimator always add up to the number the
+ * visitor is quoted. That arithmetic is checkable on screen, and it has to hold.
+ */
+/** Upper bound of a quote as a multiple of the low. See calculateEstimate. */
+const QUOTE_BAND = 1.2;
+
+const roundQuote = (amount: number) => {
+  const step = amount >= 100000 ? 2500 : amount >= 20000 ? 1000 : 500;
+  return Math.round(amount / step) * step;
+};
 
 export interface EstimateResult {
   low: number;
@@ -355,6 +371,29 @@ export interface EstimateResult {
  * Live estimate for a service + scale band + chosen add-ons.
  * The upper bound carries a 25% band for integration and content unknowns.
  */
+/**
+ * How much an add-on grows with the scale band.
+ *
+ * Add-ons DO get more expensive at larger scale — an Enterprise CRM integration
+ * means more systems, SSO and audit trails than a Starter one — but not in full
+ * proportion to the core build, because a chunk of each add-on is fixed work.
+ * So the tier multiplier is damped to 60% of its effect:
+ *
+ *   Starter    x1.0    Growth  x1.48    Enterprise  x2.32
+ */
+const ADDON_SCALE_DAMPING = 0.6;
+
+export const addonMultiplier = (tier: ScaleTier) =>
+  1 + (tier.multiplier - 1) * ADDON_SCALE_DAMPING;
+
+/**
+ * Price of one add-on at a given scale. The estimator UI and the total are both
+ * driven by THIS function, so the per-add-on figures a visitor reads always sum
+ * to the total they are quoted — no rounding drift between the two.
+ */
+export const scaledAddonPrice = (addon: ServiceAddon, tier: ScaleTier) =>
+  roundQuote(addon.price * addonMultiplier(tier));
+
 export function calculateEstimate(
   service: ServicePricing,
   tier: ScaleTier,
@@ -362,11 +401,15 @@ export function calculateEstimate(
 ): EstimateResult {
   const addonTotal = service.addons
     .filter((addon) => addonIds.includes(addon.id))
-    .reduce((sum, addon) => sum + addon.price, 0);
+    .reduce((sum, addon) => sum + scaledAddonPrice(addon, tier), 0);
 
-  const subtotal = service.startsAt * tier.multiplier + addonTotal;
-  const low = roundToHalfK(subtotal);
-  const high = roundToHalfK(subtotal * 1.25);
+  // Base is rounded before summing so low === base + the add-on figures shown.
+  const subtotal = roundQuote(service.startsAt * tier.multiplier) + addonTotal;
+  const low = subtotal;
+  // A 20% band. Wide enough to absorb integration and content unknowns before
+  // detailed scoping, tight enough to read as a considered figure rather than a
+  // guess — and a round number you can state plainly if a client asks.
+  const high = roundQuote(subtotal * QUOTE_BAND);
 
   let weeksLabel = 'Ongoing · 3-month minimum';
   if (service.baseWeeks) {
