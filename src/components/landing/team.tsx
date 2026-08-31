@@ -45,7 +45,7 @@ const TEAM_MEMBERS: TeamMember[] = [
     role: 'Co-Founder & AI Architect',
     department: 'AI & Systems',
     email: 'mayank@myplanet.services',
-    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=600&auto=format&fit=crop',
+    image: '/teampic/mayank.jpg',
     blobColor: 'from-zinc-800 to-zinc-950',
     bio: 'Specializes in AI reasoning engines, modern cloud SaaS platforms, high-converting web experiences, and multi-channel acquisition funnels.',
     specialties: [
