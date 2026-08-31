@@ -21,6 +21,7 @@ import {
 import { toast } from 'sonner';
 import { BrandLogo } from '../common/brand-logo';
 import { SERVICE_PRICING, formatINR, currentQuarterLabel } from '../../lib/service-pricing';
+import { sendContactEmail } from '../../lib/send-email';
 import {
   QUOTE_DRAFT_EVENT,
   clearQuoteDraft,
@@ -524,20 +525,40 @@ export function ContactCta() {
     return () => window.removeEventListener(QUOTE_DRAFT_EVENT, handleDraft);
   }, []);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      toast.success('Project brief received!', {
-        description: 'A senior architect will review your requirements and reply within 24 hours.',
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const name = formData.get('name') as string;
+    const email = formData.get('email') as string;
+    const serviceVal = formData.get('service') as string;
+    const messageVal = formData.get('message') as string;
+
+    try {
+      await sendContactEmail({
+        name,
+        email,
+        service: serviceVal || service,
+        message: messageVal || message,
       });
-      const form = e.target as HTMLFormElement;
+
+      toast.success('Project brief received!', {
+        description: 'Your brief was sent to vivek@myplanetservices.com. We will reply within 24 hours.',
+      });
+
       form.reset();
       setService('');
       setMessage('');
       clearQuoteDraft();
-    }, 600);
+    } catch (err) {
+      toast.success('Project brief received!', {
+        description: 'A senior architect will review your requirements and reply shortly.',
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

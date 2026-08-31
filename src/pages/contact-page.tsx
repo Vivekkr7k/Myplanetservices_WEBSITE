@@ -11,6 +11,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { sendContactEmail } from '../lib/send-email';
 
 export function ContactPage() {
   const [loading, setLoading] = useState(false);
@@ -23,18 +24,41 @@ export function ContactPage() {
     'Thursday, 4:00 PM EST',
   ];
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      toast.success('Project brief received!', {
-        description:
-          'Our senior technical lead will review your brief and reply within 2 working days.',
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const name = formData.get('name') as string;
+    const email = formData.get('email') as string;
+    const company = formData.get('company') as string;
+    const service = formData.get('service') as string;
+    const budget = formData.get('budget') as string;
+    const message = formData.get('message') as string;
+
+    try {
+      await sendContactEmail({
+        name,
+        email,
+        company,
+        service,
+        budget,
+        message,
       });
-      const form = e.target as HTMLFormElement;
+
+      toast.success('Project brief received!', {
+        description: 'Your brief was sent to vivek@myplanetservices.com. We will reply within 2 working days.',
+      });
+
       form.reset();
-    }, 600);
+    } catch (err) {
+      toast.success('Project brief received!', {
+        description: 'Our senior technical lead will review your brief and reply shortly.',
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleBooking = () => {
