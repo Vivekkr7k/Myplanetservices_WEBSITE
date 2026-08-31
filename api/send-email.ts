@@ -68,7 +68,7 @@ export default async function handler(req: any, res: any) {
     `;
 
     const { data, error } = await resend.emails.send({
-      from: 'onboarding@resend.dev',
+      from: 'Vivek from My Planet Services <vivek@myplanetservices.com>',
       to: 'vivek@myplanetservices.com',
       replyTo: email || undefined,
       subject: `New Project Inquiry from ${name || email || 'Website Visitor'}`,
