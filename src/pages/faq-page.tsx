@@ -72,7 +72,7 @@ const ALL_FAQS = [
   {
     category: 'Pricing & Billing',
     q: 'What happens after the project launches?',
-    a: 'Every project comes with a complimentary 14 to 30-day post-launch warranty covering any technical bugs or performance adjustments. Following that, you can transition into a flexible maintenance retainer or roll into continuous growth sprints.',
+    a: 'Every build includes a free first year: Hostinger hosting on an account registered in your name, plus full maintenance — security patches, dependency updates, uptime monitoring, bug fixes on delivered scope, and up to 2 hours of content edits each month. After those 12 months you can renew hosting at cost, move to a flexible maintenance retainer, or take the whole thing in-house. Nothing is locked to us.',
   },
   {
     category: 'Process & Timelines',
@@ -95,21 +95,21 @@ export function FaqPage() {
   };
 
   return (
-    <div className="pt-28 pb-20 sm:pt-36 sm:pb-32 overflow-hidden">
+    <div className="pt-24 pb-16 sm:pt-32 sm:pb-24 lg:pt-36 lg:pb-32 overflow-hidden">
       {/* Aurora Glow */}
       <div
         className="aurora absolute inset-x-0 -top-24 h-[620px] opacity-90 blur-[2px] pointer-events-none -z-10"
         aria-hidden="true"
       />
 
-      <div className="max-w-4xl mx-auto px-5">
+      <div className="max-w-4xl mx-auto px-5 sm:px-8">
         {/* Header */}
         <div className="text-left mb-16">
           <div className="bg-butter text-butter-foreground rounded-full px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] inline-flex items-center gap-2 shadow-sm mb-6">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Help Center & FAQ</span>
           </div>
-          <h1 className="font-display text-4xl sm:text-6xl font-medium leading-[1.05] tracking-tight text-foreground mb-6">
+          <h1 className="font-display text-display-xl font-medium text-foreground mb-6">
             Questions, answered <br />
             in plain English.
           </h1>

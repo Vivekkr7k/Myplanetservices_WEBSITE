@@ -2,8 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 54 54' fill='none'><path d='M 43 7 Q 43 12 48 12 Q 43 12 43 17 Q 43 12 38 12 Q 43 12 43 7 Z' fill='%23F6E05E'/><circle cx='25' cy='27' r='15' stroke='%2309090B' stroke-width='3'/><path d='M 9 37.5 C 7 42.5 15 45.5 29 40 C 40 35.5 47 27.5 45 19' stroke='%23F6E05E' stroke-width='3' stroke-linecap='round'/></svg>" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f7f5ef" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1f1e1c" />
     <title>My Planet Services — SaaS, Web & AI Development Studio</title>
     <meta name="description" content="My Planet Services builds websites, mobile apps, AI automation, SEO/AEO/GEO programs, digital marketing and full SaaS products for scaling teams." />
     
@@ -21,6 +25,21 @@
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&family=Inter+Tight:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet" />
   </head>
   <body class="bg-background text-foreground antialiased selection:bg-butter selection:text-butter-foreground">
+    <!-- Resolve the theme BEFORE first paint so the page never flashes the wrong
+         ground colour. Kept inline and blocking on purpose. -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('mps:theme');
+          var dark =
+            stored === 'dark' ||
+            ((!stored || stored === 'system') &&
+              window.matchMedia('(prefers-color-scheme: dark)').matches);
+          if (dark) document.documentElement.classList.add('dark');
+          document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+        } catch (e) {}
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

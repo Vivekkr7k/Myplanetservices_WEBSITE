@@ -73,7 +73,7 @@ export function WhyUs() {
   return (
     <section
       id="why"
-      className="bg-zinc-950 text-white py-24 sm:py-32 scroll-mt-12 relative overflow-hidden"
+      className="bg-ink text-ink-foreground py-16 sm:py-24 lg:py-32 scroll-mt-12 relative overflow-hidden"
     >
       {/* Background ambient lighting */}
       <div
@@ -81,17 +81,17 @@ export function WhyUs() {
         aria-hidden="true"
       />
 
-      <div className="max-w-7xl mx-auto px-5 sm:px-8 relative z-10">
+      <div className="site-container relative z-10">
         {/* Section Header */}
         <div data-reveal className="max-w-3xl mb-16 text-left">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-butter text-butter-foreground text-[11px] font-semibold uppercase tracking-[0.14em] shadow-xs mb-5">
             <span>Competitive Advantage</span>
           </div>
-          <h2 className="font-display text-4xl sm:text-5xl font-medium leading-[1.05] tracking-tight text-white mb-6">
+          <h2 className="font-display text-display-lg font-medium text-ink-foreground mb-6">
             Why visionary founders choose <br />
             My Planet Services as their build partner
           </h2>
-          <p className="text-base leading-relaxed text-zinc-400">
+          <p className="text-base leading-relaxed text-ink-muted">
             We are built for teams that demand velocity, architectural excellence, and compounding outcomes. You partner directly with senior operators who care about the business metric behind every line of code.
           </p>
         </div>
@@ -107,7 +107,7 @@ export function WhyUs() {
                   key={benefit.title}
                   data-reveal
                   data-reveal-delay={`${idx * 70}`}
-                  className="bg-zinc-900/90 rounded-[28px] p-6 sm:p-7 border border-white/10 flex gap-4 items-start transition-all duration-300 hover:-translate-y-1 hover:border-white/20 shadow-lg group"
+                  className="bg-ink-soft/90 rounded-[28px] p-6 sm:p-7 border border-white/10 flex gap-4 items-start transition-all duration-300 hover:-translate-y-1 hover:border-white/20 shadow-lg group"
                 >
                   <div
                     style={{ animationDelay: `${idx * 0.35}s` }}
@@ -127,10 +127,10 @@ export function WhyUs() {
                     />
                   </div>
                   <div>
-                    <h3 className="font-display text-lg sm:text-xl font-medium tracking-tight text-white mb-1.5">
+                    <h3 className="font-display text-lg sm:text-xl font-medium tracking-tight text-ink-foreground mb-1.5">
                       {benefit.title}
                     </h3>
-                    <p className="text-sm leading-relaxed text-zinc-400">
+                    <p className="text-sm leading-relaxed text-ink-muted">
                       {benefit.description}
                     </p>
                   </div>
@@ -142,13 +142,13 @@ export function WhyUs() {
           {/* Right Column — 2x2 Stats + Butter Card */}
           <div data-reveal data-reveal-delay="150" className="flex flex-col gap-4">
             {/* 2x2 Stats Grid */}
-            <div className="bg-zinc-900/90 rounded-[32px] p-8 border border-white/10 grid grid-cols-2 gap-8 shadow-lg">
+            <div className="bg-ink-soft/90 rounded-[32px] p-6 sm:p-8 border border-white/10 grid grid-cols-2 gap-5 sm:gap-8 shadow-lg">
               {STATS_DATA.map((stat) => (
                 <div key={stat.label}>
-                  <div className="font-display text-4xl sm:text-5xl font-medium tracking-tight text-white mb-2">
+                  <div className="font-display text-display-lg font-medium text-ink-foreground mb-2">
                     {stat.value}
                   </div>
-                  <div className="text-xs sm:text-sm text-zinc-400 font-medium">
+                  <div className="text-xs sm:text-sm text-ink-muted font-medium">
                     {stat.label}
                   </div>
                 </div>
@@ -176,14 +176,14 @@ export function WhyUs() {
 
 export function Process() {
   return (
-    <section id="process" className="py-24 sm:py-32 scroll-mt-12 bg-background relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-5 sm:px-8">
+    <section id="process" className="py-16 sm:py-24 lg:py-32 scroll-mt-12 bg-background relative overflow-hidden">
+      <div className="site-container">
         {/* Header */}
         <div data-reveal className="max-w-3xl mb-16 text-left">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-butter text-butter-foreground text-[11px] font-semibold uppercase tracking-[0.14em] shadow-xs mb-5">
             <span>Execution Framework</span>
           </div>
-          <h2 className="font-display text-4xl sm:text-5xl font-medium leading-[1.05] tracking-tight text-foreground mb-4">
+          <h2 className="font-display text-display-lg font-medium text-foreground mb-4">
             A battle-tested process that removes guesswork.
           </h2>
           <p className="text-base leading-relaxed text-muted-foreground">
@@ -202,7 +202,7 @@ export function Process() {
                 data-reveal-delay={`${index * 80}`}
                 className={`rounded-[32px] p-7 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 border group relative overflow-hidden ${
                   isDark
-                    ? 'bg-zinc-950 text-white border-white/10 shadow-xl hover:border-butter/30 hover:shadow-2xl'
+                    ? 'bg-ink text-ink-foreground border-white/10 shadow-xl hover:border-butter/30 hover:shadow-2xl'
                     : 'bg-card text-foreground border-border shadow-soft hover:shadow-xl'
                 }`}
               >
@@ -226,7 +226,7 @@ export function Process() {
                     </span>
                     <span
                       className={`text-xs font-mono font-semibold ${
-                        isDark ? 'text-zinc-400' : 'text-muted-foreground'
+                        isDark ? 'text-ink-muted' : 'text-muted-foreground'
                       }`}
                     >
                       {item.percent}
@@ -247,7 +247,7 @@ export function Process() {
                   {/* Step Title */}
                   <h3
                     className={`font-display text-xl font-medium tracking-tight mb-3 ${
-                      isDark ? 'text-white' : 'text-foreground'
+                      isDark ? 'text-ink-foreground' : 'text-foreground'
                     }`}
                   >
                     {item.title}
@@ -256,7 +256,7 @@ export function Process() {
                   {/* Description */}
                   <p
                     className={`text-sm leading-relaxed ${
-                      isDark ? 'text-zinc-300' : 'text-muted-foreground'
+                      isDark ? 'text-ink-muted' : 'text-muted-foreground'
                     }`}
                   >
                     {item.description}

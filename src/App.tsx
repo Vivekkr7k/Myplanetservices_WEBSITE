@@ -5,6 +5,7 @@ import { SiteNav } from './components/landing/site-nav';
 import { SiteFooter } from './components/landing/sections';
 import { Toaster } from 'sonner';
 import { SmoothScrollProvider } from './lib/lenis-scroll';
+import { ThemeProvider } from './lib/theme';
 
 // Pages
 import HomePage from './pages/home-page';
@@ -20,8 +21,9 @@ export function App() {
   useReveal();
 
   return (
-    <BrowserRouter>
-      <SmoothScrollProvider>
+    <ThemeProvider>
+      <BrowserRouter>
+        <SmoothScrollProvider>
         <div className="min-h-screen max-w-full overflow-x-hidden bg-background text-foreground flex flex-col selection:bg-butter selection:text-butter-foreground">
         {/* Route change scroll-to-top handler */}
         <ScrollToTop />
@@ -50,8 +52,9 @@ export function App() {
         {/* Global Footer */}
         <SiteFooter />
       </div>
-      </SmoothScrollProvider>
-    </BrowserRouter>
+        </SmoothScrollProvider>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

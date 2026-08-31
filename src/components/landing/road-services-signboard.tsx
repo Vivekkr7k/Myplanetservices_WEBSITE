@@ -121,20 +121,20 @@ export function RoadServicesSignboard({
   return (
     <div className="relative w-full max-w-[390px] sm:max-w-[420px] lg:max-w-[450px] select-none">
       {/* Architectural Wooden & Glass Milestone Signboard (Positioned on the road path) */}
-      <div className="rounded-[22px] sm:rounded-[28px] bg-white/95 backdrop-blur-2xl text-zinc-950 p-3 sm:p-4.5 lg:p-5 shadow-[0_15px_40px_rgba(0,0,0,0.12)] border border-black/10 transition-all duration-300 hover:shadow-xl relative overflow-hidden">
+      <div className="rounded-[22px] sm:rounded-[28px] bg-card/95 backdrop-blur-2xl text-foreground p-3 sm:p-4.5 lg:p-5 shadow-[0_15px_40px_rgba(0,0,0,0.12)] border border-border transition-all duration-300 hover:shadow-xl relative overflow-hidden">
         {/* Top Header: Road Milestone Marker & Category */}
-        <div className="flex items-center justify-between pb-1.5 sm:pb-2 mb-1.5 sm:mb-2 border-b border-zinc-200/80">
+        <div className="flex items-center justify-between pb-1.5 sm:pb-2 mb-1.5 sm:mb-2 border-b border-border">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-zinc-950 text-white font-mono font-bold text-[10px] sm:text-[11px] flex items-center justify-center shadow-xs">
+            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-primary text-primary-foreground font-mono font-bold text-[10px] sm:text-[11px] flex items-center justify-center shadow-xs">
               {current.mile}
             </div>
             <div>
-              <div className="text-[9px] sm:text-[10px] font-mono uppercase tracking-wider text-zinc-500 flex items-center gap-1">
+              <div className="text-[9px] sm:text-[10px] font-mono uppercase tracking-wider text-muted-foreground flex items-center gap-1">
                 <span>Milestone {current.mile}/06</span>
-                <span className="text-zinc-300">·</span>
+                <span className="text-muted-foreground/60">·</span>
                 <span className="text-emerald-700 font-semibold">{current.timeRange}</span>
               </div>
-              <div className="text-[11px] sm:text-xs font-semibold text-zinc-900 leading-tight">
+              <div className="text-[11px] sm:text-xs font-semibold text-foreground leading-tight">
                 {current.category}
               </div>
             </div>
@@ -144,7 +144,7 @@ export function RoadServicesSignboard({
             <button
               type="button"
               onClick={prevMilestone}
-              className="p-1 rounded-full border border-zinc-200 hover:bg-zinc-100 text-zinc-700 transition-colors cursor-pointer"
+              className="p-1 rounded-full border border-border hover:bg-secondary text-muted-foreground transition-colors cursor-pointer"
               aria-label="Previous service"
             >
               <ChevronLeft className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
@@ -152,7 +152,7 @@ export function RoadServicesSignboard({
             <button
               type="button"
               onClick={nextMilestone}
-              className="p-1 rounded-full border border-zinc-200 hover:bg-zinc-100 text-zinc-700 transition-colors cursor-pointer"
+              className="p-1 rounded-full border border-border hover:bg-secondary text-muted-foreground transition-colors cursor-pointer"
               aria-label="Next service"
             >
               <ChevronRight className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
@@ -169,25 +169,25 @@ export function RoadServicesSignboard({
           </div>
 
           {/* Title */}
-          <h3 className="font-display text-base sm:text-xl font-bold tracking-tight text-zinc-950 mb-0.5 sm:mb-1 flex items-center gap-1.5">
-            <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-950 shrink-0" />
+          <h3 className="font-display text-base sm:text-xl font-bold tracking-tight text-foreground mb-0.5 sm:mb-1 flex items-center gap-1.5">
+            <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 text-foreground shrink-0" />
             <span>{current.title}</span>
           </h3>
 
           {/* Description */}
-          <p className="text-[10px] sm:text-[11.5px] text-zinc-600 leading-snug mb-1.5 sm:mb-2 line-clamp-1 sm:line-clamp-2">
+          <p className="text-[10px] sm:text-[11.5px] text-muted-foreground leading-snug mb-1.5 sm:mb-2 line-clamp-1 sm:line-clamp-2">
             {current.description}
           </p>
 
           {/* Technical Spec Pill */}
-          <div className="px-2.5 py-1 rounded-lg bg-zinc-100/90 text-zinc-700 text-[10px] sm:text-[11px] font-mono flex items-center gap-1.5">
+          <div className="px-2.5 py-1 rounded-lg bg-secondary text-muted-foreground text-[10px] sm:text-[11px] font-mono flex items-center gap-1.5">
             <Check className="w-2.5 h-2.5 text-emerald-600 stroke-[3]" />
             <span className="truncate">{current.metrics}</span>
           </div>
         </div>
 
         {/* Milestone Steps Bar & Road Progress */}
-        <div className="pt-1.5 sm:pt-2 border-t border-zinc-200/80 flex flex-col gap-1.5">
+        <div className="pt-1.5 sm:pt-2 border-t border-border flex flex-col gap-1.5">
           <div className="flex items-center justify-between gap-2">
             {/* 6 Step Pills */}
             <div className="flex items-center gap-1">
@@ -197,8 +197,8 @@ export function RoadServicesSignboard({
                   onClick={() => handleSelect(idx)}
                   className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
                     currentIdx === idx
-                      ? 'w-4 sm:w-5 bg-zinc-950'
-                      : 'w-1.5 bg-zinc-300 hover:bg-zinc-500'
+                      ? 'w-4 sm:w-5 bg-primary'
+                      : 'w-1.5 bg-border hover:bg-muted-foreground'
                   }`}
                   aria-label={`Jump to Milestone ${item.mile}`}
                 />
@@ -207,7 +207,7 @@ export function RoadServicesSignboard({
 
             <a
               href={current.link}
-              className="text-[10px] sm:text-[11px] font-bold tracking-wider uppercase text-zinc-950 hover:text-black underline underline-offset-4 flex items-center gap-1 cursor-pointer transition-colors"
+              className="text-[10px] sm:text-[11px] font-bold tracking-wider uppercase text-foreground hover:text-butter-foreground underline underline-offset-4 flex items-center gap-1 cursor-pointer transition-colors"
             >
               <span>Explore</span>
               <ArrowRight className="w-2.5 h-2.5" />
@@ -215,7 +215,7 @@ export function RoadServicesSignboard({
           </div>
 
           {/* Video Timeline Scrubber Line (0s -> 10s) */}
-          <div className="w-full bg-zinc-100 rounded-full h-1 overflow-hidden">
+          <div className="w-full bg-secondary rounded-full h-1 overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-emerald-500 via-amber-500 to-indigo-600 rounded-full transition-all duration-100"
               style={{ width: `${Math.min(Math.max((videoTime / 10) * 100, 4), 100)}%` }}

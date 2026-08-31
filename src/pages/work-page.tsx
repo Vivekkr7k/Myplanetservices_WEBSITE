@@ -115,21 +115,21 @@ export function WorkPage() {
       : CASE_STUDIES.filter((item) => item.category === selectedCat);
 
   return (
-    <div className="pt-28 pb-20 sm:pt-36 sm:pb-32 overflow-hidden">
+    <div className="pt-24 pb-16 sm:pt-32 sm:pb-24 lg:pt-36 lg:pb-32 overflow-hidden">
       {/* Aurora Glow */}
       <div
         className="aurora absolute inset-x-0 -top-24 h-[620px] opacity-90 blur-[2px] pointer-events-none -z-10"
         aria-hidden="true"
       />
 
-      <div className="max-w-6xl mx-auto px-5">
+      <div className="site-container-narrow">
         {/* Header */}
         <div className="max-w-3xl text-left mb-16">
           <div className="bg-butter text-butter-foreground rounded-full px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] inline-flex items-center gap-2 shadow-sm mb-6">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Case Studies & Proof</span>
           </div>
-          <h1 className="font-display text-4xl sm:text-6xl font-medium leading-[1.05] tracking-tight text-foreground mb-6">
+          <h1 className="font-display text-display-xl font-medium text-foreground mb-6">
             Proof over promises. <br />
             Selected client outcomes.
           </h1>
@@ -175,7 +175,7 @@ export function WorkPage() {
 
                 {/* Big Metric Display */}
                 <div className="mb-6 bg-ink text-ink-foreground rounded-3xl p-6 border border-white/5 shadow-inner">
-                  <div className="font-display text-4xl sm:text-5xl font-medium tracking-tight text-butter mb-1">
+                  <div className="font-display text-display-lg font-medium text-butter mb-1">
                     {study.metric}
                   </div>
                   <div className="text-xs text-ink-muted">
@@ -226,7 +226,7 @@ export function WorkPage() {
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-2 2xl:grid-cols-3 gap-8">
             <div className="bg-card rounded-3xl p-8 border border-border shadow-xs">
               <p className="font-display text-base sm:text-lg font-light leading-snug text-foreground mb-6">
                 “My Planet Services replaced three vendors for us. They delivered our entire SaaS platform in 9 weeks and then immediately layered on AI automations that cut our ops costs in half.”
@@ -262,7 +262,7 @@ export function WorkPage() {
         {/* CTA */}
         <div className="rounded-3xl bg-butter text-butter-foreground p-8 sm:p-12 text-center shadow-soft">
           <div className="max-w-2xl mx-auto">
-            <h2 className="font-display text-3xl sm:text-4xl font-medium tracking-tight mb-4">
+            <h2 className="font-display text-display-md font-medium mb-4">
               Want similar outcomes for your product?
             </h2>
             <p className="text-sm text-butter-foreground/80 leading-relaxed mb-8">

@@ -72,11 +72,27 @@ const TEAM_MEMBERS: TeamMember[] = [
     ],
     experience: '4+ yrs',
   },
+  {
+    name: 'Om Verma',
+    role: 'GTM Engineer & Lead Gen Specialist',
+    department: 'Growth',
+    email: 'om@myplanet.services',
+    image: '/teampic/om.jpg',
+    blobColor: 'from-zinc-800 to-zinc-950',
+    bio: 'Architecting high-converting outbound pipelines, automated lead scoring engines, ICP market enrichment, and full-funnel GTM growth systems.',
+    specialties: [
+      'GTM Engineering',
+      'Lead Generation & ICP',
+      'Outbound Automation',
+      'CRM Pipeline Architecture',
+    ],
+    experience: '3+ yrs',
+  },
 ];
 
 const EXPERT_BADGES = [
   { text: '4+ Years In Production Engineering', color: 'bg-emerald-50 text-emerald-800 border-emerald-200' },
-  { text: '30+ Shipped MVPs', color: 'bg-zinc-100 text-zinc-800 border-zinc-200' },
+  { text: '30+ Shipped MVPs', color: 'bg-secondary text-foreground border-border' },
   { text: '100+ Happy Founders', color: 'bg-rose-50 text-rose-800 border-rose-200' },
   { text: 'Zero Junior Handoffs', color: 'bg-butter/60 text-butter-foreground border-butter' },
 ];
@@ -114,14 +130,14 @@ export function TeamSection() {
   };
 
   return (
-    <section id="team" className="py-24 sm:py-32 scroll-mt-12 bg-background relative overflow-hidden">
+    <section id="team" className="py-16 sm:py-24 lg:py-32 scroll-mt-12 bg-background relative overflow-hidden">
       {/* Ambient background lighting */}
       <div
         className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-butter/10 rounded-full blur-3xl pointer-events-none -z-10"
         aria-hidden="true"
       />
 
-      <div className="max-w-7xl mx-auto px-5 sm:px-8">
+      <div className="site-container">
         {/* Floating Context Badges (Combined from Image 2) */}
         <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 mb-10">
           {EXPERT_BADGES.map((badge) => (
@@ -141,7 +157,7 @@ export function TeamSection() {
             <span>Senior Product Squad</span>
           </div>
 
-          <h2 className="font-display text-4xl sm:text-6xl font-medium leading-[1.05] tracking-tight text-foreground mb-5">
+          <h2 className="font-display text-display-xl font-medium text-foreground mb-5">
             Meet Our Experts
           </h2>
 
@@ -153,7 +169,7 @@ export function TeamSection() {
           <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
             <Link
               to="/contact"
-              className="bg-zinc-950 hover:bg-black text-white px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold tracking-wide inline-flex items-center gap-2 transition-all duration-300 shadow-md hover:scale-105 active:scale-95 group"
+              className="bg-ink hover:opacity-90 text-ink-foreground px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold tracking-wide inline-flex items-center gap-2 transition-all duration-300 shadow-md hover:scale-105 active:scale-95 group"
             >
               <Zap className="w-3.5 h-3.5 fill-current text-butter animate-icon-wiggle" />
               <span>Start Sprints With Us</span>
@@ -170,8 +186,8 @@ export function TeamSection() {
           </div>
         </div>
 
-        {/* 3-Member Portrait Columns */}
-        <div className="grid md:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto">
+        {/* 4-Member Portrait Grid */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6 sm:gap-7 max-w-7xl mx-auto">
           {TEAM_MEMBERS.map((member, index) => {
             const isDark = index % 2 === 1; // Alternating: Center card (1 - Sarah) is Black, Side cards (0 & 2) are Light
             const isCopied = copiedEmail === member.email;
@@ -183,7 +199,7 @@ export function TeamSection() {
                 data-reveal-delay={`${index * 80}`}
                 className={`rounded-[32px] p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:-translate-y-2 border group relative overflow-hidden ${
                   isDark
-                    ? 'bg-zinc-950 text-white border-white/10 shadow-xl hover:border-butter/40 hover:shadow-2xl'
+                    ? 'bg-ink text-ink-foreground border-white/10 shadow-xl hover:border-butter/40 hover:shadow-2xl'
                     : 'bg-card text-foreground border-border shadow-soft hover:shadow-xl'
                 }`}
               >
@@ -218,8 +234,8 @@ export function TeamSection() {
                     <span
                       className={`absolute bottom-1 right-2 z-20 text-[9.5px] font-mono font-semibold px-2 py-0.5 rounded-full border shadow-2xs ${
                         isDark
-                          ? 'bg-zinc-900 text-butter border-white/10'
-                          : 'bg-white/90 text-zinc-800 border-black/10'
+                          ? 'bg-ink-soft text-butter border-white/10'
+                          : 'bg-card text-foreground border-border'
                       }`}
                     >
                       {member.experience}
@@ -229,7 +245,7 @@ export function TeamSection() {
                   {/* Role Title in Crisp Monospace */}
                   <div
                     className={`text-[10.5px] uppercase font-mono tracking-wider font-semibold mb-1 truncate ${
-                      isDark ? 'text-butter/90' : 'text-zinc-500'
+                      isDark ? 'text-butter/90' : 'text-muted-foreground'
                     }`}
                   >
                     {member.role}
@@ -238,7 +254,7 @@ export function TeamSection() {
                   {/* Member Name */}
                   <h3
                     className={`font-display text-xl sm:text-2xl font-medium tracking-tight mb-2.5 ${
-                      isDark ? 'text-white' : 'text-foreground'
+                      isDark ? 'text-ink-foreground' : 'text-foreground'
                     }`}
                   >
                     {member.name}
@@ -247,7 +263,7 @@ export function TeamSection() {
                   {/* Short Bio */}
                   <p
                     className={`text-xs leading-relaxed mb-4 line-clamp-2 ${
-                      isDark ? 'text-zinc-300' : 'text-muted-foreground'
+                      isDark ? 'text-ink-muted' : 'text-muted-foreground'
                     }`}
                   >
                     {member.bio}
@@ -265,7 +281,7 @@ export function TeamSection() {
                     <a
                       href={`mailto:${member.email}`}
                       className={`text-xs font-mono transition-colors truncate hover:underline ${
-                        isDark ? 'text-zinc-300 hover:text-white' : 'text-zinc-600 hover:text-zinc-950'
+                        isDark ? 'text-ink-muted hover:text-ink-foreground' : 'text-muted-foreground hover:text-foreground'
                       }`}
                     >
                       {member.email}
@@ -276,8 +292,8 @@ export function TeamSection() {
                       onClick={() => handleCopyEmail(member.email)}
                       className={`p-1.5 rounded-lg transition-colors cursor-pointer shrink-0 ${
                         isDark
-                          ? 'text-zinc-400 hover:text-white hover:bg-white/10'
-                          : 'text-zinc-500 hover:text-zinc-950 hover:bg-secondary'
+                          ? 'text-ink-muted hover:text-ink-foreground hover:bg-white/10'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
                       }`}
                       title={isCopied ? 'Copied!' : 'Copy email address'}
                       aria-label={`Copy email for ${member.name}`}
@@ -297,7 +313,7 @@ export function TeamSection() {
                         key={spec}
                         className={`text-[9.5px] font-mono px-2 py-0.5 rounded-md ${
                           isDark
-                            ? 'bg-white/5 text-zinc-400 border border-white/5'
+                            ? 'bg-white/5 text-ink-muted border border-white/5'
                             : 'bg-secondary text-muted-foreground border border-border/40'
                         }`}
                       >

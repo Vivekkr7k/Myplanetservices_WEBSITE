@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
@@ -7,6 +7,7 @@ import {
   Check,
   CheckCircle2,
   Clock,
+  Gift,
   Mail,
   MapPin,
   Minus,
@@ -19,6 +20,13 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { BrandLogo } from '../common/brand-logo';
+import { SERVICE_PRICING, formatINR, currentQuarterLabel } from '../../lib/service-pricing';
+import {
+  QUOTE_DRAFT_EVENT,
+  clearQuoteDraft,
+  getQuoteDraft,
+  type QuoteDraft,
+} from '../../lib/quote-draft';
 
 /* -------------------------------------------------------------------------- */
 /*                                TESTIMONIALS                                */
@@ -56,20 +64,20 @@ const TESTIMONIALS_DATA = [
 
 export function Testimonials() {
   return (
-    <section className="bg-secondary/60 py-24 sm:py-32 relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-5 sm:px-8">
+    <section className="bg-secondary/60 py-16 sm:py-24 lg:py-32 relative overflow-hidden">
+      <div className="site-container">
         {/* Header */}
         <div data-reveal className="max-w-3xl mb-16 text-left">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-butter text-butter-foreground text-[11px] font-semibold uppercase tracking-[0.14em] shadow-xs mb-5">
             <span>Founder Testimonials</span>
           </div>
-          <h2 className="font-display text-4xl sm:text-5xl font-medium leading-[1.05] tracking-tight text-foreground">
+          <h2 className="font-display text-display-lg font-medium text-foreground">
             Partnerships that compound.
           </h2>
         </div>
 
         {/* 3 Alternating Testimonial Cards */}
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {TESTIMONIALS_DATA.map((item, idx) => {
             const isDark = idx % 2 === 1; // Alternating: Center card (1) is Black
             return (
@@ -79,7 +87,7 @@ export function Testimonials() {
                 data-reveal-delay={`${idx * 80}`}
                 className={`rounded-[32px] p-8 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 border relative overflow-hidden ${
                   isDark
-                    ? 'bg-zinc-950 text-white border-white/10 shadow-2xl hover:border-butter/30 hover:shadow-2xl'
+                    ? 'bg-ink text-ink-foreground border-white/10 shadow-2xl hover:border-butter/30 hover:shadow-2xl'
                     : 'bg-card text-foreground border-border shadow-soft hover:shadow-xl'
                 }`}
               >
@@ -105,7 +113,7 @@ export function Testimonials() {
 
                   <blockquote
                     className={`font-display text-lg font-light leading-relaxed mb-8 ${
-                      isDark ? 'text-zinc-100' : 'text-foreground'
+                      isDark ? 'text-ink-foreground' : 'text-foreground'
                     }`}
                   >
                     “{item.quote}”
@@ -122,7 +130,7 @@ export function Testimonials() {
                     className={`w-11 h-11 rounded-2xl text-xs font-semibold flex items-center justify-center shadow-xs animate-icon-float ${
                       isDark
                         ? 'bg-butter text-butter-foreground font-bold animate-icon-glow'
-                        : 'bg-zinc-950 text-white animate-icon-glow-dark'
+                        : 'bg-ink text-ink-foreground animate-icon-glow-dark'
                     }`}
                   >
                     {item.avatar}
@@ -130,14 +138,14 @@ export function Testimonials() {
                   <div>
                     <div
                       className={`font-semibold text-sm ${
-                        isDark ? 'text-white' : 'text-foreground'
+                        isDark ? 'text-ink-foreground' : 'text-foreground'
                       }`}
                     >
                       {item.author}
                     </div>
                     <div
                       className={`text-xs ${
-                        isDark ? 'text-zinc-400' : 'text-muted-foreground'
+                        isDark ? 'text-ink-muted' : 'text-muted-foreground'
                       }`}
                     >
                       {item.role},{' '}
@@ -176,7 +184,7 @@ const PRICING_PLANS = [
       'Next.js 15 & React 19 stack',
       'SEO & Answer Engine foundations',
       'Headless CMS integration',
-      '2 weeks post-launch warranty',
+      'Free 1 year hosting + maintenance',
     ],
     featured: false,
     cta: 'Request Sprint Proposal',
@@ -219,14 +227,14 @@ const PRICING_PLANS = [
 
 export function Pricing() {
   return (
-    <section id="pricing" className="py-24 sm:py-32 scroll-mt-12 bg-background relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-5 sm:px-8">
+    <section id="pricing" className="py-16 sm:py-24 lg:py-32 scroll-mt-12 bg-background relative overflow-hidden">
+      <div className="site-container">
         {/* Header */}
         <div data-reveal className="max-w-3xl mb-16 text-left">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-butter text-butter-foreground text-[11px] font-semibold uppercase tracking-[0.14em] shadow-xs mb-5">
             <span>Engagement Models</span>
           </div>
-          <h2 className="font-display text-4xl sm:text-5xl font-medium leading-[1.05] tracking-tight text-foreground mb-4">
+          <h2 className="font-display text-display-lg font-medium text-foreground mb-4">
             Flexible engagement models. Zero surprises.
           </h2>
           <p className="text-base leading-relaxed text-muted-foreground">
@@ -235,7 +243,7 @@ export function Pricing() {
         </div>
 
         {/* 3 Pricing Cards */}
-        <div className="grid lg:grid-cols-3 gap-6 items-stretch">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
           {PRICING_PLANS.map((plan, idx) => (
             <div
               key={plan.name}
@@ -243,7 +251,7 @@ export function Pricing() {
               data-reveal-delay={`${idx * 80}`}
               className={`rounded-[36px] p-8 sm:p-9 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 relative ${
                 plan.featured
-                  ? 'bg-zinc-950 text-white border border-butter/30 shadow-2xl'
+                  ? 'bg-ink text-ink-foreground border border-butter/30 shadow-2xl'
                   : 'bg-card text-foreground border border-border hover:shadow-xl'
               }`}
             >
@@ -271,7 +279,7 @@ export function Pricing() {
                   </div>
                   <span
                     className={`text-xs inline-block mt-1 font-medium ${
-                      plan.featured ? 'text-zinc-400' : 'text-muted-foreground'
+                      plan.featured ? 'text-ink-muted' : 'text-muted-foreground'
                     }`}
                   >
                     {plan.cadence}
@@ -280,7 +288,7 @@ export function Pricing() {
 
                 <p
                   className={`text-sm leading-relaxed mb-8 ${
-                    plan.featured ? 'text-zinc-300' : 'text-muted-foreground'
+                    plan.featured ? 'text-ink-muted' : 'text-muted-foreground'
                   }`}
                 >
                   {plan.description}
@@ -306,7 +314,7 @@ export function Pricing() {
                       >
                         <Check className="w-2.5 h-2.5 stroke-[3]" />
                       </div>
-                      <span className={plan.featured ? 'text-zinc-200' : 'text-foreground'}>
+                      <span className={plan.featured ? 'text-ink-foreground' : 'text-foreground'}>
                         {feat}
                       </span>
                     </div>
@@ -319,13 +327,73 @@ export function Pricing() {
                 className={`w-full rounded-full py-4 text-center text-sm font-semibold transition-all duration-200 block shadow-md cursor-pointer ${
                   plan.featured
                     ? 'bg-butter text-butter-foreground hover:scale-[1.02]'
-                    : 'bg-zinc-950 text-white hover:bg-butter hover:text-butter-foreground hover:scale-[1.02]'
+                    : 'bg-ink text-ink-foreground hover:bg-butter hover:text-butter-foreground hover:scale-[1.02]'
                 }`}
               >
                 {plan.cta}
               </a>
             </div>
           ))}
+        </div>
+
+        {/* Per-service starting prices */}
+        <div data-reveal className="mt-6 rounded-[36px] bg-card border border-border p-7 sm:p-9">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-7">
+            <div>
+              <h3 className="font-display text-xl sm:text-2xl font-medium tracking-tight text-foreground mb-1.5">
+                Or start with a single service.
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Entry pricing per discipline — final quote confirmed in writing after scoping.
+              </p>
+              <div className="inline-flex items-center gap-2 mt-3 rounded-full bg-butter/20 border border-butter/40 px-3 py-1">
+                <Gift className="w-3.5 h-3.5 text-butter-foreground shrink-0" />
+                <span className="text-[11px] font-semibold text-butter-foreground">
+                  Every build includes 1 year hosting + maintenance, free
+                </span>
+              </div>
+            </div>
+            <Link
+              to="/pricing#service-pricing"
+              className="text-xs font-semibold text-foreground flex items-center gap-1.5 hover:text-butter-foreground transition-colors shrink-0"
+            >
+              <span>See what each price includes</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            {SERVICE_PRICING.map((service) => {
+              const ServiceIcon = service.icon;
+              return (
+                <Link
+                  key={service.id}
+                  to={`/services?tab=${service.id}`}
+                  className="rounded-2xl border border-border bg-secondary/40 p-4 flex flex-col gap-2 hover:bg-secondary hover:border-butter/40 transition-colors group"
+                >
+                  <div className="flex items-center gap-2 text-muted-foreground group-hover:text-foreground transition-colors">
+                    <ServiceIcon className="w-4 h-4 shrink-0" />
+                    <span className="text-[11px] font-semibold uppercase tracking-wider leading-tight">
+                      {service.shortTitle}
+                    </span>
+                  </div>
+                  <div>
+                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                      Starts from
+                    </div>
+                    <div className="font-display text-xl font-semibold tracking-tight text-foreground">
+                      {formatINR(service.startsAt)}
+                      {service.unit === 'per month' && (
+                        <span className="text-[11px] font-medium text-muted-foreground ml-1">
+                          /mo
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>
@@ -367,14 +435,14 @@ export function Faq() {
   };
 
   return (
-    <section id="faq" className="py-24 sm:py-32 scroll-mt-12 bg-background">
-      <div className="max-w-4xl mx-auto px-5 sm:px-8">
+    <section id="faq" className="py-16 sm:py-24 lg:py-32 scroll-mt-12 bg-background">
+      <div className="site-container-narrow">
         {/* Header */}
         <div data-reveal className="text-center max-w-2xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-butter text-butter-foreground text-[11px] font-semibold uppercase tracking-[0.14em] shadow-xs mb-5">
             <span>Frequently Asked</span>
           </div>
-          <h2 className="font-display text-4xl sm:text-5xl font-medium leading-[1.05] tracking-tight text-foreground">
+          <h2 className="font-display text-display-lg font-medium text-foreground">
             Clear answers to common questions.
           </h2>
         </div>
@@ -434,6 +502,27 @@ export function Faq() {
 
 export function ContactCta() {
   const [loading, setLoading] = useState(false);
+  const [service, setService] = useState('');
+  const [message, setMessage] = useState('');
+
+  // Receive a scope configured in the estimator above, so the visitor never
+  // retypes it. Reads any draft left from an earlier scroll, then stays live.
+  useEffect(() => {
+    const existing = getQuoteDraft();
+    if (existing) {
+      setService(existing.serviceId);
+      setMessage(existing.message);
+    }
+
+    const handleDraft = (event: Event) => {
+      const draft = (event as CustomEvent<QuoteDraft>).detail;
+      setService(draft.serviceId);
+      setMessage(draft.message);
+    };
+
+    window.addEventListener(QUOTE_DRAFT_EVENT, handleDraft);
+    return () => window.removeEventListener(QUOTE_DRAFT_EVENT, handleDraft);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -445,15 +534,18 @@ export function ContactCta() {
       });
       const form = e.target as HTMLFormElement;
       form.reset();
+      setService('');
+      setMessage('');
+      clearQuoteDraft();
     }, 600);
   };
 
   return (
     <section id="contact" className="py-16 sm:py-24 scroll-mt-12 bg-background">
-      <div className="max-w-7xl mx-auto px-5 sm:px-8">
+      <div className="site-container">
         <div
           data-reveal
-          className="rounded-[36px] bg-zinc-950 text-white p-8 sm:p-14 relative overflow-hidden border border-white/10 shadow-2xl"
+          className="rounded-[36px] bg-ink text-ink-foreground p-8 sm:p-14 relative overflow-hidden border border-white/10 shadow-2xl"
         >
           {/* Ambient lighting glows */}
           <div
@@ -471,11 +563,11 @@ export function ContactCta() {
               <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 text-butter text-[11px] font-semibold uppercase tracking-[0.14em] shadow-xs mb-6 border border-white/10">
                 <span>Start a Project</span>
               </div>
-              <h2 className="font-display text-4xl sm:text-5xl font-medium leading-[1.05] tracking-tight text-white mb-6">
+              <h2 className="font-display text-display-lg font-medium text-ink-foreground mb-6">
                 Let's engineer something <br />
                 extraordinary together.
               </h2>
-              <p className="text-base leading-relaxed text-zinc-400 max-w-md mb-10 font-light">
+              <p className="text-base leading-relaxed text-ink-muted max-w-md mb-10 font-light">
                 Tell us about your product goals, timeline, and ideal stack. You will receive a scoped architecture proposal and fixed quote within one business day.
               </p>
 
@@ -483,7 +575,7 @@ export function ContactCta() {
               <div className="flex flex-col gap-4">
                 <a
                   href="mailto:hello@myplanet.services"
-                  className="flex items-center gap-3.5 text-sm text-zinc-400 hover:text-white transition-colors group"
+                  className="flex items-center gap-3.5 text-sm text-ink-muted hover:text-ink-foreground transition-colors group"
                 >
                   <div className="w-11 h-11 rounded-2xl bg-white/5 text-butter flex items-center justify-center shrink-0 border border-white/10 group-hover:border-butter/40 transition-colors animate-icon-float animate-icon-glow">
                     <Mail className="w-4 h-4 animate-icon-wiggle group-hover:scale-120 transition-transform" />
@@ -492,14 +584,14 @@ export function ContactCta() {
                 </a>
                 <a
                   href="tel:+14155550148"
-                  className="flex items-center gap-3.5 text-sm text-zinc-400 hover:text-white transition-colors group"
+                  className="flex items-center gap-3.5 text-sm text-ink-muted hover:text-ink-foreground transition-colors group"
                 >
                   <div style={{ animationDelay: '0.3s' }} className="w-11 h-11 rounded-2xl bg-white/5 text-butter flex items-center justify-center shrink-0 border border-white/10 group-hover:border-butter/40 transition-colors animate-icon-float animate-icon-glow">
                     <Phone className="w-4 h-4 animate-icon-sway group-hover:scale-120 transition-transform" />
                   </div>
                   <span className="font-mono">+1 (415) 555-0148</span>
                 </a>
-                <div className="flex items-center gap-3.5 text-sm text-zinc-400 group">
+                <div className="flex items-center gap-3.5 text-sm text-ink-muted group">
                   <div style={{ animationDelay: '0.6s' }} className="w-11 h-11 rounded-2xl bg-white/5 text-butter flex items-center justify-center shrink-0 border border-white/10 animate-icon-float animate-icon-glow">
                     <MapPin className="w-4 h-4 animate-icon-bob group-hover:scale-120 transition-transform" />
                   </div>
@@ -509,12 +601,12 @@ export function ContactCta() {
             </div>
 
             {/* Right Intake Form */}
-            <div className="bg-zinc-900/90 rounded-[32px] p-7 sm:p-9 border border-white/10 shadow-xl">
+            <div className="bg-ink-soft/90 rounded-[32px] p-7 sm:p-9 border border-white/10 shadow-xl">
               <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-left">
                 <div>
                   <label
                     htmlFor="name"
-                    className="block text-xs font-mono uppercase tracking-wider text-zinc-400 mb-2"
+                    className="block text-xs font-mono uppercase tracking-wider text-ink-muted mb-2"
                   >
                     Your name
                   </label>
@@ -524,14 +616,14 @@ export function ContactCta() {
                     type="text"
                     required
                     placeholder="Alex Morgan"
-                    className="w-full rounded-2xl bg-white/5 border border-white/10 px-4 py-3.5 text-sm text-white placeholder:text-zinc-500 focus:border-butter focus:outline-hidden transition-colors"
+                    className="w-full rounded-2xl bg-white/5 border border-white/10 px-4 py-3.5 text-sm text-ink-foreground placeholder:text-ink-muted focus:border-butter focus:outline-hidden transition-colors"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="email"
-                    className="block text-xs font-mono uppercase tracking-wider text-zinc-400 mb-2"
+                    className="block text-xs font-mono uppercase tracking-wider text-ink-muted mb-2"
                   >
                     Work email
                   </label>
@@ -541,14 +633,14 @@ export function ContactCta() {
                     type="email"
                     required
                     placeholder="alex@company.com"
-                    className="w-full rounded-2xl bg-white/5 border border-white/10 px-4 py-3.5 text-sm text-white placeholder:text-zinc-500 focus:border-butter focus:outline-hidden transition-colors"
+                    className="w-full rounded-2xl bg-white/5 border border-white/10 px-4 py-3.5 text-sm text-ink-foreground placeholder:text-ink-muted focus:border-butter focus:outline-hidden transition-colors"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="service"
-                    className="block text-xs font-mono uppercase tracking-wider text-zinc-400 mb-2"
+                    className="block text-xs font-mono uppercase tracking-wider text-ink-muted mb-2"
                   >
                     Primary discipline
                   </label>
@@ -556,40 +648,41 @@ export function ContactCta() {
                     id="service"
                     name="service"
                     required
-                    defaultValue=""
-                    className="w-full rounded-2xl bg-zinc-900 border border-white/10 px-4 py-3.5 text-sm text-white focus:border-butter focus:outline-hidden transition-colors appearance-none cursor-pointer"
+                    value={service}
+                    onChange={(e) => setService(e.target.value)}
+                    className="w-full rounded-2xl bg-ink-soft border border-white/10 px-4 py-3.5 text-sm text-ink-foreground focus:border-butter focus:outline-hidden transition-colors appearance-none cursor-pointer"
                   >
-                    <option value="" disabled className="bg-zinc-900 text-zinc-500">
+                    <option value="" disabled className="bg-ink-soft text-ink-muted">
                       Select primary build requirement
                     </option>
-                    <option value="ecommerce" className="bg-zinc-900 text-white">
+                    <option value="ecommerce" className="bg-ink-soft text-ink-foreground">
                       E-Commerce Development (Shopify / Headless)
                     </option>
-                    <option value="corporate" className="bg-zinc-900 text-white">
+                    <option value="corporate" className="bg-ink-soft text-ink-foreground">
                       Company & Corporate Website
                     </option>
-                    <option value="redesign" className="bg-zinc-900 text-white">
+                    <option value="redesign" className="bg-ink-soft text-ink-foreground">
                       Website Redesign & Modernization
                     </option>
-                    <option value="crm-erp" className="bg-zinc-900 text-white">
+                    <option value="crm-erp" className="bg-ink-soft text-ink-foreground">
                       Custom CRM & ERP Systems
                     </option>
-                    <option value="saas" className="bg-zinc-900 text-white">
+                    <option value="saas" className="bg-ink-soft text-ink-foreground">
                       SaaS Platform Engineering
                     </option>
-                    <option value="ai" className="bg-zinc-900 text-white">
+                    <option value="ai" className="bg-ink-soft text-ink-foreground">
                       AI Agents & Copilots
                     </option>
-                    <option value="website" className="bg-zinc-900 text-white">
+                    <option value="website" className="bg-ink-soft text-ink-foreground">
                       High-Converting Web Platform
                     </option>
-                    <option value="app" className="bg-zinc-900 text-white">
+                    <option value="app" className="bg-ink-soft text-ink-foreground">
                       Mobile Application (iOS / Android)
                     </option>
-                    <option value="seo" className="bg-zinc-900 text-white">
+                    <option value="seo" className="bg-ink-soft text-ink-foreground">
                       SEO, AEO & Generative Engine Indexing
                     </option>
-                    <option value="marketing" className="bg-zinc-900 text-white">
+                    <option value="marketing" className="bg-ink-soft text-ink-foreground">
                       Performance Marketing & Growth
                     </option>
                   </select>
@@ -598,17 +691,19 @@ export function ContactCta() {
                 <div>
                   <label
                     htmlFor="message"
-                    className="block text-xs font-mono uppercase tracking-wider text-zinc-400 mb-2"
+                    className="block text-xs font-mono uppercase tracking-wider text-ink-muted mb-2"
                   >
                     Project brief & timeline
                   </label>
                   <textarea
                     id="message"
                     name="message"
-                    rows={3}
+                    rows={message ? 6 : 3}
                     required
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
                     placeholder="Tell us about the product goals, target launch date, or current stack..."
-                    className="w-full rounded-2xl bg-white/5 border border-white/10 px-4 py-3.5 text-sm text-white placeholder:text-zinc-500 focus:border-butter focus:outline-hidden transition-colors resize-none"
+                    className="w-full rounded-2xl bg-white/5 border border-white/10 px-4 py-3.5 text-sm text-ink-foreground placeholder:text-ink-muted focus:border-butter focus:outline-hidden transition-colors resize-none"
                   />
                 </div>
 
@@ -648,11 +743,11 @@ export function SiteFooter() {
         aria-hidden="true"
       />
 
-      <div className="max-w-7xl mx-auto px-5 sm:px-8">
+      <div className="site-container">
         {/* 1. Top Bento Sprint Scoping Banner */}
         <div
           data-reveal
-          className="rounded-[32px] bg-zinc-950 text-white p-8 sm:p-12 mb-16 relative overflow-hidden border border-white/10 shadow-2xl"
+          className="rounded-[32px] bg-ink text-ink-foreground p-8 sm:p-12 mb-16 relative overflow-hidden border border-white/10 shadow-2xl"
         >
           {/* Subtle Butter Yellow Glow in Corner */}
           <div
@@ -664,12 +759,12 @@ export function SiteFooter() {
             <div className="max-w-2xl">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-butter text-[11px] font-mono font-semibold uppercase tracking-wider mb-4 shadow-2xs">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>Q2 2026 Sprint Slots Available</span>
+                <span>{currentQuarterLabel()} Sprint Slots Available</span>
               </div>
-              <h3 className="font-display text-2xl sm:text-4xl font-medium tracking-tight text-white mb-3">
+              <h3 className="font-display text-display-md font-medium text-ink-foreground mb-3">
                 Ready to build something extraordinary?
               </h3>
-              <p className="text-sm sm:text-base leading-relaxed text-zinc-300">
+              <p className="text-sm sm:text-base leading-relaxed text-ink-muted">
                 Partner directly with our principal operators to ship custom web platforms, mobile apps, autonomous AI swarms, and scalable SaaS infrastructure in weeks.
               </p>
             </div>
@@ -684,7 +779,7 @@ export function SiteFooter() {
               </Link>
               <Link
                 to="/services"
-                className="bg-white/10 hover:bg-white/20 text-white font-medium border border-white/15 px-6 py-3.5 rounded-full text-xs sm:text-sm inline-flex items-center gap-2 hover:scale-102 active:scale-98 transition-all"
+                className="bg-white/10 hover:bg-white/20 text-ink-foreground font-medium border border-white/15 px-6 py-3.5 rounded-full text-xs sm:text-sm inline-flex items-center gap-2 hover:scale-102 active:scale-98 transition-all"
               >
                 <Zap className="w-4 h-4 text-butter animate-icon-wiggle" />
                 <span>Explore Disciplines</span>
@@ -702,7 +797,7 @@ export function SiteFooter() {
               className="inline-flex items-center"
               aria-label="My Planet Services Home"
             >
-              <BrandLogo variant="light" />
+              <BrandLogo variant="auto" size="lg" />
             </Link>
 
             <p className="text-sm leading-relaxed text-muted-foreground max-w-md">

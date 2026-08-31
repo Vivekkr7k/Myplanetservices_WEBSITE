@@ -100,21 +100,21 @@ const STATS = [
 
 export function WhyUsPage() {
   return (
-    <div className="pt-28 pb-20 sm:pt-36 sm:pb-32 overflow-hidden">
+    <div className="pt-24 pb-16 sm:pt-32 sm:pb-24 lg:pt-36 lg:pb-32 overflow-hidden">
       {/* Aurora Glow */}
       <div
         className="aurora absolute inset-x-0 -top-24 h-[620px] opacity-90 blur-[2px] pointer-events-none -z-10"
         aria-hidden="true"
       />
 
-      <div className="max-w-6xl mx-auto px-5">
+      <div className="site-container-narrow">
         {/* Header */}
         <div className="max-w-3xl text-left mb-16">
           <div className="bg-butter text-butter-foreground rounded-full px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] inline-flex items-center gap-2 shadow-sm mb-6">
             <Award className="w-3.5 h-3.5" />
             <span>The My Planet Services Advantage</span>
           </div>
-          <h1 className="font-display text-4xl sm:text-6xl font-medium leading-[1.05] tracking-tight text-foreground mb-6">
+          <h1 className="font-display text-display-xl font-medium text-foreground mb-6">
             Engineered for speed. <br />
             Built for compounding <br />
             outcomes.
@@ -181,7 +181,7 @@ export function WhyUsPage() {
               <TrendingUp className="w-4 h-4" />
               <span>Proven Track Record</span>
             </div>
-            <h2 className="font-display text-3xl sm:text-4xl font-medium tracking-tight text-ink-foreground mb-4">
+            <h2 className="font-display text-display-md font-medium text-ink-foreground mb-4">
               Real metrics from real engagements.
             </h2>
             <p className="text-sm text-ink-muted leading-relaxed">
@@ -196,7 +196,7 @@ export function WhyUsPage() {
                 className="bg-ink-soft rounded-3xl p-6 sm:p-8 border border-white/5 flex flex-col justify-between hover:border-butter/30 transition-colors"
               >
                 <div>
-                  <div className="font-display text-4xl sm:text-5xl font-medium tracking-tight text-butter mb-2">
+                  <div className="font-display text-display-lg font-medium text-butter mb-2">
                     {stat.value}
                   </div>
                   <div className="text-sm font-medium text-ink-foreground mb-1">
@@ -217,7 +217,7 @@ export function WhyUsPage() {
             <div className="bg-butter text-butter-foreground rounded-full px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] inline-block shadow-sm mb-4">
               Direct Comparison
             </div>
-            <h2 className="font-display text-3xl sm:text-4xl font-medium tracking-tight text-foreground mb-3">
+            <h2 className="font-display text-display-md font-medium text-foreground mb-3">
               How My Planet Services compares to traditional agencies.
             </h2>
             <p className="text-sm text-muted-foreground">
@@ -270,7 +270,7 @@ export function WhyUsPage() {
         {/* CTA Card */}
         <div className="rounded-3xl bg-butter text-butter-foreground p-8 sm:p-12 text-center shadow-soft">
           <div className="max-w-2xl mx-auto">
-            <h2 className="font-display text-3xl sm:text-4xl font-medium tracking-tight mb-4">
+            <h2 className="font-display text-display-md font-medium mb-4">
               Work with an accountable partner.
             </h2>
             <p className="text-sm text-butter-foreground/80 leading-relaxed mb-8">

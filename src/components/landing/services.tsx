@@ -154,9 +154,9 @@ const SERVICES_DATA = [
 
 export function LogoMarquee() {
   return (
-    <section className="bg-zinc-950 py-10 overflow-hidden border-y border-white/10 relative select-none">
-      <div className="max-w-7xl mx-auto px-5 sm:px-8 mb-6 text-center">
-        <p className="text-xs uppercase font-mono tracking-[0.28em] text-zinc-400">
+    <section className="bg-ink py-10 overflow-hidden border-y border-white/10 relative select-none">
+      <div className="site-container mb-6 text-center">
+        <p className="text-xs uppercase font-mono tracking-[0.28em] text-ink-muted">
           Trusted by fast-growing technology companies
         </p>
       </div>
@@ -170,7 +170,7 @@ export function LogoMarquee() {
           {PARTNER_LOGOS.map((logo, idx) => (
             <span
               key={`logo-1-${idx}`}
-              className="text-2xl sm:text-3xl font-display font-semibold tracking-tight text-zinc-500 hover:text-white transition-colors cursor-default whitespace-nowrap"
+              className="text-2xl sm:text-3xl font-display font-semibold tracking-tight text-ink-muted hover:text-ink-foreground transition-colors cursor-default whitespace-nowrap"
             >
               {logo}
             </span>
@@ -183,7 +183,7 @@ export function LogoMarquee() {
           {PARTNER_LOGOS.map((logo, idx) => (
             <span
               key={`logo-2-${idx}`}
-              className="text-2xl sm:text-3xl font-display font-semibold tracking-tight text-zinc-500 hover:text-white transition-colors cursor-default whitespace-nowrap"
+              className="text-2xl sm:text-3xl font-display font-semibold tracking-tight text-ink-muted hover:text-ink-foreground transition-colors cursor-default whitespace-nowrap"
             >
               {logo}
             </span>
@@ -196,14 +196,14 @@ export function LogoMarquee() {
 
 export function Services() {
   return (
-    <section id="services" className="py-24 sm:py-32 scroll-mt-12 bg-background relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-5 sm:px-8">
+    <section id="services" className="py-16 sm:py-24 lg:py-32 scroll-mt-12 bg-background relative overflow-hidden">
+      <div className="site-container">
         {/* Section Header */}
         <div data-reveal className="max-w-3xl mb-16 text-left">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-butter text-butter-foreground text-[11px] font-semibold uppercase tracking-[0.14em] shadow-xs mb-5">
             <span>Specialized Capabilities</span>
           </div>
-          <h2 className="font-display text-4xl sm:text-5xl font-medium leading-[1.05] tracking-tight text-foreground mb-6">
+          <h2 className="font-display text-display-lg font-medium text-foreground mb-6">
             Engineered disciplines. <br />
             One accountable squad.
           </h2>
@@ -213,7 +213,7 @@ export function Services() {
         </div>
 
         {/* 6-Card Bento Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-5">
           {SERVICES_DATA.map((service, index) => {
             const Icon = service.icon;
             return (
@@ -223,7 +223,7 @@ export function Services() {
                 data-reveal-delay={`${index * 70}`}
                 className={`rounded-[32px] p-7 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl border group relative overflow-hidden ${
                   service.highlight
-                    ? 'bg-zinc-950 text-white border-butter/30 shadow-xl'
+                    ? 'bg-ink text-ink-foreground border-butter/30 shadow-xl'
                     : 'bg-card text-foreground border-border/80 shadow-soft'
                 }`}
               >
@@ -278,14 +278,14 @@ export function Services() {
                   {/* Title & Description */}
                   <h3
                     className={`font-display text-xl sm:text-2xl font-medium tracking-tight mb-3 ${
-                      service.highlight ? 'text-white' : 'text-foreground'
+                      service.highlight ? 'text-ink-foreground' : 'text-foreground'
                     }`}
                   >
                     {service.title}
                   </h3>
                   <p
                     className={`text-sm leading-relaxed mb-6 ${
-                      service.highlight ? 'text-zinc-300' : 'text-muted-foreground'
+                      service.highlight ? 'text-ink-muted' : 'text-muted-foreground'
                     }`}
                   >
                     {service.description}
@@ -302,7 +302,7 @@ export function Services() {
                     <div
                       key={bullet}
                       className={`flex items-center gap-2 text-xs font-medium ${
-                        service.highlight ? 'text-zinc-200' : 'text-foreground/80'
+                        service.highlight ? 'text-ink-foreground' : 'text-foreground/80'
                       }`}
                     >
                       <div
@@ -322,8 +322,8 @@ export function Services() {
                     to={`/services?tab=${service.id}`}
                     className={`inline-flex items-center gap-1 text-xs font-semibold transition-colors ${
                       service.highlight
-                        ? 'text-butter hover:text-white'
-                        : 'text-zinc-900 hover:text-black dark:text-zinc-200'
+                        ? 'text-butter hover:text-ink-foreground'
+                        : 'text-foreground hover:text-butter-foreground'
                     }`}
                   >
                     <span>Explore capability</span>

@@ -234,21 +234,21 @@ export function ServicesPage() {
   const Icon = activeDiscipline.icon;
 
   return (
-    <div className="pt-28 pb-20 sm:pt-36 sm:pb-32 overflow-hidden">
+    <div className="pt-24 pb-16 sm:pt-32 sm:pb-24 lg:pt-36 lg:pb-32 overflow-hidden">
       {/* Aurora Glow */}
       <div
         className="aurora absolute inset-x-0 -top-24 h-[620px] opacity-90 blur-[2px] pointer-events-none -z-10"
         aria-hidden="true"
       />
 
-      <div className="max-w-6xl mx-auto px-5">
+      <div className="site-container-narrow">
         {/* Header */}
         <div className="max-w-3xl text-left mb-16">
           <div className="bg-butter text-butter-foreground rounded-full px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] inline-flex items-center gap-2 shadow-sm mb-6">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Our Capabilities</span>
           </div>
-          <h1 className="font-display text-4xl sm:text-6xl font-medium leading-[1.05] tracking-tight text-foreground mb-6">
+          <h1 className="font-display text-display-xl font-medium text-foreground mb-6">
             Complete disciplines. <br />
             One senior studio. <br />
             Zero friction.
@@ -366,7 +366,7 @@ export function ServicesPage() {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
             {DISCIPLINES.map((d, dIdx) => {
               const CardIcon = d.icon;
               return (
@@ -430,7 +430,7 @@ export function ServicesPage() {
               <Code className="w-4 h-4" />
               <span>Modern Engineering Arsenal</span>
             </div>
-            <h2 className="font-display text-3xl sm:text-4xl font-medium tracking-tight text-ink-foreground mb-4">
+            <h2 className="font-display text-display-md font-medium text-ink-foreground mb-4">
               Built on battle-tested, high-performance technology.
             </h2>
             <p className="text-sm text-ink-muted leading-relaxed">
@@ -461,7 +461,7 @@ export function ServicesPage() {
             <div className="w-12 h-12 rounded-full bg-ink text-butter flex items-center justify-center mx-auto mb-4">
               <Shield className="w-6 h-6" />
             </div>
-            <h2 className="font-display text-3xl sm:text-4xl font-medium tracking-tight mb-4">
+            <h2 className="font-display text-display-md font-medium mb-4">
               Ready to accelerate your delivery?
             </h2>
             <p className="text-sm text-butter-foreground/80 leading-relaxed mb-8">

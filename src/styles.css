@@ -127,6 +127,46 @@
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.6 0.03 90);
+
+  /* Ink is a near-black surface in light mode. In dark mode it must become an
+     ELEVATED surface instead, or every ink card would vanish into the page. */
+  --ink: oklch(0.245 0.006 60);
+  --ink-foreground: oklch(0.975 0.006 92);
+  --ink-soft: oklch(0.305 0.006 60);
+  --ink-muted: oklch(0.74 0.008 80);
+
+  /* Butter is dialled back so large fills don't glare against a dark ground. */
+  --butter: oklch(0.87 0.11 100);
+  --butter-foreground: oklch(0.17 0.03 90);
+  --mint: oklch(0.8 0.09 158);
+
+  --terracotta: #b0785f;
+  --terracotta-foreground: #1a1917;
+
+  /* Dark surfaces need depth from darkness, not from a tinted grey. */
+  --shadow-soft: 0 1px 2px oklch(0 0 0 / 0.4), 0 12px 40px -18px oklch(0 0 0 / 0.7);
+  --shadow-float: 0 30px 70px -30px oklch(0 0 0 / 0.85);
+
+  /* The aurora wash is a pastel bloom; at full strength on a dark page it reads
+     as fog, so it is dimmed and deepened rather than removed. */
+  --gradient-aurora: radial-gradient(
+      60% 60% at 18% 20%,
+      oklch(0.55 0.09 158 / 0.32) 0%,
+      transparent 62%
+    ),
+    radial-gradient(50% 55% at 85% 10%, oklch(0.6 0.08 120 / 0.24) 0%, transparent 66%),
+    radial-gradient(55% 60% at 60% 90%, oklch(0.58 0.09 100 / 0.22) 0%, transparent 62%);
+}
+
+/* Theme transition.
+   Deliberately scoped to <body> alone. A descendant selector here would carry
+   higher specificity than Tailwind's own `transition-*` utilities and, because
+   it sets the `transition` shorthand, would silently wipe out every hover
+   scale/translate on the site. The ground fading is enough. */
+@media (prefers-reduced-motion: no-preference) {
+  html.theme-ready body {
+    transition: background-color 0.28s ease, color 0.28s ease;
+  }
 }
 
 @layer base {
@@ -140,6 +180,21 @@
   html {
     max-width: 100%;
     overflow-x: hidden;
+    /* Fixed nav clearance for every in-page anchor jump. */
+    scroll-padding-top: 6.5rem;
+  }
+
+  /* No media element may ever force a horizontal scrollbar. */
+  img,
+  video,
+  canvas,
+  iframe {
+    max-width: 100%;
+  }
+
+  /* Long unbroken strings (emails, URLs, mono text) wrap instead of overflowing. */
+  body {
+    overflow-wrap: break-word;
   }
 
   body {
@@ -475,3 +530,76 @@ html.lenis body {
   animation: icon-sparkle 3s ease-in-out infinite;
 }
 
+
+/* ==========================================================================
+   Responsive Layout System
+   One container utility drives every section, so page-to-page width never
+   jitters and large monitors get proportionally more content, not more gutter.
+
+   phones      <640   : 20px gutters
+   tablets     >=640  : 32px gutters
+   laptops     >=1024 : 40px gutters, 1280px content
+   desktops    >=1536 : 1440px content
+   large/ultra >=1920 : 1600px content
+   ========================================================================== */
+@utility site-container {
+  width: 100%;
+  margin-inline: auto;
+  max-width: 80rem; /* 1280 */
+  padding-inline: 1.25rem;
+
+  @media (width >= 40rem) {
+    padding-inline: 2rem;
+  }
+
+  @media (width >= 64rem) {
+    padding-inline: 2.5rem;
+  }
+
+  @media (width >= 96rem) {
+    max-width: 90rem; /* 1440 */
+  }
+
+  @media (width >= 120rem) {
+    max-width: 100rem; /* 1600 */
+  }
+}
+
+/* Narrow measure for long-form reading columns inside a site-container. */
+@utility site-container-narrow {
+  width: 100%;
+  margin-inline: auto;
+  max-width: 72rem; /* 1152 */
+  padding-inline: 1.25rem;
+
+  @media (width >= 40rem) {
+    padding-inline: 2rem;
+  }
+
+  @media (width >= 64rem) {
+    padding-inline: 2.5rem;
+  }
+
+  @media (width >= 96rem) {
+    max-width: 80rem; /* 1280 */
+  }
+}
+
+/* Fluid type helpers — headings that track the viewport instead of stepping. */
+@utility text-display-xl {
+  font-size: clamp(2.25rem, 1.45rem + 3vw, 4rem);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+}
+
+@utility text-display-lg {
+  font-size: clamp(2rem, 1.5rem + 2vw, 3.25rem);
+  line-height: 1.07;
+  letter-spacing: -0.032em;
+}
+
+@utility text-display-md {
+  font-size: clamp(1.5rem, 1rem + 1.6vw, 2.25rem);
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+}

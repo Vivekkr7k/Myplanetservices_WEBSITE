@@ -107,21 +107,21 @@ const TOOLS = [
 
 export function ProcessPage() {
   return (
-    <div className="pt-28 pb-20 sm:pt-36 sm:pb-32 overflow-hidden">
+    <div className="pt-24 pb-16 sm:pt-32 sm:pb-24 lg:pt-36 lg:pb-32 overflow-hidden">
       {/* Aurora Glow */}
       <div
         className="aurora absolute inset-x-0 -top-24 h-[620px] opacity-90 blur-[2px] pointer-events-none -z-10"
         aria-hidden="true"
       />
 
-      <div className="max-w-6xl mx-auto px-5">
+      <div className="site-container-narrow">
         {/* Header */}
         <div className="max-w-3xl text-left mb-16">
           <div className="bg-butter text-butter-foreground rounded-full px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] inline-flex items-center gap-2 shadow-sm mb-6">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Our Methodology</span>
           </div>
-          <h1 className="font-display text-4xl sm:text-6xl font-medium leading-[1.05] tracking-tight text-foreground mb-6">
+          <h1 className="font-display text-display-xl font-medium text-foreground mb-6">
             A disciplined process <br />
             that removes guesswork <br />
             at every step.
@@ -146,7 +146,7 @@ export function ProcessPage() {
                     {/* Header bar */}
                     <div className="flex items-center justify-between mb-6">
                       <div className="flex items-center gap-3">
-                        <span className="font-display text-3xl sm:text-4xl font-semibold text-foreground/40">
+                        <span className="font-display text-display-md font-semibold text-foreground/40">
                           {phase.step}
                         </span>
                         <div
@@ -223,7 +223,7 @@ export function ProcessPage() {
               <MessageSquare className="w-4 h-4" />
               <span>Predictable Delivery Rhythm</span>
             </div>
-            <h2 className="font-display text-3xl sm:text-4xl font-medium tracking-tight text-ink-foreground mb-4">
+            <h2 className="font-display text-display-md font-medium text-ink-foreground mb-4">
               Our weekly sprint operating rhythm.
             </h2>
             <p className="text-sm text-ink-muted leading-relaxed">
@@ -231,7 +231,7 @@ export function ProcessPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {CADENCE_DAYS.map((cadence) => (
               <div
                 key={cadence.day}
@@ -284,7 +284,7 @@ export function ProcessPage() {
         {/* Process CTA */}
         <div className="rounded-3xl bg-butter text-butter-foreground p-8 sm:p-12 text-center shadow-soft">
           <div className="max-w-2xl mx-auto">
-            <h2 className="font-display text-3xl sm:text-4xl font-medium tracking-tight mb-4">
+            <h2 className="font-display text-display-md font-medium mb-4">
               Ready to kick off Phase 01?
             </h2>
             <p className="text-sm text-butter-foreground/80 leading-relaxed mb-8">
