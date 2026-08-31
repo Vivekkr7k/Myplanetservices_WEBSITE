@@ -1,0 +1,477 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * My Planet Services design system — cream + ink + butter yellow, with mint aurora accents.
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-display: "Geist", "Inter Tight", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Geist", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", "SF Mono", ui-monospace, monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-butter: var(--butter);
+  --color-butter-foreground: var(--butter-foreground);
+  --color-mint: var(--mint);
+  --color-terracotta: var(--terracotta);
+  --color-terracotta-foreground: var(--terracotta-foreground);
+  --color-ink: var(--ink);
+  --color-ink-foreground: var(--ink-foreground);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-muted: var(--ink-muted);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+}
+
+:root {
+  --radius: 0.875rem;
+
+  --background: oklch(0.968 0.007 92);
+  --foreground: oklch(0.19 0.008 60);
+  --card: oklch(0.99 0.004 92);
+  --card-foreground: oklch(0.19 0.008 60);
+  --popover: oklch(0.99 0.004 92);
+  --popover-foreground: oklch(0.19 0.008 60);
+
+  --primary: oklch(0.19 0.008 60);
+  --primary-foreground: oklch(0.975 0.006 92);
+  --secondary: oklch(0.94 0.008 92);
+  --secondary-foreground: oklch(0.24 0.008 60);
+  --muted: oklch(0.94 0.008 92);
+  --muted-foreground: oklch(0.52 0.012 70);
+  --accent: oklch(0.93 0.05 155);
+  --accent-foreground: oklch(0.25 0.03 155);
+
+  --butter: oklch(0.93 0.1 100);
+  --butter-foreground: oklch(0.22 0.03 90);
+  --mint: oklch(0.87 0.08 158);
+
+  --terracotta: #8d5d48;
+  --terracotta-foreground: #fcf9f6;
+
+  --ink: oklch(0.16 0.004 60);
+  --ink-foreground: oklch(0.975 0.006 92);
+  --ink-soft: oklch(0.22 0.005 60);
+  --ink-muted: oklch(0.72 0.008 80);
+
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --border: oklch(0.89 0.008 90);
+  --input: oklch(0.89 0.008 90);
+  --ring: oklch(0.62 0.03 90);
+
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+
+  --shadow-soft: 0 1px 2px oklch(0.2 0.01 80 / 0.05), 0 12px 40px -18px oklch(0.2 0.01 80 / 0.25);
+  --shadow-float: 0 30px 70px -30px oklch(0.2 0.01 80 / 0.35);
+  --gradient-aurora: radial-gradient(
+      60% 60% at 18% 20%,
+      oklch(0.93 0.08 158 / 0.75) 0%,
+      transparent 60%
+    ),
+    radial-gradient(50% 55% at 85% 10%, oklch(0.95 0.07 120 / 0.6) 0%, transparent 65%),
+    radial-gradient(55% 60% at 60% 90%, oklch(0.95 0.08 100 / 0.55) 0%, transparent 60%);
+}
+
+.dark {
+  --background: oklch(0.16 0.004 60);
+  --foreground: oklch(0.975 0.006 92);
+  --card: oklch(0.22 0.005 60);
+  --card-foreground: oklch(0.975 0.006 92);
+  --popover: oklch(0.22 0.005 60);
+  --popover-foreground: oklch(0.975 0.006 92);
+  --primary: oklch(0.93 0.1 100);
+  --primary-foreground: oklch(0.18 0.01 90);
+  --secondary: oklch(0.26 0.006 60);
+  --secondary-foreground: oklch(0.975 0.006 92);
+  --muted: oklch(0.26 0.006 60);
+  --muted-foreground: oklch(0.72 0.008 80);
+  --accent: oklch(0.26 0.006 60);
+  --accent-foreground: oklch(0.975 0.006 92);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.6 0.03 90);
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    border-color: var(--color-border);
+    box-sizing: border-box;
+  }
+
+  html {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
+    position: relative;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+    letter-spacing: -0.035em;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
+  }
+}
+
+/* Lenis smooth scrolling rules */
+html.lenis,
+html.lenis body {
+  height: auto;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+@utility aurora {
+  background-image: var(--gradient-aurora);
+}
+
+@utility shadow-soft {
+  box-shadow: var(--shadow-soft);
+}
+
+@utility shadow-float {
+  box-shadow: var(--shadow-float);
+}
+
+@utility grain {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.35;
+    background-image: radial-gradient(oklch(0.5 0 0 / 0.06) 1px, transparent 1px);
+    background-size: 4px 4px;
+  }
+}
+
+@utility reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@utility reveal-in {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+@utility animate-marquee {
+  animation: marquee 28s linear infinite;
+}
+
+@utility animate-float-slow {
+  animation: float-slow 7s ease-in-out infinite;
+}
+
+/* MacBook-style device frame */
+@utility device-bezel {
+  background: linear-gradient(
+    160deg,
+    oklch(0.34 0.004 60) 0%,
+    oklch(0.19 0.004 60) 22%,
+    oklch(0.13 0.004 60) 65%,
+    oklch(0.22 0.004 60) 100%
+  );
+  box-shadow:
+    0 1px 0 0 oklch(1 0 0 / 0.22) inset,
+    0 0 0 1px oklch(0.1 0.004 60 / 0.9),
+    0 40px 80px -34px oklch(0.2 0.01 80 / 0.5),
+    0 12px 30px -18px oklch(0.2 0.01 80 / 0.35);
+}
+
+@utility device-glass {
+  box-shadow:
+    0 0 0 1px oklch(0 0 0 / 0.55) inset,
+    0 24px 50px -30px oklch(0 0 0 / 0.6) inset;
+}
+
+@utility device-sheen {
+  background: linear-gradient(
+    118deg,
+    oklch(1 0 0 / 0.16) 0%,
+    oklch(1 0 0 / 0.05) 26%,
+    transparent 46%
+  );
+}
+
+/* Radar hotspot pulse */
+@keyframes radar-pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+  }
+  70% {
+    transform: scale(1.15);
+    box-shadow: 0 0 0 14px rgba(255, 255, 255, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+  }
+}
+
+@utility animate-radar {
+  animation: radar-pulse 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Glassmorphic luxury card */
+@utility glass-card {
+  background: rgba(18, 22, 29, 0.75);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.4),
+    0 1px 0 rgba(255, 255, 255, 0.1) inset;
+}
+
+@utility glass-card-light {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 20px 40px -15px rgba(20, 20, 30, 0.15),
+    0 1px 0 rgba(255, 255, 255, 0.9) inset;
+}
+
+/* Editorial Serif Utility */
+@utility font-serif-editorial {
+  font-family: var(--font-serif);
+  letter-spacing: -0.02em;
+}
+
+/* ==========================================================================
+   Icon Micro-Animations & Looping Ambient Motion System
+   ========================================================================== */
+
+/* 1. Gentle Looping Float (for circular / rounded icon badges) */
+@keyframes icon-badge-float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-5px) rotate(1.5deg);
+  }
+}
+
+/* 2. Soft Looping Pulse & Scale */
+@keyframes icon-pulse-gentle {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.09);
+  }
+}
+
+/* 3. Slow Infinite Rotation (for Globes, Gears, Orbits, Compasses) */
+@keyframes icon-spin-slow {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* 4. Playful Micro-Wiggle (for Bots, Phones, Megaphones, Lightning) */
+@keyframes icon-wiggle {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
+  }
+  20% {
+    transform: rotate(-6deg) scale(1.06);
+  }
+  40% {
+    transform: rotate(6deg) scale(1.06);
+  }
+  60% {
+    transform: rotate(-3deg) scale(1.02);
+  }
+  80% {
+    transform: rotate(3deg) scale(1.02);
+  }
+}
+
+/* 5. Smooth Sway Motion (for Scales, Megaphones, Radios) */
+@keyframes icon-sway {
+  0%, 100% {
+    transform: rotate(-5deg) translateY(0);
+  }
+  50% {
+    transform: rotate(5deg) translateY(-3px);
+  }
+}
+
+/* 6. Gentle Vertical Bob (for Layers, Stacks, Devices) */
+@keyframes icon-bob {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-4px) scale(1.06);
+  }
+}
+
+/* 7. Ambient Glowing Ring Pulse (for Butter Badges) */
+@keyframes icon-glow-ring {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(246, 224, 94, 0.45), 0 4px 12px -2px rgba(246, 224, 94, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(246, 224, 94, 0), 0 8px 20px -2px rgba(246, 224, 94, 0.35);
+  }
+}
+
+/* 8. Ambient Glowing Ring Pulse (for Dark / Neutral Badges) */
+@keyframes icon-glow-dark {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.25), 0 4px 12px -2px rgba(0, 0, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(255, 255, 255, 0), 0 8px 18px -2px rgba(0, 0, 0, 0.45);
+  }
+}
+
+/* 9. Shimmer Sparkle for Stars & Badges */
+@keyframes icon-sparkle {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.15) rotate(12deg);
+    filter: brightness(1.25);
+  }
+}
+
+/* Utility classes for icon badges & icons */
+@utility animate-icon-float {
+  animation: icon-badge-float 3.8s ease-in-out infinite;
+}
+
+@utility animate-icon-pulse {
+  animation: icon-pulse-gentle 3s ease-in-out infinite;
+}
+
+@utility animate-icon-spin {
+  animation: icon-spin-slow 14s linear infinite;
+}
+
+@utility animate-icon-wiggle {
+  animation: icon-wiggle 3.6s ease-in-out infinite;
+}
+
+@utility animate-icon-sway {
+  animation: icon-sway 4s ease-in-out infinite;
+}
+
+@utility animate-icon-bob {
+  animation: icon-bob 3.2s ease-in-out infinite;
+}
+
+@utility animate-icon-glow {
+  animation: icon-glow-ring 2.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@utility animate-icon-glow-dark {
+  animation: icon-glow-dark 2.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@utility animate-icon-sparkle {
+  animation: icon-sparkle 3s ease-in-out infinite;
+}
+
