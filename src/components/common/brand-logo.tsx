@@ -15,7 +15,7 @@ interface BrandLogoProps {
    */
   variant?: 'light' | 'dark' | 'auto';
   className?: string;
-  /** Rendered height. Width follows the artwork's ~1.73:1 aspect. */
+  /** Rendered height. Width follows the artwork's 444:260 aspect. */
   size?: 'sm' | 'md' | 'lg';
 }
 
@@ -39,8 +39,8 @@ export function BrandLogo({
     <img
       src={src}
       alt="My Planet Services"
-      width={417}
-      height={240}
+      width={444}
+      height={260}
       decoding="async"
       className={`${SIZES[size]} w-auto select-none transition-transform duration-300 group-hover:scale-[1.03] ${className}`}
       draggable={false}

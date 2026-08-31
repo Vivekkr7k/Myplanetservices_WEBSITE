@@ -1,4 +1,7 @@
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
   ShoppingCart,
   Building2,
@@ -194,12 +197,85 @@ export function LogoMarquee() {
   );
 }
 
+
 export function Services() {
+  const listRef = useRef<HTMLDivElement>(null);
+
+  /**
+   * Scroll focus — the row nearest the vertical centre of the viewport sits at
+   * full size while rows further away recede. Peak scale is 1.0 and never above,
+   * so a focused row can't overflow the container on a wide screen.
+   *
+   * Large pointer screens only: on a phone a row already fills most of the
+   * viewport, so scaling it just reads as jitter.
+   */
+  useEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
+
+    gsap.registerPlugin(ScrollTrigger);
+    const mm = gsap.matchMedia();
+
+    mm.add('(min-width: 1024px) and (prefers-reduced-motion: no-preference)', () => {
+      const cards = gsap.utils.toArray<HTMLElement>('[data-focus-card]', list);
+      if (!cards.length) return;
+
+      // quickSetter writes straight to the style without per-frame tween overhead.
+      const setters = cards.map((el) => ({
+        setScale: gsap.quickSetter(el, 'scale') as (v: number) => void,
+        setOpacity: gsap.quickSetter(el, 'opacity') as (v: number) => void,
+        el,
+      }));
+
+      const update = () => {
+        const vh = window.innerHeight;
+        const viewportCentre = vh / 2;
+        // How far from centre a row must travel before it has fully receded.
+        const falloff = vh * 0.58;
+
+        for (const { el, setScale, setOpacity } of setters) {
+          const rect = el.getBoundingClientRect();
+          const cardCentre = rect.top + rect.height / 2;
+          const distance = Math.min(Math.abs(cardCentre - viewportCentre) / falloff, 1);
+          const proximity = 1 - distance;
+          // smoothstep, so size eases in near the centre instead of tracking linearly
+          const eased = proximity * proximity * (3 - 2 * proximity);
+
+          setScale(0.945 + 0.055 * eased);
+          setOpacity(0.68 + 0.32 * eased);
+        }
+      };
+
+      // Lenis already bridges its scroll into ScrollTrigger.update(), so this
+      // stays in sync with the smooth-scroll loop rather than fighting it.
+      const trigger = ScrollTrigger.create({
+        trigger: list,
+        start: 'top bottom',
+        end: 'bottom top',
+        onUpdate: update,
+        onRefresh: update,
+      });
+
+      update();
+
+      return () => {
+        trigger.kill();
+        // quickSetter writes inline styles that matchMedia won't revert for us.
+        gsap.set(cards, { clearProps: 'transform,opacity' });
+      };
+    });
+
+    return () => mm.revert();
+  }, []);
+
   return (
-    <section id="services" className="py-16 sm:py-24 lg:py-32 scroll-mt-12 bg-background relative overflow-hidden">
+    <section
+      id="services"
+      className="py-16 sm:py-24 lg:py-32 scroll-mt-12 bg-background relative overflow-hidden"
+    >
       <div className="site-container">
         {/* Section Header */}
-        <div data-reveal className="max-w-3xl mb-16 text-left">
+        <div data-reveal className="max-w-3xl mb-12 sm:mb-16 text-left">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-butter text-butter-foreground text-[11px] font-semibold uppercase tracking-[0.14em] shadow-xs mb-5">
             <span>Specialized Capabilities</span>
           </div>
@@ -212,123 +288,142 @@ export function Services() {
           </p>
         </div>
 
-        {/* 6-Card Bento Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-5">
+        {/* Single column of full-width capability rows */}
+        <div ref={listRef} className="flex flex-col gap-4 sm:gap-5">
           {SERVICES_DATA.map((service, index) => {
             const Icon = service.icon;
+            const dark = service.highlight;
+
             return (
+              /* Layer 1 — reveal owns the entry translate */
               <div
                 key={service.title}
                 data-reveal
-                data-reveal-delay={`${index * 70}`}
-                className={`rounded-[32px] p-7 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl border group relative overflow-hidden ${
-                  service.highlight
-                    ? 'bg-ink text-ink-foreground border-butter/30 shadow-xl'
-                    : 'bg-card text-foreground border-border/80 shadow-soft'
-                }`}
               >
-                {/* Highlight Glow for Feature Card */}
-                {service.highlight && (
-                  <div
-                    className="absolute -top-16 -right-16 w-40 h-40 bg-butter/15 rounded-full blur-2xl pointer-events-none"
-                    aria-hidden="true"
-                  />
-                )}
-
-                <div>
-                  {/* Top Bar: Animated Icon + Category Badge */}
-                  <div className="flex items-center justify-between mb-6">
-                    <div
-                      style={{ animationDelay: `${index * 0.3}s` }}
-                      className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 shadow-xs animate-icon-float ${
-                        service.highlight
-                          ? 'bg-butter text-butter-foreground animate-icon-glow'
-                          : 'bg-secondary text-foreground group-hover:bg-butter group-hover:text-butter-foreground animate-icon-glow-dark'
-                      }`}
-                    >
-                      <Icon
-                        style={{ animationDelay: `${index * 0.2}s` }}
-                        className={`w-6 h-6 transition-transform duration-300 group-hover:scale-120 ${
-                          index === 0
-                            ? 'animate-icon-spin'
-                            : index === 1
-                            ? 'animate-icon-wiggle'
-                            : index === 2
-                            ? 'animate-icon-bob'
-                            : index === 3
-                            ? 'animate-icon-wiggle'
-                            : index === 4
-                            ? 'animate-icon-pulse'
-                            : 'animate-icon-sway'
-                        }`}
-                      />
-                    </div>
-
-                    <span
-                      className={`text-[10px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-full ${
-                        service.highlight
-                          ? 'bg-white/10 text-butter border border-white/10'
-                          : 'bg-secondary text-muted-foreground'
-                      }`}
-                    >
-                      {service.category}
-                    </span>
-                  </div>
-
-                  {/* Title & Description */}
-                  <h3
-                    className={`font-display text-xl sm:text-2xl font-medium tracking-tight mb-3 ${
-                      service.highlight ? 'text-ink-foreground' : 'text-foreground'
+                {/* Layer 2 — GSAP owns this transform (scroll focus) */}
+                <div data-focus-card className="will-change-transform transform-gpu">
+                  {/* Layer 3 — CSS owns this transform (hover) */}
+                  <article
+                    className={`group/card block rounded-[28px] sm:rounded-[32px] border overflow-hidden relative transition-[transform,box-shadow] duration-500 ease-out lg:hover:scale-[1.018] ${
+                      dark
+                        ? 'bg-ink text-ink-foreground border-butter/30 shadow-xl hover:shadow-2xl'
+                        : 'bg-card text-foreground border-border/80 shadow-soft hover:shadow-xl'
                     }`}
                   >
-                    {service.title}
-                  </h3>
-                  <p
-                    className={`text-sm leading-relaxed mb-6 ${
-                      service.highlight ? 'text-ink-muted' : 'text-muted-foreground'
-                    }`}
-                  >
-                    {service.description}
-                  </p>
-                </div>
-
-                {/* Bullets List */}
-                <div
-                  className={`pt-5 border-t flex flex-col gap-2.5 ${
-                    service.highlight ? 'border-white/10' : 'border-border/60'
-                  }`}
-                >
-                  {service.bullets.map((bullet) => (
-                    <div
-                      key={bullet}
-                      className={`flex items-center gap-2 text-xs font-medium ${
-                        service.highlight ? 'text-ink-foreground' : 'text-foreground/80'
-                      }`}
-                    >
+                    {/* Warm bloom on the ink rows */}
+                    {dark && (
                       <div
-                        className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${
-                          service.highlight ? 'bg-butter/20 text-butter' : 'bg-butter/30 text-butter-foreground'
+                        className="absolute -top-20 -right-10 w-72 h-40 bg-butter/15 rounded-full blur-3xl pointer-events-none"
+                        aria-hidden="true"
+                      />
+                    )}
+
+                    <div className="relative p-6 sm:p-8 lg:p-10 grid gap-6 sm:gap-8 lg:gap-12 lg:grid-cols-[auto_minmax(0,1.45fr)_minmax(0,1fr)] lg:items-center">
+                      {/* Zone 1 — icon + index */}
+                      <div className="flex lg:flex-col items-center lg:items-start gap-4 shrink-0">
+                        <div
+                          style={{ animationDelay: `${index * 0.3}s` }}
+                          className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-xs animate-icon-float ${
+                            dark
+                              ? 'bg-butter text-butter-foreground animate-icon-glow'
+                              : 'bg-secondary text-foreground group-hover/card:bg-butter group-hover/card:text-butter-foreground transition-colors duration-300 animate-icon-glow-dark'
+                          }`}
+                        >
+                          <Icon
+                            style={{ animationDelay: `${index * 0.2}s` }}
+                            className={`w-6 h-6 sm:w-7 sm:h-7 transition-transform duration-300 group-hover/card:scale-110 ${
+                              index % 6 === 0
+                                ? 'animate-icon-spin'
+                                : index % 6 === 1
+                                ? 'animate-icon-wiggle'
+                                : index % 6 === 2
+                                ? 'animate-icon-bob'
+                                : index % 6 === 3
+                                ? 'animate-icon-wiggle'
+                                : index % 6 === 4
+                                ? 'animate-icon-pulse'
+                                : 'animate-icon-sway'
+                            }`}
+                          />
+                        </div>
+                        <span
+                          className={`font-mono text-xs font-semibold tracking-widest tabular-nums ${
+                            dark ? 'text-butter/70' : 'text-muted-foreground'
+                          }`}
+                        >
+                          {String(index + 1).padStart(2, '0')}
+                        </span>
+                      </div>
+
+                      {/* Zone 2 — category, title, description, CTA */}
+                      <div className="min-w-0">
+                        <span
+                          className={`inline-block text-[10px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-full mb-3 ${
+                            dark
+                              ? 'bg-white/10 text-butter border border-white/10'
+                              : 'bg-secondary text-muted-foreground'
+                          }`}
+                        >
+                          {service.category}
+                        </span>
+
+                        <h3
+                          className={`font-display text-xl sm:text-2xl lg:text-[1.75rem] font-medium tracking-tight leading-snug mb-2.5 ${
+                            dark ? 'text-ink-foreground' : 'text-foreground'
+                          }`}
+                        >
+                          {service.title}
+                        </h3>
+
+                        <p
+                          className={`text-sm leading-relaxed mb-5 ${
+                            dark ? 'text-ink-muted' : 'text-muted-foreground'
+                          }`}
+                        >
+                          {service.description}
+                        </p>
+
+                        <Link
+                          to={`/services?tab=${service.id}`}
+                          className={`inline-flex items-center gap-1.5 text-xs font-semibold transition-colors ${
+                            dark
+                              ? 'text-butter hover:text-ink-foreground'
+                              : 'text-foreground hover:text-butter-foreground'
+                          }`}
+                        >
+                          <span>Explore capability</span>
+                          <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover/card:translate-x-1" />
+                        </Link>
+                      </div>
+
+                      {/* Zone 3 — bullets */}
+                      <div
+                        className={`flex flex-col gap-3 pt-5 border-t lg:pt-0 lg:border-t-0 lg:pl-10 lg:border-l ${
+                          dark ? 'border-white/10' : 'border-border/60'
                         }`}
                       >
-                        <Check className="w-2.5 h-2.5 stroke-[3]" />
+                        {service.bullets.map((bullet) => (
+                          <div
+                            key={bullet}
+                            className={`flex items-center gap-2.5 text-xs sm:text-[13px] font-medium ${
+                              dark ? 'text-ink-foreground' : 'text-foreground/80'
+                            }`}
+                          >
+                            <div
+                              className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${
+                                dark
+                                  ? 'bg-butter/20 text-butter'
+                                  : 'bg-butter/30 text-butter-foreground'
+                              }`}
+                            >
+                              <Check className="w-2.5 h-2.5 stroke-[3]" />
+                            </div>
+                            <span>{bullet}</span>
+                          </div>
+                        ))}
                       </div>
-                      <span>{bullet}</span>
                     </div>
-                  ))}
-                </div>
-
-                <div className="pt-4 mt-2">
-                  <Link
-                    to={`/services?tab=${service.id}`}
-                    className={`inline-flex items-center gap-1 text-xs font-semibold transition-colors ${
-                      service.highlight
-                        ? 'text-butter hover:text-ink-foreground'
-                        : 'text-foreground hover:text-butter-foreground'
-                    }`}
-                  >
-                    <span>Explore capability</span>
-                    <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-                  </Link>
+                  </article>
                 </div>
               </div>
             );
