@@ -6,11 +6,19 @@
  * are siblings under different sections and neither owns the other's state.
  */
 
+import type { QuoteSnapshot } from './send-email';
+
 export interface QuoteDraft {
   /** Matches the `value` of the contact form's discipline <select>. */
   serviceId: string;
   /** Pre-written project brief describing the configured scope. */
   message: string;
+  /**
+   * The same configuration as structured data. The prose is for the visitor to
+   * read and edit; this is what the notification email renders as a table, so
+   * the team gets clean fields even if the visitor rewrites the message.
+   */
+  quote?: QuoteSnapshot;
 }
 
 const STORAGE_KEY = 'mps:quote-draft';

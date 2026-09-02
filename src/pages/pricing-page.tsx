@@ -15,9 +15,10 @@ import {
 import {
   SERVICE_PRICING,
   BUNDLED_PERKS,
-  formatINR,
   qualifiesForBundle,
 } from '../lib/service-pricing';
+import { useCurrency } from '../lib/currency-context';
+import { CurrencyToggle } from '../components/common/currency-toggle';
 
 const PLANS = [
   {
@@ -94,6 +95,7 @@ const COMPARISON_MATRIX = [
 ];
 
 export function PricingPage() {
+  const { price } = useCurrency();
   const [selectedPlan, setSelectedPlan] = useState('Scale');
   const [selectedAddons, setSelectedAddons] = useState<string[]>(['ai']);
 
@@ -226,9 +228,14 @@ export function PricingPage() {
               <IndianRupee className="w-3.5 h-3.5" />
               <span>Starting Prices by Service</span>
             </div>
-            <h2 className="font-display text-display-md font-medium text-foreground mb-3">
-              What each service starts at.
-            </h2>
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+              <h2 className="font-display text-display-md font-medium text-foreground">
+                What each service starts at.
+              </h2>
+              {/* Currency follows the visitor's timezone; this corrects it when
+                  a VPN or a trip abroad gets that wrong. */}
+              <CurrencyToggle className="shrink-0" />
+            </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Entry pricing for the smallest production-ready scope of every discipline we ship — each one including a free year of hosting and maintenance. Final quotes scale with feature depth, integrations and team size, confirmed in writing before a single line of code.
             </p>
@@ -311,7 +318,7 @@ export function PricingPage() {
                       </div>
                       <div className="flex items-baseline gap-1.5 flex-wrap">
                         <span className="font-display text-3xl font-semibold tracking-tight text-foreground">
-                          {formatINR(service.startsAt)}
+                          {price(service.startsAt)}
                         </span>
                         <span className="text-xs font-medium text-muted-foreground">
                           {service.unit}

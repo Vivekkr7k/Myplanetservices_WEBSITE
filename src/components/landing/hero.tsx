@@ -6,6 +6,7 @@ import { MILESTONE_SERVICES } from './road-services-signboard';
 import { SystemTourModal } from './system-tour-modal';
 import { useSmoothScroll } from '../../lib/lenis-scroll';
 import { toast } from 'sonner';
+import { sendLeadCapture } from '../../lib/send-email';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -226,14 +227,29 @@ export function Hero() {
   // Lead capture email state
   const [emailInput, setEmailInput] = useState('');
 
-  const handleEmailSubmit = (e: React.FormEvent) => {
+  const [emailSending, setEmailSending] = useState(false);
+
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!emailInput || !emailInput.includes('@')) {
       toast.error('Please enter a valid email address.');
       return;
     }
-    toast.success(`Thanks! We've received ${emailInput}. Our team will be in touch shortly.`);
-    setEmailInput('');
+
+    setEmailSending(true);
+    const result = await sendLeadCapture({ email: emailInput, source: 'Homepage hero' });
+    setEmailSending(false);
+
+    if (result.success) {
+      toast.success('Thanks — check your inbox', {
+        description: `We sent a confirmation to ${result.confirmationSentTo ?? emailInput}.`,
+      });
+      setEmailInput('');
+    } else {
+      toast.error("Couldn't save your email", {
+        description: `${result.error ?? 'Please try again'} — or email vivek@myplanetservices.com directly.`,
+      });
+    }
   };
 
   // Determine current active milestone and phase name
@@ -371,9 +387,10 @@ export function Hero() {
 
                 <button
                   type="submit"
-                  className="bg-zinc-950 hover:bg-black text-white dark:bg-butter dark:text-butter-foreground dark:hover:bg-butter/90 px-3.5 py-1.5 sm:px-4.5 sm:py-2 rounded-full text-[11px] sm:text-xs font-semibold tracking-wide inline-flex items-center gap-1 transition-all duration-300 shadow-md hover:scale-102 active:scale-95 cursor-pointer shrink-0"
+                  disabled={emailSending}
+                  className="bg-zinc-950 hover:bg-black text-white dark:bg-butter dark:text-butter-foreground dark:hover:bg-butter/90 px-3.5 py-1.5 sm:px-4.5 sm:py-2 rounded-full text-[11px] sm:text-xs font-semibold tracking-wide inline-flex items-center gap-1 transition-all duration-300 shadow-md hover:scale-102 active:scale-95 cursor-pointer shrink-0 disabled:opacity-60"
                 >
-                  <span>Get Started</span>
+                  <span>{emailSending ? 'Sending…' : 'Get Started'}</span>
                   <ArrowUpRight className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                 </button>
               </form>

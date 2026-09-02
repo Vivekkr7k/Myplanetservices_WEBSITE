@@ -7,22 +7,38 @@ import {
   ShieldCheck,
   Sparkles,
   Calendar,
-  Clock,
   CheckCircle2,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { sendContactEmail } from '../lib/send-email';
+import { sendProjectBrief, sendCallRequest } from '../lib/send-email';
+import { BookingCalendar } from '../components/common/booking-calendar';
+import { CurrencyToggle } from '../components/common/currency-toggle';
+import { useCurrency } from '../lib/currency-context';
+import { describeSlot, type Slot } from '../lib/booking-slots';
+import { SERVICE_OPTIONS } from '../lib/service-options';
+
+/**
+ * Budget bands in INR, converted to the visitor's currency for display.
+ *
+ * The lowest band starts at ₹5,000 on purpose: our own entry price is ₹8,000,
+ * so a range that opened at ₹25,000 left every small-project enquiry with
+ * nothing truthful to pick.
+ */
+const BUDGET_BANDS: { min: number; max?: number }[] = [
+  { min: 5000, max: 10000 },
+  { min: 10000, max: 25000 },
+  { min: 25000, max: 50000 },
+  { min: 50000, max: 100000 },
+  { min: 100000, max: 250000 },
+  { min: 250000, max: 500000 },
+  { min: 500000 },
+];
 
 export function ContactPage() {
+  const { timeZone, price } = useCurrency();
   const [loading, setLoading] = useState(false);
-  const [selectedSlot, setSelectedSlot] = useState('Tomorrow, 2:00 PM EST');
-
-  const TIME_SLOTS = [
-    'Tomorrow, 10:00 AM EST',
-    'Tomorrow, 2:00 PM EST',
-    'Thursday, 11:30 AM EST',
-    'Thursday, 4:00 PM EST',
-  ];
+  const [booking, setBooking] = useState(false);
+  const [slot, setSlot] = useState<Slot | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -37,34 +53,65 @@ export function ContactPage() {
     const budget = formData.get('budget') as string;
     const message = formData.get('message') as string;
 
-    try {
-      await sendContactEmail({
-        name,
-        email,
-        company,
-        service,
-        budget,
-        message,
-      });
+    const result = await sendProjectBrief({
+      name,
+      email,
+      company,
+      service,
+      budget,
+      message,
+      source: 'Contact page',
+    });
 
-      toast.success('Project brief received!', {
-        description: 'Your brief was sent to vivek@myplanetservices.com. We will reply within 2 working days.',
-      });
+    setLoading(false);
 
+    // Report what actually happened. Claiming success on a failed send loses the
+    // lead silently and leaves the visitor expecting a reply that never comes.
+    if (result.success) {
+      toast.success('Project brief received', {
+        description: `A confirmation is on its way to ${result.confirmationSentTo ?? email}. We reply within one working day.`,
+      });
       form.reset();
-    } catch (err) {
-      toast.success('Project brief received!', {
-        description: 'Our senior technical lead will review your brief and reply shortly.',
+    } else {
+      toast.error("Couldn't send your brief", {
+        description: `${result.error ?? 'Please try again'} — or email vivek@myplanetservices.com directly.`,
       });
-    } finally {
-      setLoading(false);
     }
   };
 
-  const handleBooking = () => {
-    toast.success('Discovery call requested!', {
-      description: `We have reserved ${selectedSlot} for your team. Calendar invite sent.`,
+  const handleBooking = async () => {
+    if (!slot) {
+      toast.error('Pick a time first', {
+        description: 'Choose a date and an available slot to request a call.',
+      });
+      return;
+    }
+
+    setBooking(true);
+    // Pull whatever the visitor has already typed into the brief form above, so
+    // the request isn't an anonymous time slot with no way to reply.
+    const form = document.querySelector<HTMLFormElement>('#contact-brief-form');
+    const fd = form ? new FormData(form) : null;
+
+    const result = await sendCallRequest({
+      // Carries both readings so the request is unambiguous across timezones.
+      slot: describeSlot(slot.iso, timeZone),
+      name: (fd?.get('name') as string) || undefined,
+      email: (fd?.get('email') as string) || undefined,
+      source: 'Contact page',
     });
+
+    setBooking(false);
+
+    if (result.success) {
+      toast.success('Call request sent', {
+        description: `We'll confirm ${describeSlot(slot.iso, timeZone)} by email and send the calendar invite.`,
+      });
+    } else {
+      toast.error("Couldn't send your request", {
+        description: `${result.error ?? 'Please try again'} — or email vivek@myplanetservices.com directly.`,
+      });
+    }
   };
 
   return (
@@ -98,11 +145,16 @@ export function ContactPage() {
             <h2 className="font-display text-2xl font-medium text-foreground mb-2">
               Send a Project Brief
             </h2>
-            <p className="text-xs sm:text-sm text-muted-foreground mb-8">
-              Fill in what you know. We'll handle the scoping, technical architecture, and milestones.
-            </p>
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
+              <p className="text-xs sm:text-sm text-muted-foreground max-w-sm">
+                Fill in what you know. We'll handle the scoping, technical architecture, and milestones.
+              </p>
+              {/* Detection reads the browser timezone; a VPN gets it wrong, so
+                  the visitor can always correct it. */}
+              <CurrencyToggle className="shrink-0" />
+            </div>
 
-            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            <form id="contact-brief-form" onSubmit={handleSubmit} className="flex flex-col gap-5">
               <div className="grid sm:grid-cols-2 gap-5">
                 <div>
                   <label
@@ -157,16 +209,11 @@ export function ContactPage() {
                     <option value="" disabled>
                       Select primary service
                     </option>
-                    <option value="ecommerce">E-Commerce Development</option>
-                    <option value="corporate">Company & Corporate Websites</option>
-                    <option value="redesign">Website Redesign & Modernization</option>
-                    <option value="crm-erp">Custom CRM & ERP Systems</option>
-                    <option value="website">Website Development</option>
-                    <option value="app">Mobile App Development</option>
-                    <option value="ai">AI Automation & Agents</option>
-                    <option value="saas">SaaS Product Engineering</option>
-                    <option value="seo">SEO / AEO / GEO Strategy</option>
-                    <option value="marketing">Digital Marketing & Growth</option>
+                    {SERVICE_OPTIONS.map((opt) => (
+                      <option key={opt.id} value={opt.id}>
+                        {opt.label}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
@@ -180,13 +227,22 @@ export function ContactPage() {
                   <select
                     id="budget"
                     name="budget"
-                    defaultValue="$10k - $25k"
                     className="w-full rounded-2xl bg-secondary/50 border border-border px-4 py-3.5 text-sm text-foreground focus:border-foreground focus:bg-card focus:outline-hidden transition-all appearance-none cursor-pointer"
+                    defaultValue=""
                   >
-                    <option value="$5k - $10k">$5,000 – $10,000</option>
-                    <option value="$10k - $25k">$10,000 – $25,000</option>
-                    <option value="$25k - $50k">$25,000 – $50,000</option>
-                    <option value="$50k+">$50,000+</option>
+                    <option value="">Select a range</option>
+                    {BUDGET_BANDS.map((band) => {
+                      const label = band.max
+                        ? `${price(band.min)} – ${price(band.max)}`
+                        : `${price(band.min)}+`;
+                      return (
+                        <option key={band.min} value={label}>
+                          {label}
+                        </option>
+                      );
+                    })}
+                    <option value="Not sure yet">Not sure yet</option>
+                    <option value="Prefer to discuss">Prefer to discuss</option>
                   </select>
                 </div>
               </div>
@@ -230,37 +286,34 @@ export function ContactPage() {
                 Book a 30-Min Discovery Call
               </h3>
               <p className="text-xs sm:text-sm text-ink-muted leading-relaxed mb-6">
-                Prefer an interactive whiteboard session? Pick an available opening on our senior engineering calendar.
+                Pick any weekday that suits you. Times are shown in your own
+                timezone — we handle the conversion.
               </p>
 
-              {/* Slot selector */}
-              <div className="flex flex-col gap-2.5 mb-6">
-                {TIME_SLOTS.map((slot) => (
-                  <button
-                    key={slot}
-                    type="button"
-                    onClick={() => setSelectedSlot(slot)}
-                    className={`p-3.5 rounded-2xl text-xs sm:text-sm border flex items-center justify-between transition-colors cursor-pointer ${
-                      selectedSlot === slot
-                        ? 'bg-butter text-butter-foreground border-butter font-semibold shadow-xs'
-                        : 'bg-ink-soft text-ink-muted border-white/5 hover:border-white/20'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <Clock className="w-4 h-4" />
-                      <span>{slot}</span>
-                    </div>
-                    {selectedSlot === slot && <CheckCircle2 className="w-4 h-4" />}
-                  </button>
-                ))}
+              <div className="bg-ink-soft rounded-2xl p-4 sm:p-5 border border-white/10 mb-5">
+                <BookingCalendar
+                  timeZone={timeZone}
+                  selectedIso={slot?.iso ?? null}
+                  onSelect={setSlot}
+                />
               </div>
+
+              {slot && (
+                <div className="flex items-start gap-2.5 rounded-2xl bg-butter/15 border border-butter/40 px-4 py-3 mb-5">
+                  <CheckCircle2 className="w-4 h-4 text-butter shrink-0 mt-0.5" />
+                  <p className="text-xs text-ink-foreground leading-snug">
+                    {describeSlot(slot.iso, timeZone)}
+                  </p>
+                </div>
+              )}
 
               <button
                 type="button"
                 onClick={handleBooking}
-                className="w-full bg-butter text-butter-foreground rounded-full py-3.5 text-sm font-semibold hover:scale-[1.02] transition-transform cursor-pointer shadow-sm"
+                disabled={booking || !slot}
+                className="w-full bg-butter text-butter-foreground rounded-full py-3.5 text-sm font-semibold hover:scale-[1.02] transition-transform cursor-pointer shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Confirm discovery slot
+                {booking ? 'Sending request…' : slot ? 'Request this slot' : 'Pick a time above'}
               </button>
             </div>
 

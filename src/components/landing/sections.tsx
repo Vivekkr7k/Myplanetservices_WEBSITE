@@ -20,14 +20,17 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { BrandLogo } from '../common/brand-logo';
-import { SERVICE_PRICING, formatINR, currentQuarterLabel } from '../../lib/service-pricing';
-import { sendContactEmail } from '../../lib/send-email';
+import { SERVICE_PRICING, currentQuarterLabel } from '../../lib/service-pricing';
+
 import {
   QUOTE_DRAFT_EVENT,
   clearQuoteDraft,
   getQuoteDraft,
   type QuoteDraft,
 } from '../../lib/quote-draft';
+import { sendProjectBrief, type QuoteSnapshot } from '../../lib/send-email';
+import { SERVICE_OPTIONS } from '../../lib/service-options';
+import { useCurrency } from '../../lib/currency-context';
 
 /* -------------------------------------------------------------------------- */
 /*                                TESTIMONIALS                                */
@@ -227,6 +230,8 @@ const PRICING_PLANS = [
 ];
 
 export function Pricing() {
+  const { price } = useCurrency();
+
   return (
     <section id="pricing" className="py-16 sm:py-24 lg:py-32 scroll-mt-12 bg-background relative overflow-hidden">
       <div className="site-container">
@@ -383,7 +388,7 @@ export function Pricing() {
                       Starts from
                     </div>
                     <div className="font-display text-xl font-semibold tracking-tight text-foreground">
-                      {formatINR(service.startsAt)}
+                      {price(service.startsAt)}
                       {service.unit === 'per month' && (
                         <span className="text-[11px] font-medium text-muted-foreground ml-1">
                           /mo
@@ -505,6 +510,7 @@ export function ContactCta() {
   const [loading, setLoading] = useState(false);
   const [service, setService] = useState('');
   const [message, setMessage] = useState('');
+  const [quote, setQuote] = useState<QuoteSnapshot | undefined>(undefined);
 
   // Receive a scope configured in the estimator above, so the visitor never
   // retypes it. Reads any draft left from an earlier scroll, then stays live.
@@ -513,12 +519,14 @@ export function ContactCta() {
     if (existing) {
       setService(existing.serviceId);
       setMessage(existing.message);
+      setQuote(existing.quote);
     }
 
     const handleDraft = (event: Event) => {
       const draft = (event as CustomEvent<QuoteDraft>).detail;
       setService(draft.serviceId);
       setMessage(draft.message);
+      setQuote(draft.quote);
     };
 
     window.addEventListener(QUOTE_DRAFT_EVENT, handleDraft);
@@ -536,28 +544,30 @@ export function ContactCta() {
     const serviceVal = formData.get('service') as string;
     const messageVal = formData.get('message') as string;
 
-    try {
-      await sendContactEmail({
-        name,
-        email,
-        service: serviceVal || service,
-        message: messageVal || message,
-      });
+    const result = await sendProjectBrief({
+      name,
+      email,
+      service: serviceVal || service,
+      message: messageVal || message,
+      quote,
+      source: quote ? 'Homepage — estimator' : 'Homepage — contact form',
+    });
 
-      toast.success('Project brief received!', {
-        description: 'Your brief was sent to vivek@myplanetservices.com. We will reply within 24 hours.',
-      });
+    setLoading(false);
 
+    if (result.success) {
+      toast.success('Project brief received', {
+        description: `A confirmation is on its way to ${result.confirmationSentTo ?? email}. We reply within one working day.`,
+      });
       form.reset();
       setService('');
       setMessage('');
+      setQuote(undefined);
       clearQuoteDraft();
-    } catch (err) {
-      toast.success('Project brief received!', {
-        description: 'A senior architect will review your requirements and reply shortly.',
+    } else {
+      toast.error("Couldn't send your brief", {
+        description: `${result.error ?? 'Please try again'} — or email vivek@myplanetservices.com directly.`,
       });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -676,36 +686,15 @@ export function ContactCta() {
                     <option value="" disabled className="bg-ink-soft text-ink-muted">
                       Select primary build requirement
                     </option>
-                    <option value="ecommerce" className="bg-ink-soft text-ink-foreground">
-                      E-Commerce Development (Shopify / Headless)
-                    </option>
-                    <option value="corporate" className="bg-ink-soft text-ink-foreground">
-                      Company & Corporate Website
-                    </option>
-                    <option value="redesign" className="bg-ink-soft text-ink-foreground">
-                      Website Redesign & Modernization
-                    </option>
-                    <option value="crm-erp" className="bg-ink-soft text-ink-foreground">
-                      Custom CRM & ERP Systems
-                    </option>
-                    <option value="saas" className="bg-ink-soft text-ink-foreground">
-                      SaaS Platform Engineering
-                    </option>
-                    <option value="ai" className="bg-ink-soft text-ink-foreground">
-                      AI Agents & Copilots
-                    </option>
-                    <option value="website" className="bg-ink-soft text-ink-foreground">
-                      High-Converting Web Platform
-                    </option>
-                    <option value="app" className="bg-ink-soft text-ink-foreground">
-                      Mobile Application (iOS / Android)
-                    </option>
-                    <option value="seo" className="bg-ink-soft text-ink-foreground">
-                      SEO, AEO & Generative Engine Indexing
-                    </option>
-                    <option value="marketing" className="bg-ink-soft text-ink-foreground">
-                      Performance Marketing & Growth
-                    </option>
+                    {SERVICE_OPTIONS.map((opt) => (
+                      <option
+                        key={opt.id}
+                        value={opt.id}
+                        className="bg-ink-soft text-ink-foreground"
+                      >
+                        {opt.label}
+                      </option>
+                    ))}
                   </select>
                 </div>
 

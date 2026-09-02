@@ -14,7 +14,21 @@ import {
   Layers,
   Check,
   ArrowRight,
+  Sparkles,
 } from 'lucide-react';
+
+/**
+ * Work we're asked for that doesn't map to any of the nine disciplines above.
+ * Each one has to be clearly outside the list, or the section reads as padding.
+ */
+const BEYOND_THE_LIST = [
+  'Marketplaces & multi-vendor platforms',
+  'Booking & scheduling systems',
+  'Data pipelines & BI dashboards',
+  'Legacy system integration',
+  'No-code migration (Bubble, Webflow → React)',
+  'API productisation & developer portals',
+];
 
 const PARTNER_LOGOS = [
   'Vantage',
@@ -504,6 +518,73 @@ export function Services() {
               </div>
             );
           })}
+        </div>
+
+        {/* Closer: the nine rows are the common asks, not the boundary. */}
+        <div
+          data-reveal
+          className="mt-4 sm:mt-5 rounded-[28px] sm:rounded-[32px] bg-ink text-ink-foreground border border-butter/30 shadow-xl relative overflow-hidden"
+        >
+          <div
+            className="absolute -top-24 -right-16 w-80 h-56 bg-butter/15 rounded-full blur-3xl pointer-events-none"
+            aria-hidden="true"
+          />
+
+          <div className="relative p-7 sm:p-9 lg:p-11 grid gap-8 lg:gap-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:items-center">
+            <div className="min-w-0">
+              <div className="inline-flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.16em] text-butter font-semibold mb-3">
+                <Sparkles className="w-3.5 h-3.5 shrink-0 animate-icon-sparkle" />
+                <span>Not seeing yours?</span>
+              </div>
+
+              <h3 className="font-display text-2xl sm:text-3xl lg:text-[2rem] font-medium tracking-tight leading-tight text-ink-foreground mb-3">
+                If you can describe it, we can build it.
+              </h3>
+
+              <p className="text-sm sm:text-[15px] leading-relaxed text-ink-muted mb-6 max-w-xl">
+                The nine above are simply what we get asked for most. They are not
+                the boundary. Tell us what you are trying to build — and if it is
+                not something we should take on, we will say so and point you
+                somewhere better.
+              </p>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <Link
+                  to="/contact"
+                  className="bg-butter text-butter-foreground px-5 py-3 rounded-full text-xs sm:text-sm font-semibold inline-flex items-center gap-2 hover:scale-[1.03] active:scale-95 transition-transform shadow-sm group/cta"
+                >
+                  <span>Describe your project</span>
+                  <ArrowRight className="w-4 h-4 group-hover/cta:translate-x-0.5 transition-transform" />
+                </Link>
+                <Link
+                  to="/process"
+                  className="bg-white/5 text-ink-foreground border border-white/15 px-5 py-3 rounded-full text-xs sm:text-sm font-medium inline-flex items-center gap-2 hover:bg-white/10 transition-colors"
+                >
+                  <span>See how we scope</span>
+                </Link>
+              </div>
+            </div>
+
+            {/* Real briefs that fit none of the nine — concrete beats "anything". */}
+            <div className="lg:pl-10 lg:border-l border-white/10">
+              <div className="text-[10px] font-mono uppercase tracking-wider text-ink-muted font-semibold mb-4">
+                Recently asked for, and built
+              </div>
+              <div className="flex flex-col gap-2.5">
+                {BEYOND_THE_LIST.map((item) => (
+                  <div
+                    key={item}
+                    className="flex items-start gap-2.5 text-xs sm:text-[13px] font-medium text-ink-foreground"
+                  >
+                    <div className="w-4 h-4 rounded-full bg-butter/20 text-butter flex items-center justify-center shrink-0 mt-0.5">
+                      <Check className="w-2.5 h-2.5 stroke-[3]" />
+                    </div>
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>

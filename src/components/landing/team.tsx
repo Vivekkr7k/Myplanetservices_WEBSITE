@@ -4,6 +4,7 @@ import {
   Sparkles,
   Zap,
   Compass,
+  UserPlus,
 } from 'lucide-react';
 
 interface TeamMember {
@@ -251,6 +252,57 @@ export function TeamSection() {
               </div>
             );
           })}
+        </div>
+
+        {/*
+          Growth signal. Worded carefully: the section header above says "we are
+          few by design", so this has to read as deliberate expansion rather than
+          headcount bragging, or the two messages fight each other.
+        */}
+        <div
+          data-reveal
+          className="max-w-7xl mx-auto mt-8 sm:mt-10 rounded-[28px] sm:rounded-[32px] border border-dashed border-border bg-card/60 p-7 sm:p-9 flex flex-col lg:flex-row lg:items-center gap-7 lg:gap-10"
+        >
+          {/* Seats waiting to be filled */}
+          <div className="flex items-center shrink-0" aria-hidden="true">
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                style={{ animationDelay: `${i * 0.45}s` }}
+                className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl border border-dashed border-border bg-secondary/70 flex items-center justify-center animate-icon-float ${
+                  i > 0 ? '-ml-3 sm:-ml-4' : ''
+                }`}
+              >
+                <UserPlus className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground/70" />
+              </div>
+            ))}
+            <div className="-ml-3 sm:-ml-4 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-butter text-butter-foreground flex items-center justify-center font-display text-sm font-bold shadow-xs">
+              +
+            </div>
+          </div>
+
+          <div className="flex-1 min-w-0 text-left">
+            <div className="text-[10px] font-mono uppercase tracking-[0.16em] text-butter-foreground font-semibold mb-2">
+              The studio is growing
+            </div>
+            <h3 className="font-display text-lg sm:text-xl font-medium tracking-tight text-foreground mb-2 leading-snug">
+              More senior operators join us every quarter.
+            </h3>
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl">
+              We add people the same way we take on work — deliberately. Every name
+              on this page is a principal-level engineer, designer or strategist, and
+              that stays true as the studio grows. You will always be working with
+              the people actually building your product.
+            </p>
+          </div>
+
+          <a
+            href="mailto:vivek@myplanetservices.com?subject=Joining%20the%20studio"
+            className="shrink-0 bg-ink text-ink-foreground hover:bg-butter hover:text-butter-foreground px-5 py-3 rounded-full text-xs sm:text-sm font-semibold inline-flex items-center justify-center gap-2 transition-all duration-300 hover:scale-[1.03] active:scale-95 shadow-soft group"
+          >
+            <span>Think you belong here?</span>
+            <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          </a>
         </div>
       </div>
     </section>

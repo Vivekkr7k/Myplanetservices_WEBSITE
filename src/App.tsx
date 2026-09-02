@@ -6,6 +6,7 @@ import { SiteFooter } from './components/landing/sections';
 import { Toaster } from 'sonner';
 import { SmoothScrollProvider } from './lib/lenis-scroll';
 import { ThemeProvider } from './lib/theme';
+import { CurrencyProvider } from './lib/currency-context';
 
 // Pages
 import HomePage from './pages/home-page';
@@ -22,6 +23,7 @@ export function App() {
 
   return (
     <ThemeProvider>
+      <CurrencyProvider>
       <BrowserRouter>
         <SmoothScrollProvider>
         <div className="min-h-screen max-w-full overflow-x-hidden bg-background text-foreground flex flex-col selection:bg-butter selection:text-butter-foreground">
@@ -54,6 +56,7 @@ export function App() {
       </div>
         </SmoothScrollProvider>
       </BrowserRouter>
+      </CurrencyProvider>
     </ThemeProvider>
   );
 }

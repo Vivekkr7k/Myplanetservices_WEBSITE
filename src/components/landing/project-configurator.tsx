@@ -7,12 +7,13 @@ import {
   BUNDLED_PERKS,
   calculateEstimate,
   scaledAddonPrice,
-  formatINR,
   currentQuarterLabel,
   nextKickoffDate,
   qualifiesForBundle,
 } from '../../lib/service-pricing';
 import { setQuoteDraft } from '../../lib/quote-draft';
+import { useCurrency } from '../../lib/currency-context';
+import { CUSTOM_SERVICE_ID } from '../../lib/service-options';
 
 const defaultAddonsFor = (serviceId: string) =>
   SERVICE_PRICING.find((s) => s.id === serviceId)
@@ -20,10 +21,12 @@ const defaultAddonsFor = (serviceId: string) =>
     .map((a) => a.id) ?? [];
 
 export function ProjectConfigurator() {
+  const { price } = useCurrency();
   const [serviceId, setServiceId] = useState('ecommerce');
   const [tierId, setTierId] = useState('growth');
   const [addonIds, setAddonIds] = useState<string[]>(() => defaultAddonsFor('ecommerce'));
 
+  const isCustom = serviceId === CUSTOM_SERVICE_ID;
   const service = SERVICE_PRICING.find((s) => s.id === serviceId) ?? SERVICE_PRICING[0];
   const tier = SCALE_TIERS.find((t) => t.id === tierId) ?? SCALE_TIERS[1];
 
@@ -47,6 +50,21 @@ export function ProjectConfigurator() {
     );
   };
 
+  const handleCustomEnquiry = () => {
+    setQuoteDraft({
+      serviceId: CUSTOM_SERVICE_ID,
+      message: [
+        'Custom scope enquiry',
+        '',
+        "What I'm trying to build: ",
+      ].join('\n'),
+    });
+    toast.success('Tell us about it', {
+      description: "Describe the build in the form below and we'll scope and price it.",
+    });
+    document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   const handleGetQuote = () => {
     const chosen = service.addons
       .filter((a) => addonIds.includes(a.id))
@@ -55,7 +73,7 @@ export function ProjectConfigurator() {
     const message = [
       `Estimate request — ${service.title} (${tier.label} scale)`,
       chosen.length ? `Add-ons: ${chosen.join(', ')}` : 'Add-ons: core scope only',
-      `Estimated range: ${formatINR(estimate.low)} – ${formatINR(estimate.high)}${
+      `Estimated range: ${price(estimate.low)} – ${price(estimate.high)}${
         estimate.recurring ? ' per month' : ''
       }`,
       `Timeline: ${estimate.weeksLabel} · earliest kickoff ${kickoff}`,
@@ -66,7 +84,20 @@ export function ProjectConfigurator() {
       'My goals for this project: ',
     ].join('\n');
 
-    setQuoteDraft({ serviceId: service.id, message });
+    setQuoteDraft({
+      serviceId: service.id,
+      message,
+      quote: {
+        serviceTitle: service.title,
+        scale: tier.label,
+        addons: chosen,
+        low: estimate.low,
+        high: estimate.high,
+        recurring: estimate.recurring,
+        timeline: estimate.weeksLabel,
+        bundled: qualifiesForBundle(service) ? BUNDLED_PERKS.map((p) => p.label) : [],
+      },
+    });
 
     toast.success('Estimate ready', {
       description: 'Your scope is filled into the brief below — add your details to get a fixed quote.',
@@ -119,6 +150,7 @@ export function ProjectConfigurator() {
                 {s.title}
               </option>
             ))}
+            <option value={CUSTOM_SERVICE_ID}>Other / Custom service</option>
           </select>
           <ChevronDown
             className="w-4 h-4 text-muted-foreground absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"
@@ -126,6 +158,33 @@ export function ProjectConfigurator() {
           />
         </div>
       </div>
+
+      {isCustom ? (
+        /* Nothing in the catalogue matches, so there is no honest number to
+           show. Route to a conversation instead of inventing a price. */
+        <div className="relative">
+          <div className="rounded-2xl bg-secondary/60 border border-border px-4 py-5 mb-5">
+            <p className="text-sm font-medium text-foreground mb-1.5">
+              Tell us what you have in mind
+            </p>
+            <p className="text-[13px] text-muted-foreground leading-relaxed">
+              Custom scopes don't have a shelf price. Describe the build and we'll
+              come back with a fixed quote and timeline within one working day —
+              same free first year of hosting and maintenance either way.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleCustomEnquiry}
+            className="w-full bg-ink text-ink-foreground hover:bg-butter hover:text-butter-foreground px-6 py-3.5 rounded-full text-sm font-semibold inline-flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-soft cursor-pointer"
+          >
+            <span>Describe your project</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+      ) : (
+        <>
 
       {/* 2. Scale */}
       <div className="relative mb-5">
@@ -199,7 +258,7 @@ export function ProjectConfigurator() {
                     isSelected ? 'text-butter-foreground' : 'text-muted-foreground'
                   }`}
                 >
-                  +{formatINR(scaledAddonPrice(addon, tier))}
+                  +{price(scaledAddonPrice(addon, tier))}
                 </span>
               </button>
             );
@@ -232,11 +291,11 @@ export function ProjectConfigurator() {
           </div>
           <div className="flex items-baseline gap-1.5 flex-wrap">
             <span className="font-display text-2xl sm:text-3xl font-semibold text-foreground tabular-nums">
-              {formatINR(estimate.low)}
+              {price(estimate.low)}
             </span>
             <span className="text-muted-foreground text-lg">–</span>
             <span className="font-display text-2xl sm:text-3xl font-semibold text-foreground tabular-nums">
-              {formatINR(estimate.high)}
+              {price(estimate.high)}
             </span>
             {estimate.recurring && (
               <span className="text-xs text-muted-foreground font-medium">/month</span>
@@ -259,6 +318,8 @@ export function ProjectConfigurator() {
           <ArrowRight className="w-4 h-4" />
         </button>
       </div>
+        </>
+      )}
     </div>
   );
 }

@@ -101,10 +101,19 @@ const SOLUTION_CATEGORIES = [
   },
 ];
 
+/**
+ * Single source of truth for the header links — rendered by BOTH the desktop bar
+ * and the mobile sheet. They were separate lists before, which is how /faq ended
+ * up mobile-only and /why-us and /contact ended up with no entry at all.
+ *
+ * Solutions is not in here: it owns a mega-dropdown and is rendered separately.
+ */
 const NAV_LINKS = [
+  { label: 'Why Us', href: '/why-us' },
   { label: 'Process', href: '/process' },
   { label: 'Pricing', href: '/pricing' },
-  { label: 'Docs', href: '/faq' },
+  { label: 'FAQ', href: '/faq' },
+  { label: 'Contact', href: '/contact' },
 ];
 
 export function SiteNav() {
@@ -156,7 +165,7 @@ export function SiteNav() {
           </Link>
 
           {/* Center: Desktop Navigation Links (Centered in the Nav Bar) */}
-          <div className="hidden lg:flex items-center gap-7 xl:gap-8 absolute left-1/2 -translate-x-1/2">
+          <div className="hidden lg:flex items-center gap-5 xl:gap-7 2xl:gap-8 absolute left-1/2 -translate-x-1/2">
             {/* Solutions with Mega Dropdown */}
             <div
               className="relative"
@@ -265,26 +274,20 @@ export function SiteNav() {
               )}
             </div>
 
-            <NavLink
-              to="/process"
-              className={({ isActive }) =>
-                `text-xs font-mono uppercase tracking-wider transition-colors ${
-                  isActive ? 'text-foreground font-bold' : 'text-muted-foreground hover:text-foreground'
-                }`
-              }
-            >
-              PROCESS
-            </NavLink>
-            <NavLink
-              to="/pricing"
-              className={({ isActive }) =>
-                `text-xs font-mono uppercase tracking-wider transition-colors ${
-                  isActive ? 'text-foreground font-bold' : 'text-muted-foreground hover:text-foreground'
-                }`
-              }
-            >
-              PRICING
-            </NavLink>
+            {NAV_LINKS.map((link) => (
+              <NavLink
+                key={link.href}
+                to={link.href}
+                onClick={() => setDropdownOpen(false)}
+                className={({ isActive }) =>
+                  `text-xs font-mono uppercase tracking-wider whitespace-nowrap transition-colors ${
+                    isActive ? 'text-foreground font-bold' : 'text-muted-foreground hover:text-foreground'
+                  }`
+                }
+              >
+                {link.label}
+              </NavLink>
+            ))}
           </div>
 
           {/* Right: Theme Toggle, CTA Button & Mobile Hamburger */}
