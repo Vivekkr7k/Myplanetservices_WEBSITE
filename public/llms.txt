@@ -1,0 +1,46 @@
+# My Planet Services
+
+> High-velocity SaaS, Web, and AI Automation Development Studio building production software, headless storefronts, custom CRM/ERP engines, and generative AI systems for ambitious teams.
+
+## Overview
+My Planet Services operates as an integrated product unit: strategy, UI/UX architecture, full-stack engineering, and AI automation working in seamless agile sprints. Clients work directly with senior principal architects and engineers with zero agency bloat, 100% IP ownership, and weekly Friday demo deployments.
+
+- Website: https://myplanetservices.com
+- Full Knowledge Base: https://myplanetservices.com/llms-full.txt
+- Primary Contact: vivek@myplanetservices.com / hello@myplanetservices.com
+- Telephone: +1 (415) 555-0148
+- Locations: Austin, TX / Bengaluru, India / Remote-First Worldwide
+
+## Key Pages & Core Capabilities
+
+- [Home](https://myplanetservices.com/): Unified system to build, test, ship, and scale production software.
+- [Services](https://myplanetservices.com/services): 9 engineered engineering disciplines from headless e-commerce to enterprise AI copilots.
+- [Why Us](https://myplanetservices.com/why-us): Why venture-backed startups and scaling brands choose My Planet Services over traditional agencies.
+- [Process](https://myplanetservices.com/process): 4-phase agile sprint delivery model with weekly Friday demos and live staging links.
+- [Pricing](https://myplanetservices.com/pricing): Transparent fixed sprint tiers, dedicated squad retainers, and custom enterprise architectures.
+- [FAQ](https://myplanetservices.com/faq): Engineering, AI guardrails, code ownership, sprint cadence, and billing questions answered.
+- [Contact](https://myplanetservices.com/contact): Project brief submission, direct slot booking, and NDA-backed scoping within 48 hours.
+
+## Core Engineering Disciplines
+
+1. **E-Commerce Development**: Custom headless Shopify Plus & Medusa storefronts, sub-second checkout, 3D visualizers, ERP/inventory synchronization, 98+ Core Web Vitals.
+2. **Company & Corporate Websites**: Flagship digital presences, bespoke brand translation, headless CMS (Sanity, Strapi), WCAG AAA accessibility, multi-language localization.
+3. **Website Redesign & Modernization**: UI/UX overhaul, 98+ PageSpeed optimization, zero SEO equity loss, modern React 19 / Next.js migration.
+4. **Custom CRM & ERP Systems**: Tailored business operating engines, automated pipelines, role-based security, automated client/vendor portals.
+5. **Web Applications & SaaS Platforms**: Multi-tenant architectures, scalable database schemas, Stripe/Paddle billing, real-time sync, microservices.
+6. **Mobile App Development**: Cross-platform iOS & Android apps built with React Native & Flutter, offline sync, biometric auth.
+7. **AI Automation & Vector Ops**: Zero-hallucination support agents, automated lead qualification, vector RAG search, internal LLM copilots.
+8. **SEO, AEO & GEO Programs**: Programmatic SEO, schema.org JSON-LD entity structures for Google rich snippets, voice search, and generative answer engine citations (ChatGPT, Perplexity, Gemini).
+9. **Digital Marketing & Growth**: High-converting landing funnels, multi-channel performance creative, retention workflows, revenue analytics.
+
+## Engagement Models
+
+- **Launch Sprint (Fixed Scope)**: Rapid MVP delivery in 2 to 4 weeks. Ideal for founders launching a new venture or high-converting marketing system.
+- **Scale Platform (Dedicated Squad)**: Monthly dedicated senior engineering pod (full-stack + AI + design). Weekly Friday demos, direct Slack channel, continuous roadmap execution.
+- **Enterprise Engine (Custom Architecture Pod)**: High-security, multi-region architecture, SOC2 compliance, dedicated technical lead, 24/7 SLA.
+
+## Guarantees & Standards
+
+- **100% IP Ownership**: You own all source code, design systems, databases, and cloud infrastructure from day one.
+- **Mutual NDA**: Strict confidentiality prior to reviewing product roadmaps or proprietary codebases.
+- **Performance**: Guaranteed 95+ Core Web Vitals score on mobile and desktop.

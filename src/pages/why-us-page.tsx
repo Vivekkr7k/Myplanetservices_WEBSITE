@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+import { SEOHead } from '../components/common/seo-head';
+import { getBreadcrumbSchema, SITE_URL } from '../lib/seo-schemas';
 import {
   Gauge,
   Users,
@@ -99,8 +101,33 @@ const STATS = [
 ];
 
 export function WhyUsPage() {
+  const whyUsSchema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      getBreadcrumbSchema([{ name: 'Why Us', path: '/why-us' }]),
+      {
+        '@type': 'AboutPage',
+        '@id': `${SITE_URL}/why-us#webpage`,
+        url: `${SITE_URL}/why-us`,
+        name: 'Why My Planet Services — Studio Credentials & Engineering Values',
+        description:
+          'Discover why venture-backed startups and scaling enterprises partner with My Planet Services: senior squads, zero agency bloat, 100% IP ownership, and guaranteed weekly demo builds.',
+        mainEntity: {
+          '@id': `${SITE_URL}/#organization`,
+        },
+      },
+    ],
+  };
+
   return (
     <div className="pt-24 pb-16 sm:pt-32 sm:pb-24 lg:pt-36 lg:pb-32 overflow-hidden">
+      <SEOHead
+        title="Why My Planet Services — The Studio Advantage"
+        description="Discover why scaling brands choose My Planet Services: dedicated senior engineers, zero agency overhead, 100% IP ownership, and weekly demo builds."
+        canonicalPath="/why-us"
+        keywords="why hire my planet services, boutique engineering studio, vs digital agency, software development partner, senior engineers direct"
+        schema={whyUsSchema}
+      />
       {/* Aurora Glow */}
       <div
         className="aurora absolute inset-x-0 -top-24 h-[620px] opacity-90 blur-[2px] pointer-events-none -z-10"

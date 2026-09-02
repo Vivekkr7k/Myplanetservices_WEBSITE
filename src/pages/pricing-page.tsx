@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { SEOHead } from '../components/common/seo-head';
+import { getBreadcrumbSchema } from '../lib/seo-schemas';
 import {
   Check,
   Sparkles,
@@ -107,8 +109,33 @@ export function PricingPage() {
     }
   };
 
+  const pricingSchema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      getBreadcrumbSchema([{ name: 'Pricing', path: '/pricing' }]),
+      {
+        '@type': 'OfferCatalog',
+        name: 'My Planet Services Engagement Models & Tiers',
+        itemListElement: PLANS.map((plan, idx) => ({
+          '@type': 'Offer',
+          position: idx + 1,
+          name: plan.name,
+          category: plan.model,
+          description: plan.description,
+        })),
+      },
+    ],
+  };
+
   return (
     <div className="pt-24 pb-16 sm:pt-32 sm:pb-24 lg:pt-36 lg:pb-32 overflow-hidden">
+      <SEOHead
+        title="Predictable Pricing & Engagement Tiers — My Planet Services"
+        description="Transparent software engineering pricing. Choose fixed-scope Launch Sprints, monthly dedicated Scale Squads, or custom Enterprise architectures with zero hidden fees."
+        canonicalPath="/pricing"
+        keywords="software development pricing, dedicated engineering squad cost, fixed scope sprint pricing, web development retainer, SaaS MVP cost"
+        schema={pricingSchema}
+      />
       {/* Aurora Glow */}
       <div
         className="aurora absolute inset-x-0 -top-24 h-[620px] opacity-90 blur-[2px] pointer-events-none -z-10"

@@ -123,7 +123,7 @@ export function TeamSection() {
           </h2>
 
           <p className="text-base sm:text-lg leading-relaxed text-muted-foreground max-w-2xl mx-auto">
-            We are few by design. You collaborate directly with principal operators, ex-Stripe architects, and senior designers — no account managers or outsourced junior engineers.
+            We are few by design. You work directly with the principals — the engineers, designers and strategists actually building your product. No account managers, no outsourced junior teams, no handoffs.
           </p>
 
           {/* Floating Pill Action Buttons (From Image 2) */}

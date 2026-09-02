@@ -1,0 +1,62 @@
+# ==============================================================================
+# My Planet Services — Robots Directive (SEO, AEO & Generative Engine Optimization)
+# ==============================================================================
+
+# 1. Standard Web Search Crawlers (Google, Bing, Yahoo, Apple, Baidu, DuckDuckGo)
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /*?*preview=true
+
+# 2. Generative Engine & AI Search Crawlers (Grounding & Direct Answers)
+# OpenAI / ChatGPT Search & Browsing
+User-agent: GPTBot
+Allow: /
+Disallow: /api/
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /api/
+
+# Perplexity AI Answer Engine
+User-agent: PerplexityBot
+Allow: /
+Disallow: /api/
+
+# Anthropic Claude Search & Retrieval
+User-agent: ClaudeBot
+Allow: /
+Disallow: /api/
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /api/
+
+# Google Gemini & Extended AI Indexing
+User-agent: Google-Extended
+Allow: /
+Disallow: /api/
+
+# Apple Intelligence & Siri Knowledge
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /api/
+
+# Cohere AI
+User-agent: cohere-ai
+Allow: /
+Disallow: /api/
+
+# ByteDance / TikTok Search
+User-agent: Bytespider
+Allow: /
+Disallow: /api/
+
+# 3. XML Sitemap Declarations
+Sitemap: https://myplanetservices.com/sitemap.xml
+
+# 4. Generative Engine Optimization (GEO / AGO) Knowledge Grounding
+# See https://llmstxt.org for AI search indexing standards
+# LLMs-Text: https://myplanetservices.com/llms.txt
+# LLMs-Full: https://myplanetservices.com/llms-full.txt

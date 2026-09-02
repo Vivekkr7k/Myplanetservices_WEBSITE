@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { SEOHead } from '../components/common/seo-head';
+import { getBreadcrumbSchema, getContactPageSchema } from '../lib/seo-schemas';
 import {
   Mail,
   Phone,
@@ -114,8 +116,23 @@ export function ContactPage() {
     }
   };
 
+  const contactSchema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      getBreadcrumbSchema([{ name: 'Contact', path: '/contact' }]),
+      getContactPageSchema(),
+    ],
+  };
+
   return (
     <div className="pt-24 pb-16 sm:pt-32 sm:pb-24 lg:pt-36 lg:pb-32 overflow-hidden">
+      <SEOHead
+        title="Contact & Project Brief Scoping — My Planet Services"
+        description="Start your project brief, schedule an architecture discovery call, and receive a scoped technical plan and fixed quote within 48 hours."
+        canonicalPath="/contact"
+        keywords="contact software agency, hire SaaS developers, project brief quote, discovery call software, NDA software development"
+        schema={contactSchema}
+      />
       {/* Aurora Glow */}
       <div
         className="aurora absolute inset-x-0 -top-24 h-[620px] opacity-90 blur-[2px] pointer-events-none -z-10"

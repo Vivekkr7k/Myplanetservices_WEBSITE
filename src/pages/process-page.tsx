@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+import { SEOHead } from '../components/common/seo-head';
+import { getBreadcrumbSchema, getProcessSchema } from '../lib/seo-schemas';
 import {
   Compass,
   Layout,
@@ -106,8 +108,23 @@ const TOOLS = [
 ];
 
 export function ProcessPage() {
+  const processSchema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      getBreadcrumbSchema([{ name: 'Process', path: '/process' }]),
+      getProcessSchema(),
+    ],
+  };
+
   return (
     <div className="pt-24 pb-16 sm:pt-32 sm:pb-24 lg:pt-36 lg:pb-32 overflow-hidden">
+      <SEOHead
+        title="4-Phase Sprint Methodology & Engineering Process — My Planet Services"
+        description="Learn how My Planet Services takes software from discovery workshop to production deployment with two-week agile sprints, weekly Friday staging demos, and zero surprises."
+        canonicalPath="/process"
+        keywords="agile sprint process, software engineering workflow, weekly demo builds, product development methodology, staging deployment cadence"
+        schema={processSchema}
+      />
       {/* Aurora Glow */}
       <div
         className="aurora absolute inset-x-0 -top-24 h-[620px] opacity-90 blur-[2px] pointer-events-none -z-10"

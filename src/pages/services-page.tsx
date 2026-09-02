@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { SEOHead } from '../components/common/seo-head';
+import { getBreadcrumbSchema, getServicesSchema } from '../lib/seo-schemas';
 import {
   Globe,
   ShoppingCart,
@@ -233,8 +235,30 @@ export function ServicesPage() {
   const activeDiscipline = DISCIPLINES.find((d) => d.id === activeTab) || DISCIPLINES[0];
   const Icon = activeDiscipline.icon;
 
+  const servicesSchema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      getBreadcrumbSchema([{ name: 'Services', path: '/services' }]),
+      getServicesSchema(
+        DISCIPLINES.map((d) => ({
+          id: d.id,
+          title: d.title,
+          description: d.description,
+          deliverables: d.deliverables,
+        }))
+      ),
+    ],
+  };
+
   return (
     <div className="pt-24 pb-16 sm:pt-32 sm:pb-24 lg:pt-36 lg:pb-32 overflow-hidden">
+      <SEOHead
+        title="Engineered Services & Product Capabilities — My Planet Services"
+        description="Explore our 9 specialized engineering disciplines: Headless E-Commerce, Corporate Websites, Website Redesign, Custom CRM & ERP, SaaS Platforms, Mobile Apps, AI Automation, SEO/AEO/GEO, and Digital Marketing."
+        canonicalPath="/services"
+        keywords="headless commerce, Shopify Plus development, enterprise SaaS development, AI automation workflows, React 19, Next.js, mobile app development, SEO AEO GEO optimization"
+        schema={servicesSchema}
+      />
       {/* Aurora Glow */}
       <div
         className="aurora absolute inset-x-0 -top-24 h-[620px] opacity-90 blur-[2px] pointer-events-none -z-10"

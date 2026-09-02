@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { SEOHead } from '../components/common/seo-head';
+import { getBreadcrumbSchema, getFaqPageSchema } from '../lib/seo-schemas';
 import {
   Plus,
   Minus,
@@ -85,6 +87,14 @@ export function FaqPage() {
   const [selectedCat, setSelectedCat] = useState('All');
   const [openIdx, setOpenIdx] = useState<number | null>(0);
 
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      getBreadcrumbSchema([{ name: 'FAQ', path: '/faq' }]),
+      getFaqPageSchema(ALL_FAQS),
+    ],
+  };
+
   const filteredFaqs =
     selectedCat === 'All'
       ? ALL_FAQS
@@ -96,6 +106,13 @@ export function FaqPage() {
 
   return (
     <div className="pt-24 pb-16 sm:pt-32 sm:pb-24 lg:pt-36 lg:pb-32 overflow-hidden">
+      <SEOHead
+        title="Frequently Asked Questions & Answers — My Planet Services"
+        description="Clear answers about our engineering sprint cadence, AI automation guardrails, pricing, intellectual property ownership, and technical stack capabilities."
+        canonicalPath="/faq"
+        keywords="software engineering FAQ, AI automation FAQ, SEO vs AEO vs GEO, IP ownership code, agile sprint delivery FAQ"
+        schema={faqSchema}
+      />
       {/* Aurora Glow */}
       <div
         className="aurora absolute inset-x-0 -top-24 h-[620px] opacity-90 blur-[2px] pointer-events-none -z-10"

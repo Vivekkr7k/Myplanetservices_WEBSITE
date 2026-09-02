@@ -1,0 +1,171 @@
+# My Planet Services — Full Technical & Organizational Documentation
+
+> Comprehensive specification of services, engineering stacks, delivery methodologies, pricing models, security policies, and technical FAQs for My Planet Services.
+
+Website: https://myplanetservices.com  
+Contact: vivek@myplanetservices.com / hello@myplanetservices.com  
+Direct Telephone: +1 (415) 555-0148  
+Operational Hubs: Austin, Texas, USA · Bengaluru, Karnataka, India · Remote-first Worldwide  
+Business Classification: Software as a Service (SaaS), Full-Stack Web Development, and Artificial Intelligence Engineering Studio  
+
+---
+
+## 1. Company Mission & Philosophy
+
+My Planet Services is an engineering and design studio architected to eliminate traditional agency bloat. Traditional agencies sell through senior partners and outsource implementation to junior developers or third-party contractors. My Planet Services operates with small, dedicated squads led directly by principal architects, senior engineers, and product designers.
+
+Core Operating Guarantees:
+- **Zero Lock-in & 100% IP Ownership**: All source code, Git repositories, Figma design tokens, vector databases, and cloud infrastructure belong to the client from milestone completion.
+- **Weekly Working Demos**: Every Friday, active squads deploy functional staging builds accompanied by recorded walkthrough videos.
+- **Mutual NDA Guaranteed**: Standard mutual non-disclosure agreements are executed prior to analyzing proprietary roadmaps, codebase access, or private APIs.
+- **Sub-Second Performance**: Every web surface is engineered for 95+ Google PageSpeed and sub-second Core Web Vitals.
+
+---
+
+## 2. Engineered Disciplines & Deliverables
+
+### 2.1 E-Commerce Development
+- **Scope**: Headless Shopify Plus, Medusa.js, and custom commerce engines engineered for high transaction concurrency, sub-second checkout, and maximum conversion rates.
+- **Deliverables**:
+  - Headless Shopify Plus & Medusa custom architectures
+  - Sub-second checkout flows & multi-currency payment routing
+  - Interactive 3D product visualizers & custom bundle builders
+  - Automated ERP, CRM, inventory & logistics synchronization
+  - Abandoned cart recovery & automated dynamic upsell funnels
+  - Guaranteed 98+ Core Web Vitals on mobile and desktop
+- **Tech Stack**: Shopify Plus, Medusa.js, Next.js, Stripe, Sanity CMS, Tailwind CSS
+
+### 2.2 Company & Corporate Websites
+- **Scope**: Flagship corporate websites for venture-backed startups and market leaders that build enterprise trust and pipeline.
+- **Deliverables**:
+  - Bespoke brand identity translation into interactive digital experiences
+  - Headless CMS with visual component block builders (Sanity, Strapi)
+  - Enterprise security, SOC2 compliance & WCAG AAA accessibility
+  - Multi-language localization (i18n) & multi-region edge delivery
+  - Interactive investor relations, case studies & team hubs
+  - Integrated lead qualification & marketing automation webhooks
+- **Tech Stack**: React 19, Next.js, Sanity CMS, Framer Motion, Tailwind v4, Vercel Edge
+
+### 2.3 Website Redesign & Modernization
+- **Scope**: Transforming outdated, slow, or legacy websites into modern, ultra-fast web platforms without losing SEO rankings or backlinks.
+- **Deliverables**:
+  - Complete UX/UI redesign with interactive prototypes
+  - Zero-downtime database and content migration
+  - PageSpeed optimization (98+ performance index guarantee)
+  - 100% 301 URL redirect mapping preserving domain SEO equity
+  - Conversion rate optimization (CRO) redesign of key funnel pages
+  - Automated continuous deployment (CI/CD) setup
+- **Tech Stack**: React 19, TypeScript, Next.js, Tailwind v4, Vercel, Supabase
+
+### 2.4 Custom CRM & ERP Systems
+- **Scope**: Bespoke internal business platforms and operations hubs built specifically around company workflows.
+- **Deliverables**:
+  - Tailored relational database architecture (PostgreSQL, Supabase)
+  - Custom lead pipelines, automated deal stages & task assignments
+  - Role-Based Access Control (RBAC) & enterprise audit logging
+  - Real-time client and vendor collaboration portals
+  - Bidirectional integrations with Stripe, QuickBooks, Slack & Zapier
+  - Live operational analytics and custom KPI dashboards
+- **Tech Stack**: Node.js, Next.js, PostgreSQL, Supabase, Prisma, Tailwind CSS
+
+### 2.5 Web Applications & SaaS Platforms
+- **Scope**: Scalable, multi-tenant software platforms engineered from napkin concept to venture-scale enterprise architectures.
+- **Deliverables**:
+  - Multi-tenant database design with isolated tenant security
+  - Authentication engines (OAuth, SSO, SAML, Magic Link, MFA)
+  - Automated billing infrastructure (Stripe Billing, Lemon Squeezy, Paddle)
+  - Real-time WebSockets / SSE for live notifications and collaboration
+  - Robust REST & GraphQL developer API suites with Swagger docs
+  - Automated CI/CD, staging sandboxes, and edge serverless deploy
+- **Tech Stack**: Next.js, TypeScript, PostgreSQL, Prisma, Redis, Docker, AWS / Vercel
+
+### 2.6 Mobile App Development
+- **Scope**: Cross-platform iOS and Android applications delivering 60fps native feel from a unified codebase.
+- **Deliverables**:
+  - Cross-platform native compilation (React Native & Flutter)
+  - Native gesture animations and haptic feedback
+  - Offline-first SQLite/WatermelonDB sync architecture
+  - Push notification pipelines (Firebase Cloud Messaging / OneSignal)
+  - Apple App Store & Google Play submission and compliance handling
+  - In-app purchases, Apple Pay & Google Pay checkout flows
+- **Tech Stack**: React Native, Expo, Flutter, TypeScript, SQLite, Supabase
+
+### 2.7 AI Automation & Vector Ops
+- **Scope**: Production-grade AI systems with strict guardrails, zero hallucinations, and high ROI.
+- **Deliverables**:
+  - Custom AI customer support agents with vector doc grounding
+  - Multi-agent orchestration workflows (LangChain, LlamaIndex, CrewAI)
+  - Retrieval-Augmented Generation (RAG) with vector databases (Pinecone, pgvector)
+  - Automated lead enrichment, scoring & outbound research bots
+  - Enterprise LLM guardrails (Pydantic, NeMo) eliminating hallucinations
+  - Cost-optimized inference routing (OpenAI, Anthropic Claude, open-source models)
+- **Tech Stack**: Python, OpenAI API, Anthropic Claude, Pinecone, LangChain, Supabase pgvector
+
+### 2.8 SEO, AEO & GEO Programs
+- **Scope**: Triple-layer search and AI visibility engineering.
+  - SEO: Traditional search rankings on Google, Bing, DuckDuckGo.
+  - AEO: Answer Engine Optimization structuring Schema.org entities for featured snippets, Siri, and voice assistants.
+  - GEO: Generative Engine Optimization ensuring brand indexing and accurate citations in ChatGPT, Perplexity, Claude, and Gemini.
+- **Deliverables**:
+  - Programmatic SEO landing engine (hundreds of high-intent programmatic pages)
+  - Complete Schema.org JSON-LD entity architecture (Organization, Service, FAQ, Product, Breadcrumb)
+  - Generative Engine Optimization (GEO) grounding files (`llms.txt`, `llms-full.txt`)
+  - Sub-second Core Web Vitals optimization (LCP < 1.2s, INP < 100ms, CLS < 0.05)
+  - AI Search Answer engine indexing audit and citation monitoring
+  - Technical crawl audit, sitemap architecture, and semantic internal linking
+- **Tech Stack**: Schema.org, JSON-LD, Google Search Console, Ahrefs, Semrush, Perplexity AI
+
+### 2.9 Digital Marketing & Growth Systems
+- **Scope**: Full-funnel demand generation, high-converting landing pages, and revenue attribution analytics.
+- **Deliverables**:
+  - High-converting landing page architectures with sub-second loads
+  - Multi-channel paid acquisition setup (Meta, Google Search, LinkedIn)
+  - Automated lifecycle email marketing funnels (Klaviyo, Customer.io)
+  - Attribution tracking & server-side Conversions API (CAPI)
+  - Heatmap & session recording integration (PostHog, Microsoft Clarity)
+  - Continuous multivariate (A/B) conversion rate optimization testing
+- **Tech Stack**: PostHog, Klaviyo, Meta CAPI, Google Analytics 4, React 19
+
+---
+
+## 3. The 4-Phase Sprint Methodology
+
+1. **Phase 1: Architecture Workshop (Days 1–5)**
+   - Discovery workshop, entity relationship modeling, tech stack finalization, clickable Figma wireframes, and fixed delivery roadmap.
+2. **Phase 2: Core Engineering Sprints (Weeks 2–6)**
+   - Weekly two-week sprints. Monday backlog planning, mid-week async updates, Friday demo builds deployed to live staging environments.
+3. **Phase 3: QA, Performance & Penetration Testing (Week 7)**
+   - Cross-browser QA, automated stress testing, WCAG AAA accessibility audit, penetration testing, and Core Web Vitals tuning.
+4. **Phase 4: Production Launch & Transfer (Week 8+)**
+   - Zero-downtime DNS propagation, production environment verification, recorded team handover training, and transfer of all Git repos and cloud accounts.
+
+---
+
+## 4. Frequently Asked Questions (Grounding Database)
+
+**Q: How quickly can we start after the discovery call?**  
+A: Engagements kick off within 7 to 10 days of our initial discovery workshop. Urgent launches can be fast-tracked depending on pod availability.
+
+**Q: Do you work with existing codebases or only greenfield builds?**  
+A: Both. For existing systems, we conduct a technical architecture audit, isolate legacy bottlenecks, stabilize critical paths, and refactor incrementally without forcing risky all-or-nothing rewrites.
+
+**Q: How is SEO different from AEO and GEO?**  
+A: SEO targets traditional search results on Google/Bing. AEO (Answer Engine Optimization) structures entity schema for featured snippets and voice assistants. GEO (Generative Engine Optimization) ensures your brand is indexed and cited accurately inside conversational AI tools like ChatGPT, Perplexity, and Gemini. My Planet Services implements all three simultaneously.
+
+**Q: Who owns the code, design assets, and cloud infrastructure?**  
+A: The client owns 100% of all intellectual property, source code repositories, Figma designs, and cloud infrastructure from day one.
+
+**Q: Can you sign our mutual NDA before reviewing product specs?**  
+A: Yes. We regularly sign mutual Non-Disclosure Agreements prior to reviewing proprietary product roadmaps, wireframes, or data architectures.
+
+**Q: How does communication work during active sprints?**  
+A: Clients get a private shared Slack channel with their dedicated senior engineers and designers. We hold Monday sprint kickoff calls, send mid-week async updates, and deploy a live staging preview with a recorded Loom demo every single Friday.
+
+---
+
+## 5. Contact & Booking Information
+
+- **Email Inquiries**: vivek@myplanetservices.com or hello@myplanetservices.com
+- **Phone**: +1 (415) 555-0148
+- **Online Brief Submission**: https://myplanetservices.com/contact
+- **Turnaround SLA**: Scoped technical plan and fixed quote within 2 business days.
