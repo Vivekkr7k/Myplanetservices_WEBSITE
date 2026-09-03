@@ -901,6 +901,11 @@ export function SiteFooter() {
             </h4>
             <ul className="flex flex-col gap-3 text-xs text-muted-foreground">
               <li>
+                <Link to="/work" className="hover:text-foreground transition-colors flex items-center gap-1.5 group">
+                  <span className="group-hover:translate-x-1 transition-transform">Work & Case Studies</span>
+                </Link>
+              </li>
+              <li>
                 <Link to="/#team" className="hover:text-foreground transition-colors flex items-center gap-1.5 group">
                   <span className="group-hover:translate-x-1 transition-transform">Meet The Squad</span>
                 </Link>

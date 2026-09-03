@@ -109,6 +109,7 @@ const SOLUTION_CATEGORIES = [
  * Solutions is not in here: it owns a mega-dropdown and is rendered separately.
  */
 const NAV_LINKS = [
+  { label: 'Work', href: '/work' },
   { label: 'Why Us', href: '/why-us' },
   { label: 'Process', href: '/process' },
   { label: 'Pricing', href: '/pricing' },

@@ -4,6 +4,8 @@ import {
   ArrowRight,
   Sparkles,
 } from 'lucide-react';
+import { SEOHead } from '../components/common/seo-head';
+import { getBreadcrumbSchema, SITE_URL } from '../lib/seo-schemas';
 
 const CATEGORIES = [
   'All',
@@ -13,7 +15,7 @@ const CATEGORIES = [
   'SEO & Growth',
 ];
 
-const CASE_STUDIES = [
+export const CASE_STUDIES = [
   {
     client: 'Fleetly',
     category: 'SaaS Platforms',
@@ -109,6 +111,30 @@ const CASE_STUDIES = [
 export function WorkPage() {
   const [selectedCat, setSelectedCat] = useState('All');
 
+  const workSchema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      getBreadcrumbSchema([{ name: 'Work & Case Studies', path: '/work' }]),
+      {
+        '@type': 'CollectionPage',
+        '@id': `${SITE_URL}/work#webpage`,
+        url: `${SITE_URL}/work`,
+        name: 'Selected Client Work & Engineering Case Studies — My Planet Services',
+        description:
+          'Proven client outcomes across SaaS platform engineering, AI automation, high-velocity web development, and programmatic SEO.',
+        mainEntity: {
+          '@type': 'ItemList',
+          itemListElement: CASE_STUDIES.map((study, idx) => ({
+            '@type': 'CreativeWork',
+            position: idx + 1,
+            name: `${study.client} — ${study.headline}`,
+            description: study.description,
+          })),
+        },
+      },
+    ],
+  };
+
   const filteredStudies =
     selectedCat === 'All'
       ? CASE_STUDIES
@@ -116,6 +142,13 @@ export function WorkPage() {
 
   return (
     <div className="pt-24 pb-16 sm:pt-32 sm:pb-24 lg:pt-36 lg:pb-32 overflow-hidden">
+      <SEOHead
+        title="Selected Client Work & Case Studies — My Planet Services"
+        description="Explore our proven client outcomes: multi-tenant SaaS platforms, autonomous AI copilots, sub-second headless e-commerce, and 14x SEO growth programs."
+        canonicalPath="/work"
+        keywords="SaaS development case studies, AI automation case studies, web development portfolio, software agency client outcomes"
+        schema={workSchema}
+      />
       {/* Aurora Glow */}
       <div
         className="aurora absolute inset-x-0 -top-24 h-[620px] opacity-90 blur-[2px] pointer-events-none -z-10"

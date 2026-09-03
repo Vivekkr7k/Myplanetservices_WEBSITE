@@ -15,6 +15,7 @@ My Planet Services operates as an integrated product unit: strategy, UI/UX archi
 
 - [Home](https://www.myplanetservices.com/): Unified system to build, test, ship, and scale production software.
 - [Services](https://www.myplanetservices.com/services): 9 engineered engineering disciplines from headless e-commerce to enterprise AI copilots.
+- [Work](https://www.myplanetservices.com/work): Selected client case studies with verified metrics across SaaS, AI, mobile, and growth.
 - [Why Us](https://www.myplanetservices.com/why-us): Why venture-backed startups and scaling brands choose My Planet Services over traditional agencies.
 - [Process](https://www.myplanetservices.com/process): 4-phase agile sprint delivery model with weekly Friday demos and live staging links.
 - [Pricing](https://www.myplanetservices.com/pricing): Transparent fixed sprint tiers, dedicated squad retainers, and custom enterprise architectures.

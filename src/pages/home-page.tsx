@@ -4,6 +4,7 @@ import { Hero } from '../components/landing/hero';
 import { LogoMarquee, Services } from '../components/landing/services';
 import { SprintBookingSection } from '../components/landing/sprint-booking-section';
 import { WhyUs, Process } from '../components/landing/why-process';
+import { WorkSection } from '../components/landing/work-section';
 import {
   Testimonials,
   Pricing,
@@ -36,6 +37,7 @@ export function HomePage() {
       <SprintBookingSection />
       <WhyUs />
       <Process />
+      <WorkSection />
       <Testimonials />
       <TeamSection />
       <Pricing />
