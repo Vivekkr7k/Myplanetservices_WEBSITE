@@ -39,29 +39,29 @@ import { useCurrency } from '../../lib/currency-context';
 const TESTIMONIALS_DATA = [
   {
     quote:
-      'My Planet Services replaced three separate agencies. They shipped our full AI SaaS platform in 6 weeks, then automated our onboarding pipeline completely.',
-    author: 'Amara Reyes',
-    role: 'Chief Operating Officer',
-    company: 'Fleetly AI',
-    avatar: 'AR',
+      'The team did an excellent job translating our vision for Wintek Digital into a modern, professional website. They understood our digital signage solutions well and created a website that presents our products and capabilities in a clear and engaging way.',
+    author: 'Prasanna R Goudar',
+    role: 'Co-founder & CEO',
+    company: 'Wintek Digital',
+    avatar: 'PG',
     rating: 5,
   },
   {
     quote:
-      'The clearest engineering sprint process we have ever seen. Weekly demo builds every Friday meant zero surprises and a launch date we hit on the dot.',
-    author: 'Karan Joshi',
-    role: 'Founder & CEO',
-    company: 'Northwind',
-    avatar: 'KJ',
+      'We are very happy with the work done on Ariqa.in. The team was creative, responsive and open to our ideas throughout the development process. They delivered a visually appealing website that gives Ariqa a strong and professional digital presence.',
+    author: 'Sunil',
+    role: 'Founder & Leadership',
+    company: 'ARiqA (ariqa.in)',
+    avatar: 'SU',
     rating: 5,
   },
   {
     quote:
-      'Our organic traffic and Perplexity/ChatGPT answer citations surged within 90 days. Their engineering is flawless and revenue-linked.',
-    author: 'Mia Sandoval',
-    role: 'Head of Growth',
-    company: 'Glossy',
-    avatar: 'MS',
+      'Outstanding component build quality, consistent specifications, and dependable engineering. The B2B digital catalog and quotation workflows significantly streamlined procurement across our commercial operations.',
+    author: 'AeroVanguard Technologies',
+    role: 'Engineering & Procurement',
+    company: 'Fortune India Client Partner',
+    avatar: 'AV',
     rating: 5,
   },
 ];
