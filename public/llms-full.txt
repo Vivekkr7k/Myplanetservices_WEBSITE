@@ -2,7 +2,7 @@
 
 > Comprehensive specification of services, engineering stacks, delivery methodologies, pricing models, security policies, and technical FAQs for My Planet Services.
 
-Website: https://myplanetservices.com  
+Website: https://www.myplanetservices.com  
 Contact: vivek@myplanetservices.com / hello@myplanetservices.com  
 Direct Telephone: +1 (415) 555-0148  
 Operational Hubs: Austin, Texas, USA · Bengaluru, Karnataka, India · Remote-first Worldwide  
@@ -167,5 +167,5 @@ A: Clients get a private shared Slack channel with their dedicated senior engine
 
 - **Email Inquiries**: vivek@myplanetservices.com or hello@myplanetservices.com
 - **Phone**: +1 (415) 555-0148
-- **Online Brief Submission**: https://myplanetservices.com/contact
+- **Online Brief Submission**: https://www.myplanetservices.com/contact
 - **Turnaround SLA**: Scoped technical plan and fixed quote within 2 business days.

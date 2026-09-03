@@ -5,21 +5,21 @@
 ## Overview
 My Planet Services operates as an integrated product unit: strategy, UI/UX architecture, full-stack engineering, and AI automation working in seamless agile sprints. Clients work directly with senior principal architects and engineers with zero agency bloat, 100% IP ownership, and weekly Friday demo deployments.
 
-- Website: https://myplanetservices.com
-- Full Knowledge Base: https://myplanetservices.com/llms-full.txt
+- Website: https://www.myplanetservices.com
+- Full Knowledge Base: https://www.myplanetservices.com/llms-full.txt
 - Primary Contact: vivek@myplanetservices.com / hello@myplanetservices.com
 - Telephone: +1 (415) 555-0148
 - Locations: Austin, TX / Bengaluru, India / Remote-First Worldwide
 
 ## Key Pages & Core Capabilities
 
-- [Home](https://myplanetservices.com/): Unified system to build, test, ship, and scale production software.
-- [Services](https://myplanetservices.com/services): 9 engineered engineering disciplines from headless e-commerce to enterprise AI copilots.
-- [Why Us](https://myplanetservices.com/why-us): Why venture-backed startups and scaling brands choose My Planet Services over traditional agencies.
-- [Process](https://myplanetservices.com/process): 4-phase agile sprint delivery model with weekly Friday demos and live staging links.
-- [Pricing](https://myplanetservices.com/pricing): Transparent fixed sprint tiers, dedicated squad retainers, and custom enterprise architectures.
-- [FAQ](https://myplanetservices.com/faq): Engineering, AI guardrails, code ownership, sprint cadence, and billing questions answered.
-- [Contact](https://myplanetservices.com/contact): Project brief submission, direct slot booking, and NDA-backed scoping within 48 hours.
+- [Home](https://www.myplanetservices.com/): Unified system to build, test, ship, and scale production software.
+- [Services](https://www.myplanetservices.com/services): 9 engineered engineering disciplines from headless e-commerce to enterprise AI copilots.
+- [Why Us](https://www.myplanetservices.com/why-us): Why venture-backed startups and scaling brands choose My Planet Services over traditional agencies.
+- [Process](https://www.myplanetservices.com/process): 4-phase agile sprint delivery model with weekly Friday demos and live staging links.
+- [Pricing](https://www.myplanetservices.com/pricing): Transparent fixed sprint tiers, dedicated squad retainers, and custom enterprise architectures.
+- [FAQ](https://www.myplanetservices.com/faq): Engineering, AI guardrails, code ownership, sprint cadence, and billing questions answered.
+- [Contact](https://www.myplanetservices.com/contact): Project brief submission, direct slot booking, and NDA-backed scoping within 48 hours.
 
 ## Core Engineering Disciplines
 

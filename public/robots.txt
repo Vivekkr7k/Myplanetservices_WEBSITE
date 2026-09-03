@@ -54,9 +54,9 @@ Allow: /
 Disallow: /api/
 
 # 3. XML Sitemap Declarations
-Sitemap: https://myplanetservices.com/sitemap.xml
+Sitemap: https://www.myplanetservices.com/sitemap.xml
 
 # 4. Generative Engine Optimization (GEO / AGO) Knowledge Grounding
 # See https://llmstxt.org for AI search indexing standards
-# LLMs-Text: https://myplanetservices.com/llms.txt
-# LLMs-Full: https://myplanetservices.com/llms-full.txt
+# LLMs-Text: https://www.myplanetservices.com/llms.txt
+# LLMs-Full: https://www.myplanetservices.com/llms-full.txt

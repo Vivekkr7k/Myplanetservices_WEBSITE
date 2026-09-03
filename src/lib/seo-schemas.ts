@@ -3,7 +3,7 @@
  * SEO (Search Engine Optimization), and GEO (Generative Engine Optimization).
  */
 
-export const SITE_URL = 'https://myplanetservices.com';
+export const SITE_URL = 'https://www.myplanetservices.com';
 export const SITE_NAME = 'My Planet Services';
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/assets/tour-preview.jpg`;
 
