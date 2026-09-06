@@ -179,7 +179,7 @@
 
   html {
     max-width: 100%;
-    overflow-x: hidden;
+    overflow-x: clip; /* clip, not hidden: hidden makes this a scroll container and kills position:sticky below it */
     /* Fixed nav clearance for every in-page anchor jump. */
     scroll-padding-top: 6.5rem;
   }
@@ -199,7 +199,7 @@
 
   body {
     max-width: 100%;
-    overflow-x: hidden;
+    overflow-x: clip;
     position: relative;
     background-color: var(--color-background);
     color: var(--color-foreground);
@@ -226,7 +226,7 @@ html.lenis,
 html.lenis body {
   height: auto;
   max-width: 100%;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 .lenis.lenis-smooth {
@@ -288,7 +288,7 @@ html.lenis body {
     transform: translateX(0);
   }
   to {
-    transform: translateX(-50%);
+    transform: translateX(-100%);
   }
 }
 

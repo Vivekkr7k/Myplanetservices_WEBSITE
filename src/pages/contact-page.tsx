@@ -14,7 +14,6 @@ import {
 import { toast } from 'sonner';
 import { sendProjectBrief, sendCallRequest } from '../lib/send-email';
 import { BookingCalendar } from '../components/common/booking-calendar';
-import { CurrencyToggle } from '../components/common/currency-toggle';
 import { useCurrency } from '../lib/currency-context';
 import { describeSlot, type Slot } from '../lib/booking-slots';
 import { SERVICE_OPTIONS } from '../lib/service-options';
@@ -162,14 +161,9 @@ export function ContactPage() {
             <h2 className="font-display text-2xl font-medium text-foreground mb-2">
               Send a Project Brief
             </h2>
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
-              <p className="text-xs sm:text-sm text-muted-foreground max-w-sm">
-                Fill in what you know. We'll handle the scoping, technical architecture, and milestones.
-              </p>
-              {/* Detection reads the browser timezone; a VPN gets it wrong, so
-                  the visitor can always correct it. */}
-              <CurrencyToggle className="shrink-0" />
-            </div>
+            <p className="text-xs sm:text-sm text-muted-foreground mb-8 max-w-md">
+              Fill in what you know. We'll handle the scoping, technical architecture, and milestones.
+            </p>
 
             <form id="contact-brief-form" onSubmit={handleSubmit} className="flex flex-col gap-5">
               <div className="grid sm:grid-cols-2 gap-5">
@@ -349,20 +343,28 @@ export function ContactPage() {
                   </div>
                   <span>vivek@myplanetservices.com</span>
                 </a>
-                <a
-                  href="tel:+14155550148"
-                  className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors group"
-                >
-                  <div style={{ animationDelay: '0.3s' }} className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center text-foreground group-hover:bg-butter group-hover:text-butter-foreground transition-colors animate-icon-float animate-icon-glow">
+                <div className="flex items-start gap-3 text-muted-foreground group">
+                  <div style={{ animationDelay: '0.3s' }} className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center text-foreground group-hover:bg-butter group-hover:text-butter-foreground transition-colors animate-icon-float animate-icon-glow shrink-0 mt-0.5">
                     <Phone className="w-4 h-4 animate-icon-sway group-hover:scale-120 transition-transform" />
                   </div>
-                  <span>+1 (415) 555-0148</span>
-                </a>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[11px] font-medium text-foreground/80 uppercase tracking-wider">Vivek · Founder & CEO</span>
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 font-mono text-xs sm:text-sm">
+                      <a href="tel:+917808158221" className="hover:text-foreground transition-colors">
+                        +91 78081 58221
+                      </a>
+                      <span className="text-muted-foreground/40">·</span>
+                      <a href="tel:+9162076548506" className="hover:text-foreground transition-colors">
+                        +91 62076 548506
+                      </a>
+                    </div>
+                  </div>
+                </div>
                 <div className="flex items-center gap-3 text-muted-foreground group">
                   <div style={{ animationDelay: '0.6s' }} className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center text-foreground animate-icon-float">
                     <MapPin className="w-4 h-4 animate-icon-bob group-hover:scale-120 transition-transform" />
                   </div>
-                  <span>Remote-first · Austin, TX · Bengaluru, India</span>
+                  <span>Bengaluru, India</span>
                 </div>
               </div>
 

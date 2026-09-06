@@ -27,7 +27,7 @@ export function App() {
       <CurrencyProvider>
       <BrowserRouter>
         <SmoothScrollProvider>
-        <div className="min-h-screen max-w-full overflow-x-hidden bg-background text-foreground flex flex-col selection:bg-butter selection:text-butter-foreground">
+        <div className="min-h-screen max-w-full overflow-x-clip bg-background text-foreground flex flex-col selection:bg-butter selection:text-butter-foreground">
         {/* Route change scroll-to-top handler */}
         <ScrollToTop />
 

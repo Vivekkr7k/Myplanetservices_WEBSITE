@@ -31,6 +31,10 @@ export const INTERNATIONAL_MULTIPLIER = 3;
  */
 export const INR_PER_USD = 88;
 
+/**
+ * Every IANA zone that means India. Kolkata is current; Calcutta is the legacy
+ * alias still reported by older Android builds and some Windows versions.
+ */
 const IN_TIMEZONES = new Set(['Asia/Kolkata', 'Asia/Calcutta']);
 
 /** The visitor's IANA timezone, e.g. "Europe/Berlin". */
@@ -42,20 +46,52 @@ export function detectTimeZone(): string {
   }
 }
 
+/** Region tag from a BCP-47 locale: "en-IN" and "hi-IN" both give "IN". */
+function localeRegion(tag: string): string | undefined {
+  try {
+    // Intl.Locale is the correct parser and handles forms a regex misses,
+    // such as "hi-Deva-IN" where the region is not the second subtag.
+    const parsed = new Intl.Locale(tag);
+    if (parsed.region) return parsed.region.toUpperCase();
+  } catch {
+    // Not a parseable tag.
+  }
+  const parts = tag.split('-');
+  const last = parts[parts.length - 1];
+  return /^[A-Za-z]{2}$/.test(last) ? last.toUpperCase() : undefined;
+}
+
+/**
+ * Where the visitor is, without asking permission.
+ *
+ * Timezone first — it is the strongest signal the browser gives away for free
+ * and it survives a device set to English while sitting in Mumbai. Locale is
+ * the fallback, because a device configured for India that is currently abroad
+ * should still be quoted in rupees: of the two possible mistakes, showing an
+ * Indian customer INR while travelling is the harmless one.
+ */
 export function detectRegion(): Region {
   try {
     if (IN_TIMEZONES.has(detectTimeZone())) return 'IN';
+  } catch {
+    // Fall through to locale.
+  }
 
-    // Secondary signal: someone on an Indian locale but travelling still prices
-    // in INR, which is the friendlier default of the two mistakes.
-    const langs = [
-      ...(navigator.languages || []),
-      navigator.language || '',
+  try {
+    const nav = typeof navigator === 'undefined' ? undefined : navigator;
+    const tags = [
+      ...(nav?.languages ?? []),
+      nav?.language ?? '',
+      // The resolved locale is set by the browser itself, so it still reports
+      // something useful when navigator.language has been stripped.
+      Intl.DateTimeFormat().resolvedOptions().locale ?? '',
     ].filter(Boolean);
-    if (langs.some((l) => /-IN$/i.test(l))) return 'IN';
+
+    if (tags.some((tag) => localeRegion(tag) === 'IN')) return 'IN';
   } catch {
     // Fall through to the default below.
   }
+
   return 'INTL';
 }
 
@@ -98,4 +134,17 @@ export const CURRENCY_LABEL: Record<Currency, string> = {
   USD: '$ USD',
 };
 
+/**
+ * Manual currency override, kept in sessionStorage — deliberately NOT
+ * localStorage.
+ *
+ * A permanent override outlives its usefulness: someone who switches once sees
+ * that currency forever, on every later visit, even after travelling or after
+ * the toggle is removed from the page they are looking at. Scoping it to the
+ * session means an explicit choice is honoured for that visit and the next
+ * visit starts from automatic detection again.
+ */
 export const CURRENCY_STORAGE_KEY = 'mps:currency';
+
+/** The old localStorage key, cleared on load so stale values cannot stick. */
+export const LEGACY_CURRENCY_STORAGE_KEY = 'mps:currency';

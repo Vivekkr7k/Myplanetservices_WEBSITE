@@ -30,14 +30,18 @@ const BEYOND_THE_LIST = [
   'API productisation & developer portals',
 ];
 
+import { CASE_STUDIES } from '../../pages/work-page';
+
+/**
+ * Work project company names showcased in the trusted marquee banner
+ */
+const WORK_CLIENT_NAMES = CASE_STUDIES.map((study) => study.client);
+
+// Repeat client names across the marquee track for a full, continuous loop
 const PARTNER_LOGOS = [
-  'Vantage',
-  'Greenish',
-  'Glossy',
-  'Ebooks',
-  'Proline',
-  'Flash',
-  'Northwind',
+  ...WORK_CLIENT_NAMES,
+  ...WORK_CLIENT_NAMES,
+  ...WORK_CLIENT_NAMES,
 ];
 
 const SERVICES_DATA = [
@@ -183,27 +187,30 @@ export function LogoMarquee() {
         className="flex overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_15%,black_85%,transparent)]"
         aria-label="Client logos"
       >
-        <div className="flex shrink-0 items-center gap-16 sm:gap-20 animate-marquee py-2">
+        <div className="flex shrink-0 items-center gap-16 sm:gap-20 pr-16 sm:pr-20 animate-marquee py-2">
           {PARTNER_LOGOS.map((logo, idx) => (
-            <span
+            <Link
               key={`logo-1-${idx}`}
-              className="text-2xl sm:text-3xl font-display font-semibold tracking-tight text-ink-muted hover:text-ink-foreground transition-colors cursor-default whitespace-nowrap"
+              to="/work"
+              className="text-2xl sm:text-3xl font-display font-semibold tracking-tight text-ink-muted hover:text-butter transition-colors whitespace-nowrap cursor-pointer"
             >
               {logo}
-            </span>
+            </Link>
           ))}
         </div>
         <div
-          className="flex shrink-0 items-center gap-16 sm:gap-20 animate-marquee py-2"
+          className="flex shrink-0 items-center gap-16 sm:gap-20 pr-16 sm:pr-20 animate-marquee py-2"
           aria-hidden="true"
         >
           {PARTNER_LOGOS.map((logo, idx) => (
-            <span
+            <Link
               key={`logo-2-${idx}`}
-              className="text-2xl sm:text-3xl font-display font-semibold tracking-tight text-ink-muted hover:text-ink-foreground transition-colors cursor-default whitespace-nowrap"
+              to="/work"
+              tabIndex={-1}
+              className="text-2xl sm:text-3xl font-display font-semibold tracking-tight text-ink-muted hover:text-butter transition-colors whitespace-nowrap cursor-pointer"
             >
               {logo}
-            </span>
+            </Link>
           ))}
         </div>
       </div>
@@ -216,22 +223,29 @@ export function Services() {
   const listRef = useRef<HTMLDivElement>(null);
 
   /**
-   * Scroll focus — the row nearest the vertical centre of the viewport sits at
-   * full size while rows further away recede. Peak scale is 1.0 and never above,
-   * so a focused row can't overflow the container on a wide screen.
+   * Stacked deck — every row pins a little below the row before it, so the next
+   * row scrolls up and covers the one behind it, leaving a sliver of each
+   * earlier row visible above the top of the deck.
    *
-   * Large pointer screens only: on a phone a row already fills most of the
-   * viewport, so scaling it just reads as jitter.
+   * The pinning itself is pure CSS `position: sticky` (one stepped `top` per
+   * row) and never depends on JS. GSAP only adds the depth cue: a row shrinks
+   * and dims as rows pile on top of it, so the deck tapers back into the page.
    *
-   * Smoothness comes from three deliberate choices:
-   *   1. Positions are measured ONCE (and on refresh), never per frame, so the
-   *      loop performs zero layout reads and can't thrash.
-   *   2. Those measurements use offsetTop/offsetHeight, which ignore transforms.
-   *      Reading getBoundingClientRect on the very element we scale would feed
-   *      this frame's output back in as next frame's input, and the rows visibly
-   *      wobble as the two chase each other.
-   *   3. Each row damps toward its target instead of snapping to it, which
-   *      absorbs any unevenness in how scroll events arrive.
+   * Large pointer screens only: below lg a row is the tall stacked layout, and
+   * burying something that size reads as content going missing, not as depth.
+   *
+   * Two rules hold this together:
+   *   1. A row's depth is never dimmed with opacity. These rows overlap now, so
+   *      a translucent row shows the row underneath straight through its own
+   *      background. The recede is an opaque scrim laid over the card instead.
+   *   2. Depth is read from each row's live rect, not from accumulated offsets.
+   *      A rect reports the sticky-resolved position directly, so "has this row
+   *      reached its pin" is exact rather than the sum of nine measurements that
+   *      only has to be wrong once to bury the whole deck.
+   *
+   * Reading rects here is safe from feedback: we read the sticky wrapper, which
+   * is never transformed, and write to a layer inside it — and every read in a
+   * frame happens before any write, so the loop can't thrash layout.
    */
   useEffect(() => {
     const list = listRef.current;
@@ -241,114 +255,125 @@ export function Services() {
     const mm = gsap.matchMedia();
 
     mm.add('(min-width: 1024px) and (prefers-reduced-motion: no-preference)', () => {
-      const cards = gsap.utils.toArray<HTMLElement>('[data-focus-card]', list);
-      if (!cards.length) return;
+      const items = gsap.utils.toArray<HTMLElement>('[data-stack-item]', list);
+      if (items.length < 2) return;
 
       interface Row {
-        el: HTMLElement;
+        /** The sticky element — read, never transformed. */
+        item: HTMLElement;
+        /** The layer inside it we scale, so the sticky offset stays untouched. */
+        card: HTMLElement;
         setScale: (v: number) => void;
-        setOpacity: (v: number) => void;
-        /** Document-space centre, transform-independent. */
-        centre: number;
-        /** Damped focus value, 0 (receded) to 1 (front and centre). */
-        value: number;
+        /** Opaque overlay that shades the card as rows pile on top of it. */
+        setShade: (v: number) => void;
+        /** Viewport y this row pins at — its resolved CSS `top`. */
+        pin: number;
+        /** Scroll distance this row takes to travel over the row behind it. */
+        span: number;
+        /** This frame's viewport top, read before any style is written. */
+        top: number;
       }
 
-      const rows: Row[] = cards.map((el) => ({
-        el,
-        // quickSetter writes straight to the style, no per-frame tween overhead.
-        setScale: gsap.quickSetter(el, 'scale') as (v: number) => void,
-        setOpacity: gsap.quickSetter(el, 'opacity') as (v: number) => void,
-        centre: 0,
-        value: 0,
-      }));
-
-      /** Walks the offset chain — unlike getBoundingClientRect this ignores any
-       *  transform we have applied, so measurement never sees our own output. */
-      const documentTop = (el: HTMLElement) => {
-        let y = 0;
-        let node: HTMLElement | null = el;
-        while (node) {
-          y += node.offsetTop;
-          node = node.offsetParent as HTMLElement | null;
-        }
-        return y;
-      };
+      const rows: Row[] = items.map((item) => {
+        const card = item.querySelector<HTMLElement>('[data-stack-card]') ?? item;
+        const shade = item.querySelector<HTMLElement>('[data-stack-shade]');
+        return {
+          item,
+          card,
+          // quickSetter writes straight to the style, no per-frame tween overhead.
+          setScale: gsap.quickSetter(card, 'scale') as (v: number) => void,
+          setShade: shade
+            ? (gsap.quickSetter(shade, 'opacity') as (v: number) => void)
+            : () => {},
+          pin: 0,
+          span: 1,
+          top: 0,
+        };
+      });
 
       const measure = () => {
+        const gap = parseFloat(getComputedStyle(list).rowGap) || 0;
         for (const row of rows) {
-          row.centre = documentTop(row.el) + row.el.offsetHeight / 2;
+          row.pin = parseFloat(getComputedStyle(row.item).top) || 0;
+          // Roughly the pin-to-pin travel. Deliberately local to this row: it
+          // only sets how quickly the shading ramps, so being a few pixels out
+          // costs nothing, where an accumulated total would compound.
+          row.span = Math.max(row.item.offsetHeight + gap, 1);
         }
       };
 
-      const targetFor = (row: Row, viewportCentre: number, falloff: number) => {
-        const distance = Math.min(Math.abs(row.centre - viewportCentre) / falloff, 1);
-        const proximity = 1 - distance;
-        // smoothstep, so size eases in near the centre instead of tracking linearly
-        return proximity * proximity * (3 - 2 * proximity);
+      /** Rows further down the deck than this stop receding, so the bottom of a
+       *  nine-row stack doesn't shrink away to nothing. */
+      const MAX_DEPTH = 3;
+
+      const apply = () => {
+        // Read phase — every position read before any style write.
+        for (const row of rows) row.top = row.item.getBoundingClientRect().top;
+
+        // Write phase. Walking bottom-up lets each row read the depth
+        // accumulated by every row in front of it in a single pass.
+        let depth = 0;
+
+        for (let i = rows.length - 1; i >= 0; i--) {
+          const row = rows[i];
+          const d = depth < MAX_DEPTH ? depth : MAX_DEPTH;
+
+          // Scale is kept small on purpose: at this width 1% is ~12px off each
+          // edge, so anything heavier fans the slivers out wider than the
+          // 1.05rem they step down by.
+          row.setScale(1 - 0.022 * d);
+          row.setShade(0.07 * d);
+
+          // How far this row has travelled toward covering the row behind it:
+          // 0 a full span below its pin, exactly 1 once sticky has parked it
+          // there. Read from the rect, so this is the row's true position.
+          const travelled = (row.pin + row.span - row.top) / row.span;
+          depth += travelled < 0 ? 0 : travelled > 1 ? 1 : travelled;
+        }
       };
 
       let lastScroll = -1;
-      let settled = false;
-
-      const render = () => {
-        const scroll = window.scrollY;
-        const vh = window.innerHeight;
-
-        // Nothing moved and every row has reached its target — skip the frame.
-        if (scroll === lastScroll && settled) return;
-        lastScroll = scroll;
-
-        const viewportCentre = scroll + vh / 2;
-        // How far from centre a row must travel before it has fully receded.
-        const falloff = vh * 0.45;
-
-        let allSettled = true;
-
-        for (const row of rows) {
-          const target = targetFor(row, viewportCentre, falloff);
-          const delta = target - row.value;
-
-          if (Math.abs(delta) < 0.0004) {
-            row.value = target;
-          } else {
-            // Frame-rate independent damping: the same visual settle time on a
-            // 60Hz panel and a 144Hz one.
-            row.value += delta * (1 - Math.pow(0.001, gsap.ticker.deltaRatio(60) / 60));
-            allSettled = false;
-          }
-
-          row.setScale(0.955 + 0.045 * row.value);
-          row.setOpacity(0.72 + 0.28 * row.value);
-        }
-
-        settled = allSettled;
-      };
-
-      measure();
-
-      // Converge instantly on first paint so nothing visibly eases in on load.
-      const vh0 = window.innerHeight;
-      const centre0 = window.scrollY + vh0 / 2;
-      for (const row of rows) {
-        row.value = targetFor(row, centre0, vh0 * 0.45);
-        row.setScale(0.955 + 0.045 * row.value);
-        row.setOpacity(0.72 + 0.28 * row.value);
-      }
 
       // Driven by GSAP's ticker rather than a scroll callback: this runs exactly
       // once per animation frame, in step with Lenis, whether or not a scroll
       // event happened to fire.
+      const render = () => {
+        const scroll = window.scrollY;
+        if (scroll === lastScroll) return;
+        lastScroll = scroll;
+        apply();
+      };
+
+      let disposed = false;
+      const remeasure = () => {
+        if (disposed) return;
+        measure();
+        apply();
+      };
+
+      remeasure();
+
+      // Card heights move once the display face swaps in, and the deck's whole
+      // rhythm is derived from those heights.
+      document.fonts?.ready.then(remeasure);
+
       gsap.ticker.add(render);
-      ScrollTrigger.addEventListener('refresh', measure);
-      window.addEventListener('resize', measure);
+      ScrollTrigger.addEventListener('refresh', remeasure);
+      window.addEventListener('resize', remeasure);
 
       return () => {
+        disposed = true;
         gsap.ticker.remove(render);
-        ScrollTrigger.removeEventListener('refresh', measure);
-        window.removeEventListener('resize', measure);
+        ScrollTrigger.removeEventListener('refresh', remeasure);
+        window.removeEventListener('resize', remeasure);
         // quickSetter writes inline styles that matchMedia won't revert for us.
-        gsap.set(cards, { clearProps: 'transform,scale,opacity' });
+        gsap.set(
+          rows.map((row) => row.card),
+          { clearProps: 'transform,scale' }
+        );
+        gsap.set(list.querySelectorAll('[data-stack-shade]'), {
+          clearProps: 'opacity',
+        });
       };
     });
 
@@ -356,9 +381,12 @@ export function Services() {
   }, []);
 
   return (
+    /* overflow-x-clip, not overflow-hidden — `hidden` would make this section a
+       scroll container and the stacked rows inside it would never pin.
+       `isolate` keeps the deck's z-indexes from leaking into the rest of the page. */
     <section
       id="services"
-      className="py-16 sm:py-24 lg:py-32 scroll-mt-12 bg-background relative overflow-hidden"
+      className="py-16 sm:py-24 lg:py-32 scroll-mt-12 bg-background relative overflow-x-clip isolate"
     >
       <div className="site-container">
         {/* Section Header */}
@@ -375,145 +403,178 @@ export function Services() {
           </p>
         </div>
 
-        {/* Single column of full-width capability rows */}
-        <div ref={listRef} className="flex flex-col gap-3 sm:gap-4">
+        {/* Single column of full-width capability rows.
+            On lg the rows become a stacked deck: --stack-top clears the fixed
+            nav, --stack-step is the sliver of each covered row left showing,
+            and the tall gap is the scroll distance one row takes to cover the
+            row behind it. The trailing padding holds the finished deck on
+            screen for a beat before the whole stack releases. */}
+        <div
+          ref={listRef}
+          className="flex flex-col gap-3 sm:gap-4 lg:gap-[15vh] lg:pb-[15vh] [--stack-step:1.05rem] [--stack-top:7rem]"
+        >
           {SERVICES_DATA.map((service, index) => {
             const Icon = service.icon;
             const dark = service.highlight;
 
             return (
-              /* Layer 1 — reveal owns the entry translate */
+              /* Layer 1 — CSS sticky owns the pin. Deliberately never
+                 transformed: a transform here would shift the pinned box. */
               <div
                 key={service.title}
-                data-reveal
+                data-stack-item
+                style={{
+                  top: `calc(var(--stack-top) + ${index} * var(--stack-step))`,
+                  zIndex: index + 1,
+                }}
+                className="lg:sticky"
               >
-                {/* Layer 2 — GSAP owns this transform (scroll focus) */}
-                <div data-focus-card className="will-change-[transform,opacity] transform-gpu">
-                  {/* Layer 3 — CSS owns this transform (hover) */}
-                  <article
-                    className={`group/card block rounded-[28px] sm:rounded-[32px] border overflow-hidden relative transition-[scale,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] lg:hover:scale-[1.018] ${
-                      dark
-                        ? 'bg-ink text-ink-foreground border-butter/30 shadow-xl hover:shadow-2xl'
-                        : 'bg-card text-foreground border-border/80 shadow-soft hover:shadow-xl'
-                    }`}
+                {/* Layer 2 — reveal owns the entry translate */}
+                <div data-reveal>
+                  {/* Layer 3 — GSAP owns this transform (stack depth). Scaling
+                      from the top edge keeps each covered row's sliver in place. */}
+                  <div
+                    data-stack-card
+                    className="origin-top will-change-transform transform-gpu"
                   >
-                    {/* Warm bloom on the ink rows */}
-                    {dark && (
+                    {/* Layer 4 — CSS owns this transform (hover) */}
+                    <article
+                      className={`group/card block rounded-[28px] sm:rounded-[32px] border overflow-hidden relative transition-[scale,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] lg:hover:scale-[1.018] ${
+                        dark
+                          ? 'bg-ink text-ink-foreground border-butter/30 shadow-xl hover:shadow-2xl'
+                          : 'bg-card text-foreground border-border/80 shadow-soft hover:shadow-xl'
+                      }`}
+                    >
+                      {/* Warm bloom on the ink rows */}
+                      {dark && (
+                        <div
+                          className="absolute -top-20 -right-10 w-72 h-40 bg-butter/15 rounded-full blur-3xl pointer-events-none"
+                          aria-hidden="true"
+                        />
+                      )}
+
+                      {/* Depth cue for the stacked deck. It shades the card
+                          from on top instead of fading the card out: the card's
+                          own background stays fully opaque, so a covered row
+                          can never read through the row sitting over it.
+                          Clipped to the rounded corners by the article's
+                          own overflow-hidden. */}
                       <div
-                        className="absolute -top-20 -right-10 w-72 h-40 bg-butter/15 rounded-full blur-3xl pointer-events-none"
+                        data-stack-shade
+                        className="absolute inset-0 z-10 bg-black opacity-0 pointer-events-none"
                         aria-hidden="true"
                       />
-                    )}
 
-                    <div className="relative p-5 sm:p-6 lg:px-8 lg:py-6 grid gap-5 sm:gap-6 lg:gap-8 lg:grid-cols-[auto_minmax(0,1.55fr)_minmax(0,0.95fr)_auto] lg:items-center">
-                      {/* Zone 1 — icon + index */}
-                      <div className="flex lg:flex-col items-center lg:items-start gap-3 lg:gap-2 shrink-0">
-                        <div
-                          style={{ animationDelay: `${index * 0.3}s` }}
-                          className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0 shadow-xs animate-icon-float ${
-                            dark
-                              ? 'bg-butter text-butter-foreground animate-icon-glow'
-                              : 'bg-secondary text-foreground group-hover/card:bg-butter group-hover/card:text-butter-foreground transition-colors duration-300 animate-icon-glow-dark'
-                          }`}
-                        >
-                          <Icon
-                            style={{ animationDelay: `${index * 0.2}s` }}
-                            className={`w-5 h-5 sm:w-6 sm:h-6 transition-transform duration-300 group-hover/card:scale-110 ${
-                              index % 6 === 0
-                                ? 'animate-icon-spin'
-                                : index % 6 === 1
-                                ? 'animate-icon-wiggle'
-                                : index % 6 === 2
-                                ? 'animate-icon-bob'
-                                : index % 6 === 3
-                                ? 'animate-icon-wiggle'
-                                : index % 6 === 4
-                                ? 'animate-icon-pulse'
-                                : 'animate-icon-sway'
-                            }`}
-                          />
-                        </div>
-                        <span
-                          className={`font-mono text-xs font-semibold tracking-widest tabular-nums ${
-                            dark ? 'text-butter/70' : 'text-muted-foreground'
-                          }`}
-                        >
-                          {String(index + 1).padStart(2, '0')}
-                        </span>
-                      </div>
-
-                      {/* Zone 2 — category, title, description, CTA */}
-                      <div className="min-w-0">
-                        <span
-                          className={`inline-block text-[9.5px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full mb-2 ${
-                            dark
-                              ? 'bg-white/10 text-butter border border-white/10'
-                              : 'bg-secondary text-muted-foreground'
-                          }`}
-                        >
-                          {service.category}
-                        </span>
-
-                        <h3
-                          className={`font-display text-lg sm:text-xl lg:text-[1.35rem] font-medium tracking-tight leading-tight mb-1.5 ${
-                            dark ? 'text-ink-foreground' : 'text-foreground'
-                          }`}
-                        >
-                          {service.title}
-                        </h3>
-
-                        <p
-                          className={`text-[13px] leading-relaxed ${
-                            dark ? 'text-ink-muted' : 'text-muted-foreground'
-                          }`}
-                        >
-                          {service.description}
-                        </p>
-
-                      </div>
-
-                      {/* Zone 3 — bullets */}
-                      <div
-                        className={`flex flex-col gap-2 pt-4 border-t lg:pt-0 lg:border-t-0 lg:pl-8 lg:border-l ${
-                          dark ? 'border-white/10' : 'border-border/60'
-                        }`}
-                      >
-                        {service.bullets.map((bullet) => (
+                      <div className="relative p-5 sm:p-6 lg:px-8 lg:py-6 grid gap-5 sm:gap-6 lg:gap-8 lg:grid-cols-[auto_minmax(0,1.55fr)_minmax(0,0.95fr)_auto] lg:items-center">
+                        {/* Zone 1 — icon + index */}
+                        <div className="flex lg:flex-col items-center lg:items-start gap-3 lg:gap-2 shrink-0">
                           <div
-                            key={bullet}
-                            className={`flex items-center gap-2 text-[11.5px] sm:text-xs font-medium ${
-                              dark ? 'text-ink-foreground' : 'text-foreground/80'
+                            style={{ animationDelay: `${index * 0.3}s` }}
+                            className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0 shadow-xs animate-icon-float ${
+                              dark
+                                ? 'bg-butter text-butter-foreground animate-icon-glow'
+                                : 'bg-secondary text-foreground group-hover/card:bg-butter group-hover/card:text-butter-foreground transition-colors duration-300 animate-icon-glow-dark'
                             }`}
                           >
+                            <Icon
+                              style={{ animationDelay: `${index * 0.2}s` }}
+                              className={`w-5 h-5 sm:w-6 sm:h-6 transition-transform duration-300 group-hover/card:scale-110 ${
+                                index % 6 === 0
+                                  ? 'animate-icon-spin'
+                                  : index % 6 === 1
+                                  ? 'animate-icon-wiggle'
+                                  : index % 6 === 2
+                                  ? 'animate-icon-bob'
+                                  : index % 6 === 3
+                                  ? 'animate-icon-wiggle'
+                                  : index % 6 === 4
+                                  ? 'animate-icon-pulse'
+                                  : 'animate-icon-sway'
+                              }`}
+                            />
+                          </div>
+                          <span
+                            className={`font-mono text-xs font-semibold tracking-widest tabular-nums ${
+                              dark ? 'text-butter/70' : 'text-muted-foreground'
+                            }`}
+                          >
+                            {String(index + 1).padStart(2, '0')}
+                          </span>
+                        </div>
+
+                        {/* Zone 2 — category, title, description, CTA */}
+                        <div className="min-w-0">
+                          <span
+                            className={`inline-block text-[9.5px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full mb-2 ${
+                              dark
+                                ? 'bg-white/10 text-butter border border-white/10'
+                                : 'bg-secondary text-muted-foreground'
+                            }`}
+                          >
+                            {service.category}
+                          </span>
+
+                          <h3
+                            className={`font-display text-lg sm:text-xl lg:text-[1.35rem] font-medium tracking-tight leading-tight mb-1.5 ${
+                              dark ? 'text-ink-foreground' : 'text-foreground'
+                            }`}
+                          >
+                            {service.title}
+                          </h3>
+
+                          <p
+                            className={`text-[13px] leading-relaxed ${
+                              dark ? 'text-ink-muted' : 'text-muted-foreground'
+                            }`}
+                          >
+                            {service.description}
+                          </p>
+
+                        </div>
+
+                        {/* Zone 3 — bullets */}
+                        <div
+                          className={`flex flex-col gap-2 pt-4 border-t lg:pt-0 lg:border-t-0 lg:pl-8 lg:border-l ${
+                            dark ? 'border-white/10' : 'border-border/60'
+                          }`}
+                        >
+                          {service.bullets.map((bullet) => (
                             <div
-                              className={`w-3.5 h-3.5 rounded-full flex items-center justify-center shrink-0 ${
-                                dark
-                                  ? 'bg-butter/20 text-butter'
-                                  : 'bg-butter/30 text-butter-foreground'
+                              key={bullet}
+                              className={`flex items-center gap-2 text-[11.5px] sm:text-xs font-medium ${
+                                dark ? 'text-ink-foreground' : 'text-foreground/80'
                               }`}
                             >
-                              <Check className="w-2 h-2 stroke-[3.5]" />
+                              <div
+                                className={`w-3.5 h-3.5 rounded-full flex items-center justify-center shrink-0 ${
+                                  dark
+                                    ? 'bg-butter/20 text-butter'
+                                    : 'bg-butter/30 text-butter-foreground'
+                                }`}
+                              >
+                                <Check className="w-2 h-2 stroke-[3.5]" />
+                              </div>
+                              <span>{bullet}</span>
                             </div>
-                            <span>{bullet}</span>
-                          </div>
-                        ))}
-                      </div>
+                          ))}
+                        </div>
 
-                      {/* Zone 4 — CTA, pulled out of the text column so it
-                          adds no height to the row */}
-                      <Link
-                        to={`/services?tab=${service.id}`}
-                        className={`inline-flex items-center gap-1.5 text-xs font-semibold whitespace-nowrap transition-colors shrink-0 ${
-                          dark
-                            ? 'text-butter hover:text-ink-foreground'
-                            : 'text-foreground hover:text-butter-foreground'
-                        }`}
-                      >
-                        <span>Explore capability</span>
-                        <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover/card:translate-x-1" />
-                      </Link>
-                    </div>
-                  </article>
+                        {/* Zone 4 — CTA, pulled out of the text column so it
+                            adds no height to the row */}
+                        <Link
+                          to={`/services?tab=${service.id}`}
+                          className={`inline-flex items-center gap-1.5 text-xs font-semibold whitespace-nowrap transition-colors shrink-0 ${
+                            dark
+                              ? 'text-butter hover:text-ink-foreground'
+                              : 'text-foreground hover:text-butter-foreground'
+                          }`}
+                        >
+                          <span>Explore capability</span>
+                          <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover/card:translate-x-1" />
+                        </Link>
+                      </div>
+                    </article>
+                  </div>
                 </div>
               </div>
             );

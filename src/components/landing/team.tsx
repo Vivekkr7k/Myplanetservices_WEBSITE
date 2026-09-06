@@ -16,12 +16,14 @@ interface TeamMember {
   bio: string;
   specialties: string[];
   experience: string;
+  /** Shows the direct-line overlay on this portrait. */
+  isFounder?: boolean;
 }
 
 const TEAM_MEMBERS: TeamMember[] = [
   {
     name: 'Vivek Kumar',
-    role: 'Partner & Technology Lead',
+    role: 'Founder & CEO',
     department: 'Leadership',
     image: '/teampic/vivek.jpg',
     blobColor: 'from-amber-400/35 to-butter/70',
@@ -34,6 +36,7 @@ const TEAM_MEMBERS: TeamMember[] = [
       'Performance Marketing',
     ],
     experience: '4+ yrs',
+    isFounder: true,
   },
   {
     name: 'Mayank',
@@ -56,10 +59,12 @@ const TEAM_MEMBERS: TeamMember[] = [
     department: 'Growth',
     image: '/teampic/bishnu.jpg',
     blobColor: 'from-butter/50 to-amber-500/40',
-    bio: 'Delivering responsive web ecosystems, iOS & Android cross-platform solutions, technical search engine dominance, and revenue campaigns.',
+    bio: 'Delivering responsive web ecosystems, cross-platform solutions, DevOps infrastructure, strategic content writing, and revenue campaigns.',
     specialties: [
       'Website Development',
       'Mobile App Development',
+      'DevOps',
+      'Content Writing',
       'Performance Marketing',
       'SEO, AEO & GEO',
     ],
@@ -188,7 +193,56 @@ export function TeamSection() {
                         className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
                         loading="lazy"
                       />
+
+                      {/*
+                        Direct line to the founder.
+
+                        The pull here is removing the gatekeeper — the common
+                        fear is that "contact us" lands you with a salesperson.
+                        Naming the time cost (20 minutes) and what you get back
+                        lowers the perceived risk of clicking far more than any
+                        superlative would.
+
+                        Always visible on touch devices, which have no hover;
+                        slides up on pointer devices.
+                      */}
+                      {member.isFounder && (
+                        <Link
+                          to="/contact"
+                          aria-label={`Talk directly to ${member.name}`}
+                          className="absolute inset-0 flex flex-col justify-end focus:outline-hidden focus-visible:ring-2 focus-visible:ring-butter rounded-2xl"
+                        >
+                          <div
+                            className="absolute inset-0 bg-gradient-to-t from-ink via-ink/85 to-transparent opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-500"
+                            aria-hidden="true"
+                          />
+
+                          <div className="relative p-3 sm:p-4 translate-y-0 lg:translate-y-3 lg:opacity-0 lg:group-hover:translate-y-0 lg:group-hover:opacity-100 transition-all duration-500 ease-out">
+                            <p className="font-display text-sm sm:text-base font-semibold text-white leading-snug mb-1">
+                              Let's build yours.
+                            </p>
+                            <p className="text-[10px] sm:text-[11px] text-white/75 leading-snug mb-2.5">
+                              20 minutes with me — no sales team, no pitch.
+                            </p>
+                            <span className="inline-flex items-center gap-1.5 bg-butter text-butter-foreground rounded-full px-3 py-1.5 text-[10px] sm:text-[11px] font-bold">
+                              <span>Start the conversation</span>
+                              <ArrowUpRight className="w-3 h-3" />
+                            </span>
+                          </div>
+                        </Link>
+                      )}
                     </div>
+
+                    {/* Availability — a real person, reachable now */}
+                    {member.isFounder && (
+                      <span className="absolute top-1 left-2 z-20 inline-flex items-center gap-1.5 bg-ink text-white text-[9px] sm:text-[9.5px] font-mono font-semibold px-2 py-1 rounded-full border border-white/15 shadow-sm">
+                        <span className="relative flex w-1.5 h-1.5" aria-hidden="true">
+                          <span className="absolute inline-flex w-full h-full rounded-full bg-emerald-400 opacity-75 motion-safe:animate-ping" />
+                          <span className="relative inline-flex w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                        </span>
+                        <span>Replies today</span>
+                      </span>
+                    )}
 
                     {/* Experience Badge */}
                     <span

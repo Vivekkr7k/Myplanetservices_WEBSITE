@@ -9,6 +9,7 @@ import {
 } from 'react';
 import {
   CURRENCY_STORAGE_KEY,
+  LEGACY_CURRENCY_STORAGE_KEY,
   currencyForRegion,
   detectRegion,
   detectTimeZone,
@@ -39,7 +40,16 @@ const CurrencyContext = createContext<CurrencyContextValue>({
 
 function readStored(): Currency | null {
   try {
-    const raw = localStorage.getItem(CURRENCY_STORAGE_KEY);
+    // One-time cleanup: an earlier build persisted this choice permanently, so
+    // anyone who ever tapped the toggle was pinned to that currency on every
+    // future visit. Drop it, so those browsers fall back to detection.
+    localStorage.removeItem(LEGACY_CURRENCY_STORAGE_KEY);
+  } catch {
+    // Storage unavailable — nothing to clean up.
+  }
+
+  try {
+    const raw = sessionStorage.getItem(CURRENCY_STORAGE_KEY);
     return raw === 'INR' || raw === 'USD' ? raw : null;
   } catch {
     return null;
@@ -65,9 +75,9 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   const setCurrency = useCallback((next: Currency) => {
     setStored(next);
     try {
-      localStorage.setItem(CURRENCY_STORAGE_KEY, next);
+      sessionStorage.setItem(CURRENCY_STORAGE_KEY, next);
     } catch {
-      // Preference won't persist; the session still honours it.
+      // Storage blocked; the choice still applies for this page view.
     }
   }, []);
 

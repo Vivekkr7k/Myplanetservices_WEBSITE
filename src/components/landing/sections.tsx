@@ -613,20 +613,28 @@ export function ContactCta() {
                   </div>
                   <span className="font-mono">vivek@myplanetservices.com</span>
                 </a>
-                <a
-                  href="tel:+14155550148"
-                  className="flex items-center gap-3.5 text-sm text-ink-muted hover:text-ink-foreground transition-colors group"
-                >
-                  <div style={{ animationDelay: '0.3s' }} className="w-11 h-11 rounded-2xl bg-white/5 text-butter flex items-center justify-center shrink-0 border border-white/10 group-hover:border-butter/40 transition-colors animate-icon-float animate-icon-glow">
+                <div className="flex items-start gap-3.5 text-sm text-ink-muted group">
+                  <div style={{ animationDelay: '0.3s' }} className="w-11 h-11 rounded-2xl bg-white/5 text-butter flex items-center justify-center shrink-0 border border-white/10 group-hover:border-butter/40 transition-colors animate-icon-float animate-icon-glow mt-0.5">
                     <Phone className="w-4 h-4 animate-icon-sway group-hover:scale-120 transition-transform" />
                   </div>
-                  <span className="font-mono">+1 (415) 555-0148</span>
-                </a>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-xs text-ink-muted/80">Vivek (Founder & CEO)</span>
+                    <div className="flex flex-wrap items-center gap-x-2 font-mono text-ink-foreground">
+                      <a href="tel:+917808158221" className="hover:text-butter transition-colors">
+                        +91 78081 58221
+                      </a>
+                      <span className="text-ink-muted/40">·</span>
+                      <a href="tel:+9162076548506" className="hover:text-butter transition-colors">
+                        +91 62076 548506
+                      </a>
+                    </div>
+                  </div>
+                </div>
                 <div className="flex items-center gap-3.5 text-sm text-ink-muted group">
                   <div style={{ animationDelay: '0.6s' }} className="w-11 h-11 rounded-2xl bg-white/5 text-butter flex items-center justify-center shrink-0 border border-white/10 animate-icon-float animate-icon-glow">
                     <MapPin className="w-4 h-4 animate-icon-bob group-hover:scale-120 transition-transform" />
                   </div>
-                  <span>San Francisco · Austin · London · Bengaluru</span>
+                  <span>Bengaluru, India</span>
                 </div>
               </div>
             </div>
@@ -826,21 +834,29 @@ export function SiteFooter() {
                 <span className="font-mono">vivek@myplanetservices.com</span>
               </a>
 
-              <a
-                href="tel:+14155550148"
-                className="flex items-center gap-2.5 text-muted-foreground hover:text-foreground transition-colors group"
-              >
-                <div className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center text-foreground group-hover:bg-butter group-hover:text-butter-foreground transition-colors">
+              <div className="flex items-start gap-2.5 text-muted-foreground group">
+                <div className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center text-foreground group-hover:bg-butter group-hover:text-butter-foreground transition-colors shrink-0 mt-0.5">
                   <Phone className="w-3.5 h-3.5" />
                 </div>
-                <span className="font-mono">+1 (415) 555-0148</span>
-              </a>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Vivek · Founder & CEO</span>
+                  <div className="flex flex-wrap items-center gap-x-2 font-mono">
+                    <a href="tel:+917808158221" className="hover:text-foreground transition-colors">
+                      +91 78081 58221
+                    </a>
+                    <span className="text-muted-foreground/40">·</span>
+                    <a href="tel:+9162076548506" className="hover:text-foreground transition-colors">
+                      +91 62076 548506
+                    </a>
+                  </div>
+                </div>
+              </div>
 
               <div className="flex items-center gap-2.5 text-muted-foreground">
                 <div className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center text-foreground">
                   <MapPin className="w-3.5 h-3.5" />
                 </div>
-                <span>San Francisco · Austin · Bengaluru · London</span>
+                <span>Bengaluru, India</span>
               </div>
             </div>
           </div>

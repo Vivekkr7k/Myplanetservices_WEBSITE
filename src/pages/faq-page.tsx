@@ -224,13 +224,19 @@ export function FaqPage() {
                   <Mail className="w-4 h-4 text-butter" />
                   <span>vivek@myplanetservices.com</span>
                 </a>
-                <a
-                  href="tel:+14155550148"
-                  className="flex items-center gap-2 text-ink-muted hover:text-butter transition-colors"
-                >
-                  <Phone className="w-4 h-4 text-butter" />
-                  <span>+1 (415) 555-0148</span>
-                </a>
+                <div className="flex items-center gap-2 text-ink-muted">
+                  <Phone className="w-4 h-4 text-butter shrink-0" />
+                  <span className="text-xs text-ink-muted/80">Vivek (Founder & CEO):</span>
+                  <div className="flex items-center gap-1.5 font-mono">
+                    <a href="tel:+917808158221" className="hover:text-butter transition-colors">
+                      +91 78081 58221
+                    </a>
+                    <span className="text-ink-muted/40">·</span>
+                    <a href="tel:+9162076548506" className="hover:text-butter transition-colors">
+                      +91 62076 548506
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
 

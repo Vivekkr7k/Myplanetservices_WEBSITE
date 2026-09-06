@@ -68,16 +68,17 @@ function submissionContext() {
   try {
     timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
     region = detectRegion();
-    currency = localStorageCurrency() ?? currencyForRegion(region as Region);
+    currency = storedCurrency() ?? currencyForRegion(region as Region);
   } catch {
     // Context is a nice-to-have; never let it block a submission.
   }
   return { pageUrl: window.location.href, timeZone, region, currency };
 }
 
-function localStorageCurrency(): string | null {
+/** Mirrors CurrencyProvider: a manual override lasts the session only. */
+function storedCurrency(): string | null {
   try {
-    const raw = localStorage.getItem(CURRENCY_STORAGE_KEY);
+    const raw = sessionStorage.getItem(CURRENCY_STORAGE_KEY);
     return raw === 'INR' || raw === 'USD' ? raw : null;
   } catch {
     return null;

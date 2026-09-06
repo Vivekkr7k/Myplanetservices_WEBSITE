@@ -306,29 +306,29 @@ export function WorkPage() {
               </div>
 
               {/* Showcase Centerpiece: Large Immersive Browser Frame */}
-              <div className="p-5 sm:p-8 lg:p-10 bg-gradient-to-b from-secondary/30 via-background to-card">
+              <div className="p-2.5 sm:p-8 lg:p-10 bg-gradient-to-b from-secondary/30 via-background to-card">
                 <div className="rounded-2xl sm:rounded-3xl border border-border/90 bg-ink/95 shadow-2xl overflow-hidden relative group/browser">
                   {/* macOS / Modern Browser Chrome Bar */}
-                  <div className="bg-ink px-4 sm:px-6 py-3.5 flex items-center justify-between border-b border-white/10 gap-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-[#ff5f56]" />
-                      <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
-                      <div className="w-3 h-3 rounded-full bg-[#27c93f]" />
+                  <div className="bg-ink px-3.5 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between border-b border-white/10 gap-2 sm:gap-3">
+                    <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                      <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#ff5f56]" />
+                      <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#ffbd2e]" />
+                      <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#27c93f]" />
                     </div>
 
                     {/* Centered Address Pill with Lock */}
-                    <div className="flex-1 max-w-md mx-auto hidden sm:flex items-center justify-center gap-2 px-4 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-white/70 font-mono">
-                      <Lock className="w-3 h-3 text-emerald-400" />
+                    <div className="flex-1 max-w-[190px] sm:max-w-md mx-auto flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-0.5 sm:py-1 rounded-full bg-white/5 border border-white/10 text-[10.5px] sm:text-xs text-white/70 font-mono">
+                      <Lock className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-emerald-400 shrink-0" />
                       <span className="truncate">https://{study.displayUrl}/</span>
                     </div>
 
                     <div className="flex items-center gap-2 text-white/40">
-                      <RotateCw className="w-3.5 h-3.5" />
+                      <RotateCw className="w-3.5 h-3.5 hidden sm:block" />
                       <a
                         href={study.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-white/60 hover:text-white transition-colors"
+                        className="text-white/60 hover:text-white transition-colors p-1"
                         title="Open in new tab"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
@@ -350,8 +350,8 @@ export function WorkPage() {
                       loading={idx === 0 ? 'eager' : 'lazy'}
                     />
 
-                    {/* Floating Glass Metric Badge (Bottom-Right of Mockup) */}
-                    <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 backdrop-blur-xl bg-ink/90 text-ink-foreground border border-white/20 p-4 sm:p-5 rounded-2xl sm:rounded-3xl shadow-2xl flex items-center gap-4 transition-transform duration-300 group-hover/view:scale-105">
+                    {/* Floating Glass Metric Badge (Desktop only: hidden on mobile so it never obscures the screenshot) */}
+                    <div className="hidden sm:flex absolute bottom-6 right-6 backdrop-blur-xl bg-ink/90 text-ink-foreground border border-white/20 p-4 sm:p-5 rounded-2xl sm:rounded-3xl shadow-2xl items-center gap-4 transition-transform duration-300 group-hover/view:scale-105">
                       <div className="w-12 h-12 rounded-2xl bg-butter text-butter-foreground flex items-center justify-center font-display text-xl font-bold shrink-0 shadow-xs">
                         <Zap className="w-6 h-6 fill-current text-butter-foreground" />
                       </div>
@@ -368,6 +368,26 @@ export function WorkPage() {
                       </div>
                     </div>
                   </a>
+
+                  {/* Mobile Metric Bar (Cleanly docked below the image on mobile so the preview is 100% unobstructed) */}
+                  <div className="sm:hidden bg-ink/95 border-t border-white/10 px-3.5 py-2.5 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-7 h-7 rounded-lg bg-butter text-butter-foreground flex items-center justify-center font-display text-xs font-bold shrink-0">
+                        <Zap className="w-3.5 h-3.5 fill-current text-butter-foreground" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="font-display text-sm font-semibold text-butter leading-none truncate">
+                          {study.metric}
+                        </div>
+                        <div className="text-[10.5px] text-white/80 font-medium truncate">
+                          {study.metricLabel}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-[9px] text-ink-muted uppercase tracking-wider font-mono shrink-0">
+                      {study.metricSub}
+                    </div>
+                  </div>
                 </div>
               </div>
 

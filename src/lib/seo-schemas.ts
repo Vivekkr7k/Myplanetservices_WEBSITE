@@ -30,12 +30,12 @@ export function getOrganizationSchema() {
     description:
       'High-velocity SaaS, web, and AI automation engineering studio building custom web applications, mobile platforms, headless e-commerce, and generative AI systems for scaling enterprises.',
     email: 'hello@myplanetservices.com',
-    telephone: '+1-415-555-0148',
+    telephone: '+91-78081-58221',
     address: {
       '@type': 'PostalAddress',
-      addressLocality: 'Austin',
-      addressRegion: 'TX',
-      addressCountry: 'US',
+      addressLocality: 'Bengaluru',
+      addressRegion: 'Karnataka',
+      addressCountry: 'IN',
     },
     areaServed: {
       '@type': 'AdministrativeArea',
@@ -61,17 +61,17 @@ export function getOrganizationSchema() {
     contactPoint: [
       {
         '@type': 'ContactPoint',
-        telephone: '+1-415-555-0148',
+        telephone: '+91-78081-58221',
         contactType: 'Sales & Project Briefs',
         email: 'vivek@myplanetservices.com',
-        availableLanguage: ['English'],
+        availableLanguage: ['English', 'Hindi'],
       },
       {
         '@type': 'ContactPoint',
-        telephone: '+1-415-555-0148',
+        telephone: '+91-62076-548506',
         contactType: 'Customer Support & Engineering',
-        email: 'hello@myplanetservices.com',
-        availableLanguage: ['English'],
+        email: 'vivek@myplanetservices.com',
+        availableLanguage: ['English', 'Hindi'],
       },
     ],
     knowsAbout: [

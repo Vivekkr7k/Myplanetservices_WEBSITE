@@ -301,7 +301,7 @@ Centered eyebrow **FAQ**; H2 "Questions, answered." `max-w-4xl` card, dividers, 
 ### Contact CTA (`#contact`)
 `rounded-[32px] bg-ink grain` block with an aurora blob top-right (`opacity-25 blur-2xl`).
 H2 `Let's build something / worth scaling.` Body: "Tell us about the product, the timeline and the metric you're chasing. You'll get a scoped plan and a fixed quote within two working days."
-Contacts: `hello@myplanet.services` · `+1 (415) 555-0148` · `Remote-first · Austin · Bengaluru` (butter icons: Mail, Phone, MapPin).
+Contacts: `vivek@myplanetservices.com` · Vivek (Founder & CEO): `+91 78081 58221` / `+91 62076 548506` · `Bengaluru, India` (butter icons: Mail, Phone, MapPin).
 Form (`bg-ink-soft rounded-3xl`, `onSubmit` prevented): Your name · Work email · select "What do you need?" (Website Development, App Development, AI Automation, SEO / AEO / GEO, Digital Marketing, SaaS Development) · textarea "A little about the project" · butter submit **Send project brief**. Inputs: transparent, `border-white/10`, `focus:border-butter`.
 
 ### Footer
