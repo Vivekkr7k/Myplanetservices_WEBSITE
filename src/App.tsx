@@ -18,6 +18,8 @@ import PricingPage from './pages/pricing-page';
 import FaqPage from './pages/faq-page';
 import ContactPage from './pages/contact-page';
 
+import { ChatBot } from './components/chat/chat-bot';
+
 export function App() {
   // Initialize scroll reveal observer
   useReveal();
@@ -33,6 +35,9 @@ export function App() {
 
         {/* Toast notifications */}
         <Toaster position="top-right" richColors />
+
+        {/* Global AI Chatbot Concierge */}
+        <ChatBot />
 
         {/* Global Pill Navbar */}
         <SiteNav />

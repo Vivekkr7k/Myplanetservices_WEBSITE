@@ -465,7 +465,7 @@ export function Services() {
                         aria-hidden="true"
                       />
 
-                      <div className="relative p-5 sm:p-6 lg:px-8 lg:py-6 grid gap-5 sm:gap-6 lg:gap-8 lg:grid-cols-[auto_minmax(0,1.55fr)_minmax(0,0.95fr)_auto] lg:items-center">
+                      <div className="relative p-6 sm:p-7 lg:px-9 lg:py-10 min-h-[140px] sm:min-h-[155px] lg:min-h-[175px] grid gap-5 sm:gap-6 lg:gap-8 lg:grid-cols-[auto_minmax(0,1.55fr)_minmax(0,0.95fr)_auto] lg:items-center">
                         {/* Zone 1 — icon + index */}
                         <div className="flex lg:flex-col items-center lg:items-start gap-3 lg:gap-2 shrink-0">
                           <div
@@ -515,7 +515,7 @@ export function Services() {
                           </span>
 
                           <h3
-                            className={`font-display text-lg sm:text-xl lg:text-[1.35rem] font-medium tracking-tight leading-tight mb-1.5 ${
+                            className={`font-display text-lg sm:text-xl lg:text-[1.35rem] font-medium tracking-tight leading-tight mb-2 ${
                               dark ? 'text-ink-foreground' : 'text-foreground'
                             }`}
                           >
@@ -534,7 +534,7 @@ export function Services() {
 
                         {/* Zone 3 — bullets */}
                         <div
-                          className={`flex flex-col gap-2 pt-4 border-t lg:pt-0 lg:border-t-0 lg:pl-8 lg:border-l ${
+                          className={`flex flex-col gap-2.5 pt-4 border-t lg:pt-0 lg:border-t-0 lg:pl-8 lg:border-l ${
                             dark ? 'border-white/10' : 'border-border/60'
                           }`}
                         >

@@ -34,6 +34,13 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
       smoothWheel: true,
       wheelMultiplier: 1.0,
       touchMultiplier: 1.5,
+      prevent: (node) => {
+        return (
+          node instanceof HTMLElement &&
+          (node.hasAttribute('data-lenis-prevent') ||
+            Boolean(node.closest('[data-lenis-prevent]')))
+        );
+      },
     });
 
     lenisRef.current = lenis;

@@ -33,9 +33,24 @@ function devApiRoutes(): Plugin {
           let statusCode = 200
           const shim = {
             setHeader: (k: string, v: string) => res.setHeader(k, v),
+            writeHead(code: number, headers?: any) {
+              statusCode = code
+              if (headers) {
+                for (const [k, v] of Object.entries(headers)) {
+                  res.setHeader(k, v as string)
+                }
+              }
+              res.statusCode = code
+              return this
+            },
             status(code: number) {
               statusCode = code
+              res.statusCode = code
               return this
+            },
+            write(chunk: any) {
+              res.statusCode = statusCode
+              return res.write(chunk)
             },
             json(payload: unknown) {
               res.statusCode = statusCode
@@ -43,11 +58,12 @@ function devApiRoutes(): Plugin {
               res.end(JSON.stringify(payload))
               return this
             },
-            end(chunk?: string) {
+            end(chunk?: any) {
               res.statusCode = statusCode
               res.end(chunk)
               return this
             },
+            raw: res,
           }
 
           // ssrLoadModule transpiles the TypeScript handler on the fly and picks

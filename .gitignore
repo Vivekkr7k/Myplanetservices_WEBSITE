@@ -19,7 +19,7 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
-# Editor & OS files
+# Editor, OS & AI assistant files
 .vscode/
 .idea/
 .DS_Store
@@ -27,3 +27,6 @@ Thumbs.db
 *.suo
 *.user
 *.tsbuildinfo
+.agents/
+.claude/
+agent/
