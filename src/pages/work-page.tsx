@@ -306,10 +306,10 @@ export function WorkPage() {
               </div>
 
               {/* Showcase Centerpiece: Large Immersive Browser Frame */}
-              <div className="p-2.5 sm:p-8 lg:p-10 bg-gradient-to-b from-secondary/30 via-background to-card">
+              <div className="p-2.5 sm:p-5 lg:p-6 bg-gradient-to-b from-secondary/30 via-background to-card">
                 <div className="rounded-2xl sm:rounded-3xl border border-border/90 bg-ink/95 shadow-2xl overflow-hidden relative group/browser">
                   {/* macOS / Modern Browser Chrome Bar */}
-                  <div className="bg-ink px-3.5 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between border-b border-white/10 gap-2 sm:gap-3">
+                  <div className="bg-ink px-3.5 sm:px-6 py-2 sm:py-2.5 flex items-center justify-between border-b border-white/10 gap-2 sm:gap-3">
                     <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                       <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#ff5f56]" />
                       <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#ffbd2e]" />
@@ -346,7 +346,7 @@ export function WorkPage() {
                     <img
                       src={study.image}
                       alt={`${study.client} production preview`}
-                      className="w-full h-auto max-h-[560px] object-cover object-top transition-transform duration-700 ease-out group-hover/view:scale-[1.015]"
+                      className="w-full h-auto max-h-[360px] lg:max-h-[400px] object-cover object-top transition-transform duration-700 ease-out group-hover/view:scale-[1.015]"
                       loading={idx === 0 ? 'eager' : 'lazy'}
                     />
 
@@ -392,19 +392,19 @@ export function WorkPage() {
               </div>
 
               {/* Bottom Insights Grid: 3 Structured Columns */}
-              <div className="p-6 sm:p-10 lg:p-12 border-t border-border/70 grid lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+              <div className="p-5 sm:p-7 lg:p-8 border-t border-border/70 grid lg:grid-cols-12 gap-5 lg:gap-6 items-start">
                 {/* Column 1: Headline & Product Overview (5 cols) */}
                 <div className="lg:col-span-5 flex flex-col justify-between">
                   <div>
-                    <h2 className="font-display text-2xl sm:text-3xl font-medium tracking-tight text-foreground mb-3 leading-snug">
+                    <h2 className="font-display text-xl sm:text-2xl font-medium tracking-tight text-foreground mb-2 leading-snug">
                       {study.headline}
                     </h2>
 
-                    <p className="text-sm font-medium text-butter-foreground mb-4">
+                    <p className="text-xs sm:text-sm font-medium text-butter-foreground mb-3">
                       {study.tagline}
                     </p>
 
-                    <p className="text-xs sm:text-sm leading-relaxed text-muted-foreground mb-6">
+                    <p className="text-xs sm:text-sm leading-relaxed text-muted-foreground mb-4">
                       {study.overview}
                     </p>
                   </div>

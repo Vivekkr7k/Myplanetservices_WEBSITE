@@ -17,6 +17,7 @@ import {
   Sparkles,
   Star,
   Zap,
+  Lock,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { BrandLogo } from '../common/brand-logo';
@@ -997,6 +998,13 @@ export function SiteFooter() {
             </Link>
             <Link to="/faq" className="hover:text-foreground transition-colors">
               Security & Compliance
+            </Link>
+            <Link
+              to="/admin/login"
+              className="hover:text-foreground text-muted-foreground/80 transition-colors inline-flex items-center gap-1 font-mono text-[11px]"
+            >
+              <Lock className="w-3 h-3 text-butter" />
+              <span>Studio Portal</span>
             </Link>
 
             {/* Back to top smooth button */}

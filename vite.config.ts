@@ -77,11 +77,16 @@ function devApiRoutes(): Plugin {
             return
           }
 
+          const parsedUrl = new URL(req.url ?? '', 'http://localhost');
+          const query = Object.fromEntries(parsedUrl.searchParams);
+
           await handler(
             {
               method: req.method,
               headers: req.headers,
               body: rawBody ? JSON.parse(rawBody) : {},
+              query,
+              url: req.url,
             },
             shim,
           )

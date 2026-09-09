@@ -13,6 +13,7 @@ import {
   serviceLabel,
 } from './_lib/email-templates';
 import { appendLeadRow, sheetTimestamp, type LeadRow } from './_lib/sheets';
+import { saveInquiryToMongo } from './_lib/mongodb';
 
 /**
  * Serverless handler for every outbound email the site sends.
@@ -79,36 +80,28 @@ export default async function handler(req: any, res: any) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
-  // Fail loudly rather than silently pretending to send.
-  if (!RESEND_API_KEY) {
-    console.error('RESEND_API_KEY is not set — refusing to send.');
-    return res.status(500).json({ error: 'Email service is not configured.' });
-  }
-
-  const resend = new Resend(RESEND_API_KEY);
-
   try {
     const raw: Json =
       typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {};
 
-    const type = str(raw.type, 20) || 'brief';
-    const source = str(raw.source, 80);
-    const pageUrl = str(raw.pageUrl, 300);
+  const type = str(raw.type, 20) || 'brief';
+  const source = str(raw.source, 80);
+  const pageUrl = str(raw.pageUrl, 300);
 
-    /** Notification to the team, plus an optional acknowledgement to the visitor. */
-    let internal: { subject: string; html: string };
-    let clientCopy: { to: string; subject: string; html: string } | null = null;
-    let replyTo: string | undefined;
+  /** Notification to the team, plus an optional acknowledgement to the visitor. */
+  let internal: { subject: string; html: string } | null = null;
+  let clientCopy: { to: string; subject: string; html: string } | null = null;
+  let replyTo: string | undefined;
 
-    // Collected for the lead sheet; the email branches below fill these in.
-    const sheet: Partial<LeadRow> = {
-      timestamp: sheetTimestamp(),
-      formType: type,
-      region: str(raw.region, 12),
-      timezone: str(raw.timeZone, 60),
-      source: source || 'Website',
-      pageUrl,
-    };
+  // Collected for the lead sheet and MongoDB; the branches below fill these in.
+  const sheet: Partial<LeadRow> = {
+    timestamp: sheetTimestamp(),
+    formType: type,
+    region: str(raw.region, 12),
+    timezone: str(raw.timeZone, 60),
+    source: source || 'Website',
+    pageUrl,
+  };
 
     if (type === 'lead') {
       const email = str(raw.email, MAX.email);
@@ -175,33 +168,34 @@ export default async function handler(req: any, res: any) {
       replyTo = email;
     }
 
-    // The team notification is the one that must land.
-    const { data: sent, error } = await resend.emails.send({
-      from: FROM,
-      to: TEAM_INBOX,
-      replyTo,
-      subject: internal.subject,
-      html: internal.html,
-    });
+    const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
+    let sent: { id: string } | null = null;
+    let teamEmailStatus = 'Sent';
 
-    if (error) {
-      console.error('Resend error (team notification):', error);
-      // Log the attempt before bailing, so a delivery outage still leaves a
-      // record of who tried to reach us.
-      await appendLeadRow({
-        ...(sheet as LeadRow),
-        teamEmailStatus: `Failed: ${error.message ?? 'unknown'}`,
-        clientEmailStatus: 'Not attempted',
-        clientEmailTo: '',
-        resendId: '',
+    if (resend && internal) {
+      const { data: sendResult, error } = await resend.emails.send({
+        from: FROM,
+        to: TEAM_INBOX,
+        replyTo,
+        subject: internal.subject,
+        html: internal.html,
       });
-      return res.status(502).json({ error: 'Could not deliver your message. Please email us directly.' });
+
+      if (error) {
+        console.error('Resend error (team notification):', error);
+        teamEmailStatus = `Failed: ${error.message ?? 'unknown'}`;
+      } else {
+        sent = sendResult as { id: string };
+      }
+    } else if (!resend) {
+      console.warn('RESEND_API_KEY not configured; proceeding with database record');
+      teamEmailStatus = 'Skipped: RESEND_API_KEY not set';
     }
 
     // Visitor-facing copy. `clientCopy.to` is the address THEY submitted — this is
     // the dynamic recipient; only the sender is fixed.
     let clientEmailStatus = 'Not applicable';
-    if (clientCopy) {
+    if (resend && clientCopy) {
       // Best-effort: a failed acknowledgement must not fail the submission.
       try {
         const ack = await resend.emails.send({
@@ -223,20 +217,42 @@ export default async function handler(req: any, res: any) {
       }
     }
 
-    // Logged last so the row carries the real outcome of both emails. Awaited,
+    // Logged so the row carries the real outcome of both emails. Awaited,
     // but appendLeadRow swallows its own errors — the response never depends on
     // the spreadsheet being reachable.
     await appendLeadRow({
       ...(sheet as LeadRow),
-      teamEmailStatus: 'Sent',
+      teamEmailStatus,
       clientEmailStatus,
       clientEmailTo: clientCopy?.to ?? '',
+      resendId: sent?.id ?? '',
+    });
+
+    // Save to MongoDB backend database (safely awaited, never breaks response or emails if DB unconfigured)
+    await saveInquiryToMongo({
+      type: (type as 'brief' | 'lead' | 'booking') || 'brief',
+      name: (sheet.name as string) || str(raw.name, MAX.name),
+      email: (sheet.email as string) || str(raw.email, MAX.email),
+      company: (sheet.company as string) || str(raw.company, MAX.company),
+      service: (sheet.service as string) || str(raw.service, MAX.service),
+      budget: (sheet.budget as string) || str(raw.budget, MAX.budget),
+      message: (sheet.message as string) || str(raw.message, MAX.message),
+      slot: (sheet.callSlot as string) || str(raw.slot, MAX.slot),
+      source: source || 'Website',
+      pageUrl,
+      region: str(raw.region, 12),
+      timeZone: str(raw.timeZone, 60),
+      currency: str(raw.currency, 8),
+      quote: parseQuote(raw.quote) as Record<string, unknown> | undefined,
+      teamEmailStatus,
+      clientEmailStatus,
       resendId: sent?.id ?? '',
     });
 
     return res.status(200).json({
       success: true,
       id: sent?.id,
+      emailSent: teamEmailStatus === 'Sent',
       // Lets the form say "confirmation sent to <address>" rather than guessing.
       confirmationSentTo: clientCopy?.to,
     });
