@@ -88,8 +88,12 @@ export function getOrganizationSchema() {
       'Core Web Vitals Performance Optimization',
     ],
     sameAs: [
+      'https://www.youtube.com/channel/UCejb1eAnlAZeO_MTJBLktig',
+      'https://www.instagram.com/myplanetservices/',
+      'https://www.threads.com/@myplanetservices',
+      'https://www.facebook.com/profile.php?id=61593633466539',
+      'https://x.com/myplanet_s',
       'https://github.com/myplanetservices',
-      'https://twitter.com/myplanetserv',
       'https://linkedin.com/company/myplanetservices',
     ],
   };

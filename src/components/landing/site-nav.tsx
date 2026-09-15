@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { BrandLogo } from '../common/brand-logo';
 import { ThemeToggle } from '../common/theme-toggle';
+import { SocialLinks } from '../common/social-icons';
 
 const SOLUTION_CATEGORIES = [
   {
@@ -291,8 +292,13 @@ export function SiteNav() {
             ))}
           </div>
 
-          {/* Right: Theme Toggle, CTA Button & Mobile Hamburger */}
-          <div className="flex items-center gap-2.5 sm:gap-3.5 z-10">
+          {/* Right: Socials, Theme Toggle, CTA Button & Mobile Hamburger */}
+          <div className="flex items-center gap-2 sm:gap-3 z-10">
+            {/* Desktop Social Icons on xl screens */}
+            <div className="hidden xl:flex items-center gap-1 border-r border-border/80 pr-2.5 mr-0.5">
+              <SocialLinks variant="compact" />
+            </div>
+
             <ThemeToggle />
 
             <Link
@@ -387,7 +393,7 @@ export function SiteNav() {
                 </NavLink>
               ))}
 
-              <div className="pt-4 border-t border-border mt-2">
+              <div className="pt-4 border-t border-border mt-2 space-y-3">
                 <Link
                   to="/contact"
                   onClick={() => setMobileMenuOpen(false)}
@@ -396,6 +402,16 @@ export function SiteNav() {
                   <span>Start Project</span>
                   <ArrowUpRight className="w-4 h-4" />
                 </Link>
+
+                {/* Mobile Social Channels */}
+                <div className="pt-3 border-t border-border/60 flex flex-col gap-2">
+                  <span className="text-[11px] font-mono text-muted-foreground uppercase tracking-wider">
+                    Follow Our Channels
+                  </span>
+                  <div className="flex items-center justify-between">
+                    <SocialLinks variant="compact" />
+                  </div>
+                </div>
               </div>
             </div>
           </div>

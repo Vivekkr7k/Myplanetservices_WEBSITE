@@ -63,11 +63,11 @@ export function BookingCalendar({ timeZone, onSelect, selectedIso }: BookingCale
           onClick={() => shift(-1)}
           disabled={!canGoBack}
           aria-label="Previous month"
-          className="w-8 h-8 rounded-lg border border-white/15 text-ink-foreground flex items-center justify-center transition-colors hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+          className="w-8 h-8 rounded-lg border border-border text-foreground flex items-center justify-center transition-colors hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
         >
           <ChevronLeft className="w-4 h-4" />
         </button>
-        <span className="font-display text-sm font-semibold text-ink-foreground tabular-nums">
+        <span className="font-display text-sm font-semibold text-foreground tabular-nums">
           {monthLabel}
         </span>
         <button
@@ -75,7 +75,7 @@ export function BookingCalendar({ timeZone, onSelect, selectedIso }: BookingCale
           onClick={() => shift(1)}
           disabled={!canGoForward}
           aria-label="Next month"
-          className="w-8 h-8 rounded-lg border border-white/15 text-ink-foreground flex items-center justify-center transition-colors hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+          className="w-8 h-8 rounded-lg border border-border text-foreground flex items-center justify-center transition-colors hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
         >
           <ChevronRight className="w-4 h-4" />
         </button>
@@ -87,7 +87,7 @@ export function BookingCalendar({ timeZone, onSelect, selectedIso }: BookingCale
           {WEEKDAY_LABELS.map((d) => (
             <div
               key={d}
-              className="text-[10px] font-mono uppercase tracking-wider text-ink-muted text-center py-1"
+              className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground font-semibold text-center py-1"
             >
               {d.slice(0, 1)}
             </div>
@@ -108,13 +108,13 @@ export function BookingCalendar({ timeZone, onSelect, selectedIso }: BookingCale
                 onClick={() => pickDate(day)}
                 aria-label={day.toDateString()}
                 aria-pressed={isSelected}
-                className={`aspect-square rounded-lg text-xs font-medium tabular-nums transition-colors cursor-pointer ${
+                className={`aspect-square rounded-lg text-xs font-medium tabular-nums transition-all cursor-pointer ${
                   isSelected
-                    ? 'bg-butter text-butter-foreground font-bold'
+                    ? 'bg-butter text-butter-foreground font-bold shadow-xs scale-105'
                     : selectable
-                    ? 'text-ink-foreground hover:bg-white/10'
-                    : 'text-ink-muted/35 cursor-not-allowed'
-                } ${!inMonth && selectable ? 'opacity-45' : ''}`}
+                    ? 'text-foreground hover:bg-card hover:shadow-xs'
+                    : 'text-muted-foreground/35 cursor-not-allowed'
+                } ${!inMonth && selectable ? 'opacity-40' : ''}`}
               >
                 {day.getDate()}
               </button>
@@ -122,7 +122,7 @@ export function BookingCalendar({ timeZone, onSelect, selectedIso }: BookingCale
           })}
         </div>
 
-        <p className="text-[11px] text-ink-muted mt-2.5">
+        <p className="text-[11px] text-muted-foreground mt-2.5">
           Weekdays only · booking up to 60 days ahead
         </p>
       </div>
@@ -130,18 +130,18 @@ export function BookingCalendar({ timeZone, onSelect, selectedIso }: BookingCale
       {/* Time slots for the chosen day */}
       <div>
         <div className="flex items-center justify-between gap-3 mb-2.5">
-          <span className="text-xs font-medium text-ink-muted flex items-center gap-1.5">
+          <span className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
             <Clock className="w-3.5 h-3.5 shrink-0" />
-            Available times
+            <span>Available times</span>
           </span>
-          <span className="text-[10px] font-mono text-butter flex items-center gap-1 min-w-0">
+          <span className="text-[10px] font-mono font-medium text-butter-foreground bg-butter/30 px-2 py-0.5 rounded-full flex items-center gap-1 min-w-0">
             <Globe className="w-3 h-3 shrink-0" />
             <span className="truncate">{zoneLabel}</span>
           </span>
         </div>
 
         {slots.length === 0 ? (
-          <p className="text-xs text-ink-muted py-3">
+          <p className="text-xs text-muted-foreground py-3 text-center">
             No times left on this day — try the next one.
           </p>
         ) : (
@@ -157,10 +157,10 @@ export function BookingCalendar({ timeZone, onSelect, selectedIso }: BookingCale
                   type="button"
                   onClick={() => onSelect(slot)}
                   aria-pressed={active}
-                  className={`py-2 px-1 rounded-lg text-[11px] font-medium tabular-nums border transition-colors cursor-pointer ${
+                  className={`py-2 px-1 rounded-lg text-[11px] font-medium tabular-nums border transition-all cursor-pointer ${
                     active
-                      ? 'bg-butter text-butter-foreground border-butter font-semibold'
-                      : 'bg-white/5 text-ink-foreground border-white/10 hover:border-white/25'
+                      ? 'bg-butter text-butter-foreground border-butter font-semibold shadow-xs'
+                      : 'bg-card text-foreground border-border hover:border-foreground/40 hover:bg-secondary/60'
                   }`}
                 >
                   {slot.localLabel}
@@ -172,9 +172,9 @@ export function BookingCalendar({ timeZone, onSelect, selectedIso }: BookingCale
 
         {/* Only worth showing when the visitor isn't already on IST. */}
         {selectedIso && timeZone !== 'Asia/Kolkata' && timeZone !== 'Asia/Calcutta' && (
-          <p className="text-[11px] text-ink-muted mt-2.5">
+          <p className="text-[11px] text-muted-foreground mt-2.5">
             That's{' '}
-            <span className="text-butter font-medium">
+            <span className="text-foreground font-semibold underline decoration-butter">
               {slots.find((s) => s.iso === selectedIso)?.istLabel}
             </span>{' '}
             for our team.

@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { BrandLogo } from '../common/brand-logo';
+import { SocialLinks } from '../common/social-icons';
 import { SERVICE_PRICING, currentQuarterLabel } from '../../lib/service-pricing';
 
 import {
@@ -860,6 +861,14 @@ export function SiteFooter() {
                 <span>Bengaluru, India</span>
               </div>
             </div>
+
+            {/* Official Social Channels */}
+            <div className="pt-2 space-y-2.5">
+              <div className="text-[11px] font-mono font-medium text-muted-foreground uppercase tracking-wider">
+                Official Channels
+              </div>
+              <SocialLinks variant="pills" showLabels={true} />
+            </div>
           </div>
 
           {/* Column 2: Solutions (3 cols on lg) */}
@@ -983,10 +992,12 @@ export function SiteFooter() {
           </div>
         </div>
 
-        {/* 3. Bottom Bar with Copyright, Legal & Back-To-Top */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
-          <div className="flex items-center gap-2">
+        {/* 3. Bottom Bar with Copyright, Socials, Legal & Back-To-Top */}
+        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
+          <div className="flex flex-col sm:flex-row items-center gap-3">
             <span>© {currentYear} My Planet Services Inc. All rights reserved.</span>
+            <span className="hidden sm:inline text-border">|</span>
+            <SocialLinks variant="compact" />
           </div>
 
           <div className="flex flex-wrap items-center gap-6 text-xs">
