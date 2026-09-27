@@ -47,12 +47,54 @@ export interface CaseStudy {
 
 const CATEGORIES = [
   'All',
+  'Architectural Lighting & 3D Storefront',
   'AI & Augmented Reality',
   'Digital Signage & Display CMS',
   'B2B E-Commerce & Drone Supplies',
 ];
 
 export const CASE_STUDIES: CaseStudy[] = [
+  {
+    client: 'Edison Lighting',
+    url: 'https://edisonlighting.in/',
+    displayUrl: 'edisonlighting.in',
+    category: 'Architectural Lighting & 3D Storefront',
+    badge: '3D Studio & WebGL Storefront',
+    metric: '3D + AR',
+    metricLabel: 'Interactive Studio & Visualiser',
+    metricSub: 'Next.js 15 & Razorpay PWA',
+    headline: 'Architectural Lighting, Made with Precision — Custom LED Storefront & 3D Studio',
+    tagline: "Bangalore architectural, decorative & custom LED manufacturer's storefront & PWA",
+    overview:
+      "Edison Lighting is a premier Bangalore-based architectural, decorative, and custom LED manufacturer. We engineered an immersive digital flagship and e-commerce platform featuring an extensive product catalogue, Razorpay checkout, cart and wishlist, express quote and lead capture, interactive Design Studio, AR visualiser, smart-home 3D lock viewer, journal, project gallery, customer accounts, order tracking, and an admin portal for analytics, leads, and catalogues — all packaged as a high-performance installable PWA.",
+    deliverables: [
+      {
+        title: 'Interactive 3D Design Studio & AR Visualiser',
+        desc: 'Custom Three.js / React Three Fiber engine with real-time lighting customizers, room AR preview, and interactive smart-home 3D lock viewer.',
+      },
+      {
+        title: 'Full E-Commerce with Razorpay Checkout',
+        desc: 'Comprehensive architectural fixture catalogue, cart & wishlist, sub-second search, express quoting workflows, and integrated Razorpay payments.',
+      },
+      {
+        title: 'Customer Accounts & Order Lifecycle Tracking',
+        desc: 'Self-service customer portal with order status tracking, saved project configurations, design journals, and architectural project gallery.',
+      },
+      {
+        title: 'Admin Operations Hub & Installable PWA',
+        desc: 'Complete administrative back-office for catalogue management, lead pipelines, and sales analytics, engineered as an offline-ready Next.js 15 PWA.',
+      },
+    ],
+    testimonial: {
+      quote:
+        'Working with Vivek has been truly amazing, he genuinely converted my creativity into something beautiful. He was always ready to help with anything that I needed, be it a change in website, design or to even come up with ideas. I highly recommend Vivek if you need a great website.',
+      author: 'Sahil Sogi',
+      role: 'Founder, Edison Lighting',
+      avatar: 'SS',
+    },
+    image: '/assets/works/edison-preview.png',
+    tech: ['Next.js 15', 'React 19', 'Three.js / R3F', 'Tailwind v4', 'MongoDB', 'GSAP', 'Lenis', 'Zustand', 'Razorpay'],
+  },
   {
     client: 'ARiqA',
     url: 'https://ariqa.in/',
@@ -191,7 +233,7 @@ export function WorkPage() {
         url: `${SITE_URL}/work`,
         name: 'Our Work — Websites & Platforms Developed by My Planet Services',
         description:
-          'Explore production platforms engineered by My Planet Services: ARiqA AI/AR virtual try-on, Wintek Digital enterprise signage CMS, and Fortune India B2B drone commerce.',
+          'Explore production platforms engineered by My Planet Services: Edison Lighting architectural 3D storefront, ARiqA AI/AR virtual try-on, Wintek Digital enterprise signage CMS, and Fortune India B2B drone commerce.',
         mainEntity: {
           '@type': 'ItemList',
           itemListElement: CASE_STUDIES.map((study, idx) => ({
@@ -215,9 +257,9 @@ export function WorkPage() {
     <div className="pt-24 pb-16 sm:pt-32 sm:pb-24 lg:pt-36 lg:pb-32 overflow-hidden">
       <SEOHead
         title="Our Work — Websites & Platforms Engineered by My Planet Services"
-        description="Explore production platforms built by My Planet Services: ARiqA AI/AR virtual try-on, Wintek Digital enterprise signage CMS, and Fortune India B2B drone commerce."
+        description="Explore production platforms built by My Planet Services: Edison Lighting architectural 3D storefront, ARiqA AI/AR virtual try-on, Wintek Digital enterprise signage CMS, and Fortune India B2B drone commerce."
         canonicalPath="/work"
-        keywords="ARiqA virtual try on, Wintek Digital signage, Fortune India drone parts, web development portfolio, SaaS case studies, My Planet Services projects"
+        keywords="Edison Lighting, ARiqA virtual try on, Wintek Digital signage, Fortune India drone parts, architectural lighting e-commerce, web development portfolio, SaaS case studies, My Planet Services projects"
         schema={workSchema}
       />
 

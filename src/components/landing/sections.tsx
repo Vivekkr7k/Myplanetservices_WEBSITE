@@ -38,7 +38,15 @@ import { useCurrency } from '../../lib/currency-context';
 /*                                TESTIMONIALS                                */
 /* -------------------------------------------------------------------------- */
 
-const TESTIMONIALS_DATA = [
+const TESTIMONIALS_DATA: Array<{
+  quote: string;
+  author: string;
+  role: string;
+  company: string;
+  avatar: string;
+  rating: number;
+  url?: string;
+}> = [
   {
     quote:
       'The team did an excellent job translating our vision for Wintek Digital into a modern, professional website. They understood our digital signage solutions well and created a website that presents our products and capabilities in a clear and engaging way.',
@@ -47,6 +55,7 @@ const TESTIMONIALS_DATA = [
     company: 'Wintek Digital',
     avatar: 'PG',
     rating: 5,
+    url: 'https://www.wintekdigital.com/',
   },
   {
     quote:
@@ -56,15 +65,17 @@ const TESTIMONIALS_DATA = [
     company: 'ARiqA (ariqa.in)',
     avatar: 'SU',
     rating: 5,
+    url: 'https://ariqa.in/',
   },
   {
     quote:
-      'Outstanding component build quality, consistent specifications, and dependable engineering. The B2B digital catalog and quotation workflows significantly streamlined procurement across our commercial operations.',
-    author: 'AeroVanguard Technologies',
-    role: 'Engineering & Procurement',
-    company: 'Fortune India Client Partner',
-    avatar: 'AV',
+      'Working with Vivek has been truly amazing, he genuinely converted my creativity into something beautiful. He was always ready to help with anything that I needed, be it a change in website, design or to even come up with ideas. I highly recommend Vivek if you need a great website.',
+    author: 'Sahil Sogi',
+    role: 'Founder',
+    company: 'Edison Lighting (edisonlighting.in)',
+    avatar: 'SS',
     rating: 5,
+    url: 'https://edisonlighting.in/',
   },
 ];
 
@@ -155,13 +166,29 @@ export function Testimonials() {
                       }`}
                     >
                       {item.role},{' '}
-                      <span
-                        className={`font-medium ${
-                          isDark ? 'text-butter' : 'text-foreground/80'
-                        }`}
-                      >
-                        {item.company}
-                      </span>
+                      {item.url ? (
+                        <a
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`font-medium transition-colors hover:underline inline-flex items-center gap-0.5 ${
+                            isDark
+                              ? 'text-butter hover:text-white'
+                              : 'text-foreground/80 hover:text-foreground'
+                          }`}
+                        >
+                          {item.company}
+                          <ArrowUpRight className="w-2.5 h-2.5 opacity-60 inline" />
+                        </a>
+                      ) : (
+                        <span
+                          className={`font-medium ${
+                            isDark ? 'text-butter' : 'text-foreground/80'
+                          }`}
+                        >
+                          {item.company}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>

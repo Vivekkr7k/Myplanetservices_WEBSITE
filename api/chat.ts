@@ -32,6 +32,7 @@ Key Studio Facts:
   10. Strategic Copy Writing (High-converting copy, technical documentation, B2B thought leadership)
 
 - Notable Production Case Studies:
+  * Edison Lighting (edisonlighting.in): Bangalore architectural, decorative and custom LED manufacturer's storefront with 3D studio, AR visualiser, Razorpay e-commerce, and PWA.
   * ARiqA (ariqa.in): AI & AR Virtual Try-On platform for beauty and retail with <50ms real-time sub-frame tracking.
   * Wintek Digital (wintekdigital.com): Nationwide digital signage CMS and interactive kiosk network with 1,000+ connected commercial displays.
   * Fortune India (fortune-india.co.in): B2B e-commerce platform for drone parts and carbon fiber supplies with 500+ SKUs and wholesale volume quoting.
@@ -74,7 +75,8 @@ function getFallbackResponse(lastQuery: string): string {
   }
 
   if (query.includes('work') || query.includes('project') || query.includes('portfolio') || query.includes('case')) {
-    return "Here are three live platforms recently engineered and shipped by our squad:\n\n" +
+    return "Here are live platforms recently engineered and shipped by our squad:\n\n" +
+      "• **Edison Lighting** (*edisonlighting.in*): Architectural LED manufacturer storefront with 3D studio, AR visualiser, Razorpay checkout & installable PWA.\n" +
       "• **ARiqA** (*ariqa.in*): AI & AR virtual try-on engine for retail with <50ms real-time facial mesh tracking.\n" +
       "• **Wintek Digital** (*wintekdigital.com*): Centralized cloud display CMS powering 1,000+ connected commercial screens nationwide.\n" +
       "• **Fortune India** (*fortune-india.co.in*): High-speed B2B e-commerce platform for commercial drone parts with 500+ SKUs.\n\n" +

@@ -19,7 +19,7 @@ interface Message {
 const STARTER_PROMPTS = [
   'What services does your studio build?',
   'How much does a production MVP cost?',
-  'Tell me about your client projects (ARiqA, Wintek)',
+  'Tell me about your client projects (Edison, ARiqA, Wintek)',
   'How fast is your sprint turnaround?',
 ];
 

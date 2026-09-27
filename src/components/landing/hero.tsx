@@ -292,7 +292,7 @@ export function Hero() {
             {!videoError && (
               <video
                 ref={videoRef}
-                src="/assets/hero-scrub.mp4"
+                src="/assets/watermark-removed-People_working_during_day_night_202608232052.mp4"
                 poster="/assets/hero-scrub-poster.jpg"
                 playsInline
                 muted
