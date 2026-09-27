@@ -37,6 +37,9 @@ import {
   Check,
   X,
   Sparkles,
+  LayoutGrid,
+  List,
+  Loader2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -53,6 +56,7 @@ export default function AdminInquiriesPage() {
   const [isInquiryModalOpen, setIsInquiryModalOpen] = useState(false);
   const [editingInquiry, setEditingInquiry] = useState<InquiryRecord | null>(null);
   const [inquiryNoteText, setInquiryNoteText] = useState('');
+  const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -132,7 +136,7 @@ export default function AdminInquiriesPage() {
   };
 
   const handleDelete = async (id: string, nameOrEmail: string) => {
-    if (!window.confirm(`Are you sure you want to remove inquiry from ${nameOrEmail}?`)) return;
+    if (!window.confirm(`Are you sure you want to remove inquiry from "${nameOrEmail}"?`)) return;
     await deleteInquiry(id);
     setInquiries((prev) => prev.filter((i) => i.id !== id));
     if (selectedInquiry?.id === id) setSelectedInquiry(null);
@@ -234,153 +238,301 @@ export default function AdminInquiriesPage() {
     return { total, newCount, bookings, converted };
   }, [inquiries]);
 
+  // Helper for type badges
+  const renderTypeBadge = (type: InquiryType) => {
+    if (type === 'brief') {
+      return (
+        <span className="text-[11px] px-2.5 py-0.5 rounded-full font-medium bg-butter/30 text-butter-foreground border border-butter/50 uppercase tracking-wider">
+          Project Brief
+        </span>
+      );
+    }
+    if (type === 'booking') {
+      return (
+        <span className="text-[11px] px-2.5 py-0.5 rounded-full font-medium bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25 uppercase tracking-wider">
+          Discovery Call
+        </span>
+      );
+    }
+    return (
+      <span className="text-[11px] px-2.5 py-0.5 rounded-full font-medium bg-secondary text-foreground border border-border uppercase tracking-wider">
+        Quick Lead
+      </span>
+    );
+  };
+
+  // Helper for status badges
+  const renderStatusBadge = (status: InquiryStatus) => {
+    if (status === 'new') {
+      return (
+        <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full font-semibold bg-butter text-butter-foreground shadow-2xs">
+          <span className="w-1.5 h-1.5 rounded-full bg-butter-foreground animate-ping" />
+          <span>New</span>
+        </span>
+      );
+    }
+    if (status === 'contacted') {
+      return (
+        <span className="text-[11px] px-2 py-0.5 rounded-full font-medium bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/25 capitalize">
+          Contacted
+        </span>
+      );
+    }
+    if (status === 'converted') {
+      return (
+        <span className="text-[11px] px-2 py-0.5 rounded-full font-medium bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25 capitalize">
+          Converted
+        </span>
+      );
+    }
+    return (
+      <span className="text-[11px] px-2 py-0.5 rounded-full font-medium bg-secondary text-muted-foreground border border-border capitalize">
+        Archived
+      </span>
+    );
+  };
+
   return (
     <AdminLayout
       title="Inquiries & Leads Vault"
       subtitle="Real-time capture of website form submissions, discovery calls, and instant estimate leads."
     >
-      <div className="space-y-6 pb-12">
-        {/* Header Banner */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-gradient-to-r from-zinc-900/90 via-zinc-900/70 to-zinc-950 p-6 rounded-2xl border border-zinc-800 shadow-xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
-          <div className="relative z-10">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shadow-inner">
-                <Inbox className="w-5 h-5" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+      <div className="space-y-5 sm:space-y-6 pb-12">
+        {/* Header Banner - Clean Luxury Light Aesthetic */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-card p-5 sm:p-7 rounded-2xl sm:rounded-3xl border border-border/80 shadow-soft relative overflow-hidden">
+          {/* Subtle Warm Aurora Glow */}
+          <div className="absolute top-0 right-0 w-80 h-80 bg-butter/15 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
+
+          <div className="relative z-10 flex items-start sm:items-center gap-3.5">
+            <div className="w-11 h-11 rounded-2xl bg-butter text-butter-foreground flex items-center justify-center font-display shadow-xs shrink-0 mt-0.5 sm:mt-0">
+              <Inbox className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-xl sm:text-2xl font-display font-semibold text-foreground tracking-tight">
                   Inquiries & Leads Vault
-                  <span className="text-xs font-mono font-medium px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                    Live Form Submissions
-                  </span>
                 </h1>
-                <p className="text-sm text-zinc-400 mt-0.5">
-                  Real-time submissions from project briefs, discovery calls, and instant estimate calculators.
-                </p>
+                <span className="text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-butter/30 text-butter-foreground border border-butter/50">
+                  Live Form Submissions
+                </span>
               </div>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 max-w-xl">
+                Real-time submissions from project briefs, discovery calls, and instant estimate calculators.
+              </p>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 relative z-10">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 relative z-10">
             <button
               onClick={() => {
                 setEditingInquiry(null);
                 setIsInquiryModalOpen(true);
               }}
-              className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold transition-all cursor-pointer shadow-md hover:shadow-purple-500/25"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-butter text-butter-foreground text-xs font-semibold hover:scale-102 transition-all shadow-xs cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>Add Lead / Inquiry</span>
+              <span>+ Add Lead / Inquiry</span>
             </button>
 
             <button
               onClick={loadData}
               disabled={loading}
-              className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-300 border border-zinc-700/80 text-xs font-medium transition-all cursor-pointer shadow-sm hover:text-white"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-secondary hover:bg-secondary/80 text-foreground border border-border text-xs font-medium transition-colors cursor-pointer"
               title="Refresh submissions"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-purple-400' : ''}`} />
-              Refresh
+              <RefreshCw className={`w-3.5 h-3.5 text-muted-foreground ${loading ? 'animate-spin text-foreground' : ''}`} />
+              <span>Refresh</span>
             </button>
 
             <div
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium border ${
+              className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium border ${
                 dbConfigured
-                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
-                  : 'bg-amber-500/10 border-amber-500/30 text-amber-300'
+                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300'
+                  : 'bg-amber-500/10 border-amber-500/30 text-amber-700 dark:text-amber-300'
               }`}
             >
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
               <Database className="w-3.5 h-3.5" />
               <span>{dbConfigured ? 'MongoDB: Connected' : 'Cloud Database'}</span>
             </div>
           </div>
         </div>
 
-        {/* Stats Row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-zinc-900/60 border border-zinc-800/80 rounded-xl p-4 flex items-center gap-4">
-            <div className="w-11 h-11 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-300">
-              <Inbox className="w-5 h-5" />
+        {/* Stats Row - 4 Crisp Metric Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-card border border-border/80 shadow-soft relative overflow-hidden transition-all hover:border-border">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground font-semibold">
+                Total Inquiries
+              </span>
+              <div className="w-8 h-8 rounded-xl bg-secondary flex items-center justify-center text-foreground shrink-0">
+                <Inbox className="w-4 h-4 text-butter" />
+              </div>
             </div>
-            <div>
-              <p className="text-xs text-zinc-400 font-medium">Total Inquiries</p>
-              <p className="text-2xl font-bold text-white mt-0.5">{stats.total}</p>
+            <div className="text-2xl sm:text-3xl font-display font-bold text-foreground tracking-tight">
+              {stats.total}
             </div>
-          </div>
-
-          <div className="bg-zinc-900/60 border border-zinc-800/80 rounded-xl p-4 flex items-center gap-4">
-            <div className="w-11 h-11 rounded-lg bg-purple-500/15 border border-purple-500/20 flex items-center justify-center text-purple-400">
-              <Sparkles className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-xs text-zinc-400 font-medium">New / Unread</p>
-              <p className="text-2xl font-bold text-purple-400 mt-0.5">{stats.newCount}</p>
+            <div className="mt-1 text-xs text-muted-foreground truncate">
+              Across all live forms & calculators
             </div>
           </div>
 
-          <div className="bg-zinc-900/60 border border-zinc-800/80 rounded-xl p-4 flex items-center gap-4">
-            <div className="w-11 h-11 rounded-lg bg-emerald-500/15 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-              <Calendar className="w-5 h-5" />
+          <div className="p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-card border border-border/80 shadow-soft relative overflow-hidden transition-all hover:border-border">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground font-semibold">
+                New / Unread
+              </span>
+              <div className="w-8 h-8 rounded-xl bg-butter/30 text-butter-foreground flex items-center justify-center shrink-0">
+                <Sparkles className="w-4 h-4" />
+              </div>
             </div>
-            <div>
-              <p className="text-xs text-zinc-400 font-medium">Discovery Calls</p>
-              <p className="text-2xl font-bold text-emerald-400 mt-0.5">{stats.bookings}</p>
+            <div className="text-2xl sm:text-3xl font-display font-bold text-foreground tracking-tight flex items-baseline gap-2">
+              <span>{stats.newCount}</span>
+              {stats.newCount > 0 && (
+                <span className="text-xs font-semibold font-mono text-butter-foreground bg-butter/40 px-2 py-0.5 rounded-full">
+                  Action Needed
+                </span>
+              )}
+            </div>
+            <div className="mt-1 text-xs text-muted-foreground flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-butter animate-pulse shrink-0" />
+              <span>Awaiting response</span>
             </div>
           </div>
 
-          <div className="bg-zinc-900/60 border border-zinc-800/80 rounded-xl p-4 flex items-center gap-4">
-            <div className="w-11 h-11 rounded-lg bg-blue-500/15 border border-blue-500/20 flex items-center justify-center text-blue-400">
-              <CheckCircle2 className="w-5 h-5" />
+          <div className="p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-card border border-border/80 shadow-soft relative overflow-hidden transition-all hover:border-border">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground font-semibold">
+                Discovery Calls
+              </span>
+              <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                <Calendar className="w-4 h-4" />
+              </div>
             </div>
-            <div>
-              <p className="text-xs text-zinc-400 font-medium">Converted Clients</p>
-              <p className="text-2xl font-bold text-blue-400 mt-0.5">{stats.converted}</p>
+            <div className="text-2xl sm:text-3xl font-display font-bold text-foreground tracking-tight">
+              {stats.bookings}
+            </div>
+            <div className="mt-1 text-xs text-muted-foreground truncate">
+              Scheduled calendar slots
+            </div>
+          </div>
+
+          <div className="p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-card border border-border/80 shadow-soft relative overflow-hidden transition-all hover:border-border">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground font-semibold">
+                Converted Clients
+              </span>
+              <div className="w-8 h-8 rounded-xl bg-secondary flex items-center justify-center text-foreground shrink-0">
+                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              </div>
+            </div>
+            <div className="text-2xl sm:text-3xl font-display font-bold text-foreground tracking-tight">
+              {stats.converted}
+            </div>
+            <div className="mt-1 text-xs text-muted-foreground truncate">
+              Signed & moved to client records
             </div>
           </div>
         </div>
 
-        {/* Filters & Search Toolbar */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-zinc-900/40 p-4 rounded-xl border border-zinc-800/70">
-          {/* Search Input */}
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-            <input
-              type="text"
-              placeholder="Search by name, email, company, or message..."
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="w-full pl-10 pr-4 py-2 bg-zinc-950/80 border border-zinc-800 rounded-lg text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-purple-500/50 transition-colors"
-            />
-          </div>
-
-          {/* Filter Tabs */}
-          <div className="flex flex-wrap items-center gap-2">
-            {/* Type selector */}
-            <div className="flex items-center bg-zinc-950 p-1 rounded-lg border border-zinc-800 text-xs">
-              {(['all', 'brief', 'booking', 'lead'] as const).map((t) => (
+        {/* Filters & Search Toolbar - Light Card */}
+        <div className="bg-card border border-border/80 p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl shadow-soft space-y-3">
+          {/* Top Row: Search Input + View Mode Switch */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search by name, email, company, or message..."
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-secondary/50 border border-border text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:bg-card focus:border-foreground focus:ring-2 focus:ring-butter/40 transition-all font-sans"
+              />
+              {searchQuery && (
                 <button
-                  key={t}
-                  onClick={() => {
-                    setTypeFilter(t);
-                    setCurrentPage(1);
-                  }}
-                  className={`px-3 py-1.5 rounded-md font-medium capitalize transition-all cursor-pointer ${
-                    typeFilter === t
-                      ? 'bg-purple-600 text-white shadow-sm'
-                      : 'text-zinc-400 hover:text-zinc-200'
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 cursor-pointer"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+
+            <div className="flex items-center justify-between sm:justify-end gap-2.5">
+              <span className="text-xs text-muted-foreground font-mono">
+                Showing <span className="font-semibold text-foreground">{filtered.length}</span> submissions
+              </span>
+
+              {/* View Switcher: Cards vs Table */}
+              <div className="flex items-center bg-secondary/80 p-1 rounded-xl border border-border/80">
+                <button
+                  type="button"
+                  onClick={() => setViewMode('cards')}
+                  title="Card Grid View"
+                  className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                    viewMode === 'cards'
+                      ? 'bg-butter text-butter-foreground shadow-2xs font-semibold'
+                      : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
-                  {t === 'all' ? 'All Types' : t === 'brief' ? 'Briefs' : t === 'booking' ? 'Calls' : 'Leads'}
+                  <LayoutGrid className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode('table')}
+                  title="Compact Table View"
+                  className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                    viewMode === 'table'
+                      ? 'bg-butter text-butter-foreground shadow-2xs font-semibold'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <List className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Row: Filter Tabs */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-2.5 border-t border-border/60">
+            {/* Type selector */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 no-scrollbar sm:flex-wrap">
+              {[
+                { id: 'all', label: 'All Submissions', count: inquiries.length },
+                { id: 'brief', label: 'Project Briefs', count: inquiries.filter((i) => i.type === 'brief').length },
+                { id: 'booking', label: 'Discovery Calls', count: inquiries.filter((i) => i.type === 'booking').length },
+                { id: 'lead', label: 'Quick Leads', count: inquiries.filter((i) => i.type === 'lead').length },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => {
+                    setTypeFilter(tab.id as any);
+                    setCurrentPage(1);
+                  }}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all inline-flex items-center gap-1.5 shrink-0 cursor-pointer ${
+                    typeFilter === tab.id
+                      ? 'bg-butter text-butter-foreground font-semibold shadow-xs'
+                      : 'bg-secondary text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <span>{tab.label}</span>
+                  <span
+                    className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
+                      typeFilter === tab.id ? 'bg-butter-foreground/20 text-butter-foreground' : 'bg-card text-muted-foreground'
+                    }`}
+                  >
+                    {tab.count}
+                  </span>
                 </button>
               ))}
             </div>
 
             {/* Status selector */}
-            <div className="flex items-center bg-zinc-950 p-1 rounded-lg border border-zinc-800 text-xs">
+            <div className="flex items-center bg-secondary/80 p-1 rounded-xl border border-border/80 text-xs shrink-0 self-start sm:self-auto">
               {(['all', 'new', 'contacted', 'converted', 'archived'] as const).map((s) => (
                 <button
                   key={s}
@@ -388,10 +540,10 @@ export default function AdminInquiriesPage() {
                     setStatusFilter(s);
                     setCurrentPage(1);
                   }}
-                  className={`px-2.5 py-1.5 rounded-md font-medium capitalize transition-all cursor-pointer ${
+                  className={`px-2.5 py-1 rounded-lg font-medium capitalize transition-all cursor-pointer ${
                     statusFilter === s
-                      ? 'bg-zinc-800 text-white font-semibold'
-                      : 'text-zinc-400 hover:text-zinc-200'
+                      ? 'bg-card text-foreground font-semibold shadow-2xs border border-border/60'
+                      : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   {s}
@@ -401,42 +553,41 @@ export default function AdminInquiriesPage() {
           </div>
         </div>
 
-        {/* Inquiries Cards Grid */}
+        {/* Content Body: Cards View OR Table View */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 bg-zinc-900/30 rounded-2xl border border-zinc-800/80">
-            <RefreshCw className="w-8 h-8 text-purple-400 animate-spin mb-3" />
-            <p className="text-zinc-400 text-sm">Syncing inquiries from database...</p>
+          <div className="flex flex-col items-center justify-center py-20 bg-card rounded-3xl border border-border/80 shadow-soft">
+            <Loader2 className="w-8 h-8 text-butter animate-spin mb-3" />
+            <p className="text-sm font-semibold text-foreground">Syncing inquiries from MongoDB...</p>
+            <p className="text-xs text-muted-foreground mt-1">Checking live form submissions and calendar bookings.</p>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 bg-zinc-900/30 rounded-2xl border border-dashed border-zinc-800">
-            <Inbox className="w-12 h-12 text-zinc-600 mb-3" />
-            <h3 className="text-lg font-semibold text-zinc-300">No Inquiries Found</h3>
-            <p className="text-sm text-zinc-500 max-w-sm text-center mt-1">
+          <div className="flex flex-col items-center justify-center py-20 bg-card rounded-3xl border border-dashed border-border shadow-soft text-center p-6">
+            <Inbox className="w-12 h-12 text-muted-foreground/40 mb-3" />
+            <h3 className="text-base sm:text-lg font-semibold text-foreground">No Inquiries Found</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground max-w-sm mt-1">
               {searchQuery || typeFilter !== 'all' || statusFilter !== 'all'
                 ? 'Try adjusting your search terms or active filters.'
                 : 'New website form submissions and discovery call requests will appear here in real-time.'}
             </p>
+            {(searchQuery || typeFilter !== 'all' || statusFilter !== 'all') && (
+              <button
+                onClick={() => {
+                  setSearchQuery('');
+                  setTypeFilter('all');
+                  setStatusFilter('all');
+                  setCurrentPage(1);
+                }}
+                className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-butter-foreground bg-butter px-3.5 py-2 rounded-xl shadow-xs hover:scale-102 transition-transform cursor-pointer"
+              >
+                Reset Filters
+              </button>
+            )}
           </div>
-        ) : (
+        ) : viewMode === 'cards' ? (
+          /* Cards Grid View */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {paginatedInquiries.map((inq) => {
               const isNew = inq.status === 'new';
-              const typeColor =
-                inq.type === 'brief'
-                  ? 'bg-purple-500/10 text-purple-300 border-purple-500/20'
-                  : inq.type === 'booking'
-                  ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20'
-                  : 'bg-cyan-500/10 text-cyan-300 border-cyan-500/20';
-
-              const statusColor =
-                inq.status === 'new'
-                  ? 'bg-purple-500/20 text-purple-200 border-purple-500/40 animate-pulse'
-                  : inq.status === 'contacted'
-                  ? 'bg-blue-500/10 text-blue-300 border-blue-500/20'
-                  : inq.status === 'converted'
-                  ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20'
-                  : 'bg-zinc-800 text-zinc-400 border-zinc-700';
-
               const timeDisplay = new Date(inq.createdAt).toLocaleDateString('en-US', {
                 month: 'short',
                 day: 'numeric',
@@ -447,87 +598,87 @@ export default function AdminInquiriesPage() {
               return (
                 <div
                   key={inq.id}
-                  className={`bg-zinc-900/70 hover:bg-zinc-900 border rounded-2xl p-5 flex flex-col justify-between transition-all group shadow-sm hover:shadow-xl hover:border-zinc-700 ${
-                    isNew ? 'border-purple-500/40 ring-1 ring-purple-500/20' : 'border-zinc-800/80'
+                  className={`bg-card border rounded-2xl sm:rounded-3xl p-5 sm:p-6 flex flex-col justify-between transition-all group shadow-soft hover:shadow-md relative overflow-hidden ${
+                    isNew
+                      ? 'border-butter/70 ring-1 ring-butter/30 bg-card'
+                      : 'border-border/80 hover:border-foreground/20'
                   }`}
                 >
+                  {/* Subtle Butter Left Accent Bar for New Inquiries */}
+                  {isNew && (
+                    <div className="absolute left-0 inset-y-0 w-1.5 bg-butter rounded-l-full" />
+                  )}
+
                   <div>
                     {/* Top Row: Type, Status, and Timestamp */}
-                    <div className="flex items-center justify-between gap-2 mb-3">
+                    <div className="flex items-center justify-between gap-2 mb-3.5">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span
-                          className={`text-xs px-2.5 py-0.5 rounded-full font-medium border uppercase tracking-wider ${typeColor}`}
-                        >
-                          {inq.type === 'brief'
-                            ? 'Project Brief'
-                            : inq.type === 'booking'
-                            ? 'Discovery Call'
-                            : 'Quick Lead'}
-                        </span>
-                        <span
-                          className={`text-xs px-2 py-0.5 rounded-full font-medium border capitalize ${statusColor}`}
-                        >
-                          {inq.status}
-                        </span>
+                        {renderTypeBadge(inq.type)}
+                        {renderStatusBadge(inq.status)}
                       </div>
-                      <span className="text-[11px] text-zinc-500 whitespace-nowrap">
+                      <span className="text-[11px] text-muted-foreground font-mono whitespace-nowrap">
                         {timeDisplay}
                       </span>
                     </div>
 
                     {/* Sender Identity */}
-                    <div className="mb-3">
-                      <h3 className="text-base font-semibold text-white group-hover:text-purple-300 transition-colors flex items-center gap-2">
-                        {inq.name || inq.company || 'Website Visitor'}
+                    <div className="mb-3.5">
+                      <h3 className="text-base sm:text-lg font-display font-semibold text-foreground group-hover:text-butter-foreground transition-colors flex items-center gap-2">
+                        <span>{inq.name || inq.company || 'Website Visitor'}</span>
                       </h3>
-                      <div className="flex items-center gap-2 mt-1 text-xs text-zinc-400">
-                        <Mail className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
-                        <span className="truncate">{inq.email}</span>
+
+                      <div className="flex items-center gap-2 mt-1.5 text-xs text-muted-foreground">
+                        <Mail className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                        <span className="truncate font-mono">{inq.email}</span>
                         <button
                           onClick={() => handleCopy(inq.email, 'email address', inq.id)}
-                          className="text-zinc-500 hover:text-zinc-300 cursor-pointer"
-                          title="Copy email"
+                          className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer p-0.5"
+                          title="Copy email address"
                         >
                           {copiedId === inq.id ? (
-                            <Check className="w-3 h-3 text-emerald-400" />
+                            <Check className="w-3.5 h-3.5 text-emerald-600" />
                           ) : (
-                            <Copy className="w-3 h-3" />
+                            <Copy className="w-3.5 h-3.5" />
                           )}
                         </button>
                       </div>
 
                       {inq.company && inq.company !== inq.name && (
-                        <div className="flex items-center gap-2 mt-0.5 text-xs text-zinc-400">
-                          <Building2 className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
-                          <span className="truncate">{inq.company}</span>
+                        <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                          <Building2 className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                          <span className="truncate font-medium">{inq.company}</span>
                         </div>
                       )}
                     </div>
 
                     {/* Service & Budget/Slot Highlights */}
-                    <div className="bg-zinc-950/60 rounded-xl p-3 border border-zinc-800/60 mb-3 space-y-1.5 text-xs">
+                    <div className="bg-secondary/50 rounded-2xl p-3 sm:p-3.5 border border-border/60 mb-3 space-y-1.5 text-xs">
                       {inq.service && (
                         <div className="flex items-start gap-2">
-                          <span className="text-zinc-500 font-medium shrink-0">Service:</span>
-                          <span className="text-zinc-300 truncate">{inq.service}</span>
+                          <span className="text-muted-foreground font-medium shrink-0">Service:</span>
+                          <span className="text-foreground font-semibold truncate">{inq.service}</span>
                         </div>
                       )}
                       {inq.budget && (
                         <div className="flex items-center gap-2">
-                          <span className="text-zinc-500 font-medium shrink-0">Budget:</span>
-                          <span className="text-emerald-400 font-semibold">{inq.budget}</span>
+                          <span className="text-muted-foreground font-medium shrink-0">Budget:</span>
+                          <span className="text-emerald-600 dark:text-emerald-400 font-semibold font-mono">
+                            {inq.budget}
+                          </span>
                         </div>
                       )}
                       {inq.slot && (
                         <div className="flex items-center gap-2">
-                          <span className="text-zinc-500 font-medium shrink-0">Call Slot:</span>
-                          <span className="text-purple-300 font-semibold">{inq.slot}</span>
+                          <span className="text-muted-foreground font-medium shrink-0">Slot:</span>
+                          <span className="text-butter-foreground font-semibold font-mono bg-butter/30 px-2 py-0.5 rounded-md">
+                            {inq.slot}
+                          </span>
                         </div>
                       )}
                       {inq.quote?.total && (
                         <div className="flex items-center gap-2">
-                          <span className="text-zinc-500 font-medium shrink-0">Est. Total:</span>
-                          <span className="text-emerald-400 font-mono font-bold">
+                          <span className="text-muted-foreground font-medium shrink-0">Est. Total:</span>
+                          <span className="text-foreground font-mono font-bold">
                             {inq.currency === 'INR' ? '₹' : '$'}
                             {inq.quote.total.toLocaleString()}
                           </span>
@@ -537,17 +688,17 @@ export default function AdminInquiriesPage() {
 
                     {/* Short Message Snippet */}
                     {inq.message && (
-                      <p className="text-xs text-zinc-400 line-clamp-2 italic mb-3">
+                      <p className="text-xs text-muted-foreground bg-secondary/30 rounded-xl p-2.5 border border-border/40 line-clamp-2 italic mb-3">
                         "{inq.message}"
                       </p>
                     )}
                   </div>
 
                   {/* Footer Actions */}
-                  <div className="pt-3 border-t border-zinc-800/80 flex items-center justify-between gap-2">
+                  <div className="pt-3 border-t border-border/70 flex items-center justify-between gap-2">
                     <button
                       onClick={() => setSelectedInquiry(inq)}
-                      className="px-2.5 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white text-xs font-medium transition-all flex items-center gap-1 cursor-pointer"
+                      className="px-3 py-1.5 rounded-xl bg-secondary hover:bg-secondary/80 text-foreground text-xs font-semibold border border-border transition-colors flex items-center gap-1 cursor-pointer"
                     >
                       <span>View Details</span>
                       <ChevronRight className="w-3.5 h-3.5" />
@@ -556,7 +707,7 @@ export default function AdminInquiriesPage() {
                     <div className="flex items-center gap-1.5">
                       <button
                         onClick={() => handleEditInquiry(inq)}
-                        className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
+                        className="p-1.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors cursor-pointer"
                         title="Edit inquiry details"
                       >
                         <Edit3 className="w-4 h-4" />
@@ -565,7 +716,7 @@ export default function AdminInquiriesPage() {
                       {inq.status !== 'converted' && (
                         <button
                           onClick={() => handleConvertToClient(inq)}
-                          className="px-2.5 py-1.5 rounded-lg bg-purple-600/90 hover:bg-purple-600 text-white text-xs font-medium transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
+                          className="px-3 py-1.5 rounded-xl bg-butter text-butter-foreground text-xs font-semibold shadow-2xs hover:scale-102 transition-all flex items-center gap-1 cursor-pointer"
                           title="Convert to Client Record"
                         >
                           <UserPlus className="w-3.5 h-3.5" />
@@ -575,7 +726,7 @@ export default function AdminInquiriesPage() {
 
                       <button
                         onClick={() => handleDelete(inq.id, inq.name || inq.email)}
-                        className="p-1.5 rounded-lg text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
+                        className="p-1.5 rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
                         title="Delete inquiry"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -586,11 +737,128 @@ export default function AdminInquiriesPage() {
               );
             })}
           </div>
+        ) : (
+          /* Table View */
+          <div className="rounded-2xl sm:rounded-3xl border border-border/80 bg-card overflow-hidden shadow-soft">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-secondary/40 text-[11px] font-mono uppercase tracking-wider text-muted-foreground border-b border-border">
+                  <tr>
+                    <th className="py-3.5 px-4 font-semibold">Status</th>
+                    <th className="py-3.5 px-4 font-semibold">Prospect</th>
+                    <th className="py-3.5 px-4 font-semibold">Type & Service</th>
+                    <th className="py-3.5 px-4 font-semibold">Budget / Slot</th>
+                    <th className="py-3.5 px-4 font-semibold">Received</th>
+                    <th className="py-3.5 px-4 text-right font-semibold">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/60">
+                  {paginatedInquiries.map((inq) => {
+                    const isNew = inq.status === 'new';
+                    return (
+                      <tr
+                        key={inq.id}
+                        className={`hover:bg-secondary/30 transition-colors ${isNew ? 'bg-butter/5' : ''}`}
+                      >
+                        <td className="py-3.5 px-4 whitespace-nowrap">
+                          {renderStatusBadge(inq.status)}
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <div className="font-semibold text-foreground text-sm">
+                            {inq.name || 'Website Visitor'}
+                          </div>
+                          <div className="text-muted-foreground font-mono text-[11px] flex items-center gap-1.5 mt-0.5">
+                            <span>{inq.email}</span>
+                            <button
+                              onClick={() => handleCopy(inq.email, 'email', inq.id)}
+                              className="text-muted-foreground hover:text-foreground cursor-pointer"
+                              title="Copy email"
+                            >
+                              <Copy className="w-3 h-3" />
+                            </button>
+                          </div>
+                          {inq.company && (
+                            <div className="text-muted-foreground text-[11px] flex items-center gap-1 mt-0.5">
+                              <Building2 className="w-3 h-3" />
+                              <span>{inq.company}</span>
+                            </div>
+                          )}
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <div className="mb-1">{renderTypeBadge(inq.type)}</div>
+                          <div className="font-medium text-foreground text-xs truncate max-w-[200px]">
+                            {inq.service || 'General Inquiry'}
+                          </div>
+                        </td>
+                        <td className="py-3.5 px-4 whitespace-nowrap font-mono">
+                          {inq.budget && (
+                            <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                              {inq.budget}
+                            </span>
+                          )}
+                          {inq.slot && (
+                            <span className="font-semibold text-butter-foreground bg-butter/30 px-2 py-0.5 rounded-md text-[11px]">
+                              {inq.slot}
+                            </span>
+                          )}
+                          {!inq.budget && !inq.slot && (
+                            <span className="text-muted-foreground">—</span>
+                          )}
+                        </td>
+                        <td className="py-3.5 px-4 whitespace-nowrap text-muted-foreground font-mono text-[11px]">
+                          {new Date(inq.createdAt).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                          })}
+                        </td>
+                        <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                          <div className="flex items-center justify-end gap-1.5">
+                            <button
+                              onClick={() => setSelectedInquiry(inq)}
+                              className="px-2.5 py-1 rounded-lg bg-secondary hover:bg-secondary/80 text-foreground text-xs font-medium border border-border transition-colors cursor-pointer"
+                            >
+                              View
+                            </button>
+
+                            {inq.status !== 'converted' && (
+                              <button
+                                onClick={() => handleConvertToClient(inq)}
+                                className="px-2.5 py-1 rounded-lg bg-butter text-butter-foreground text-xs font-semibold shadow-2xs hover:scale-102 transition-transform cursor-pointer"
+                                title="Convert to Client"
+                              >
+                                Convert
+                              </button>
+                            )}
+
+                            <button
+                              onClick={() => handleEditInquiry(inq)}
+                              className="p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors cursor-pointer"
+                              title="Edit"
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
+                            </button>
+
+                            <button
+                              onClick={() => handleDelete(inq.id, inq.name || inq.email)}
+                              className="p-1 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
+                              title="Delete"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
         )}
 
         {/* Pagination Bar */}
         {filtered.length > 0 && (
-          <div className="pt-4 border-t border-zinc-800/80">
+          <div className="pt-4 border-t border-border/80">
             <AdminPagination
               currentPage={currentPage}
               totalItems={filtered.length}
@@ -605,24 +873,24 @@ export default function AdminInquiriesPage() {
           </div>
         )}
 
-        {/* Inquiry Detail Modal / Drawer */}
+        {/* Inquiry Detail Modal / Drawer - Clean Light Theme */}
         {selectedInquiry && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/40 backdrop-blur-xs animate-in fade-in duration-200">
+            <div className="bg-card text-foreground border border-border rounded-3xl w-full max-w-2xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
               {/* Modal Header */}
-              <div className="flex items-center justify-between p-6 border-b border-zinc-800 bg-zinc-950/50">
+              <div className="flex items-center justify-between p-5 sm:p-6 border-b border-border bg-secondary/30">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
+                  <div className="w-10 h-10 rounded-2xl bg-butter text-butter-foreground flex items-center justify-center shadow-xs">
                     <Inbox className="w-5 h-5" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                      Inquiry Details
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 font-mono">
+                    <h2 className="text-base sm:text-lg font-display font-semibold text-foreground flex items-center gap-2">
+                      <span>Inquiry Details</span>
+                      <span className="text-xs px-2.5 py-0.5 rounded-full bg-secondary text-foreground font-mono border border-border">
                         {selectedInquiry.id}
                       </span>
                     </h2>
-                    <p className="text-xs text-zinc-400">
+                    <p className="text-xs text-muted-foreground">
                       Received on{' '}
                       {new Date(selectedInquiry.createdAt).toLocaleString('en-US', {
                         dateStyle: 'full',
@@ -634,24 +902,24 @@ export default function AdminInquiriesPage() {
 
                 <button
                   onClick={() => setSelectedInquiry(null)}
-                  className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
+                  className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors cursor-pointer"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4" />
                 </button>
               </div>
 
               {/* Modal Body */}
-              <div className="p-6 space-y-6 overflow-y-auto flex-1">
+              <div className="p-5 sm:p-6 space-y-5 overflow-y-auto flex-1 text-xs">
                 {/* Status & Quick Action Bar */}
-                <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl bg-zinc-950 border border-zinc-800">
+                <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-secondary/40 border border-border/80">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-zinc-400 font-medium">Status:</span>
+                    <span className="text-xs text-muted-foreground font-semibold">Status:</span>
                     <select
                       value={selectedInquiry.status}
                       onChange={(e) =>
                         handleStatusChange(selectedInquiry.id, e.target.value as InquiryStatus)
                       }
-                      className="px-3 py-1.5 bg-zinc-900 border border-zinc-700 rounded-lg text-xs font-semibold text-white focus:outline-none focus:border-purple-500"
+                      className="px-3 py-1.5 bg-card border border-border rounded-xl text-xs font-semibold text-foreground focus:outline-none focus:border-foreground cursor-pointer"
                     >
                       <option value="new">New / Unread</option>
                       <option value="contacted">Contacted</option>
@@ -664,17 +932,17 @@ export default function AdminInquiriesPage() {
                     <button
                       type="button"
                       onClick={() => handleEditInquiry(selectedInquiry)}
-                      className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer"
+                      className="px-3 py-1.5 rounded-xl bg-card hover:bg-secondary text-foreground text-xs font-medium border border-border transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
                     >
-                      <Edit3 className="w-3.5 h-3.5 text-purple-400" />
+                      <Edit3 className="w-3.5 h-3.5 text-muted-foreground" />
                       <span>Edit Inquiry</span>
                     </button>
 
                     <a
                       href={`mailto:${selectedInquiry.email}?subject=Re: Your Project with My Planet Services`}
-                      className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium transition-colors flex items-center gap-1.5"
+                      className="px-3 py-1.5 rounded-xl bg-card hover:bg-secondary text-foreground text-xs font-medium border border-border transition-colors flex items-center gap-1.5 shadow-2xs"
                     >
-                      <Mail className="w-3.5 h-3.5" />
+                      <Mail className="w-3.5 h-3.5 text-muted-foreground" />
                       <span>Reply via Email</span>
                     </a>
 
@@ -685,7 +953,7 @@ export default function AdminInquiriesPage() {
                           setSelectedInquiry(null);
                           handleConvertToClient(target);
                         }}
-                        className="px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm"
+                        className="px-3 py-1.5 rounded-xl bg-butter text-butter-foreground text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs hover:scale-102"
                       >
                         <UserPlus className="w-3.5 h-3.5" />
                         <span>Convert to Client</span>
@@ -696,31 +964,31 @@ export default function AdminInquiriesPage() {
 
                 {/* Prospect Details Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="p-4 rounded-xl bg-zinc-950/50 border border-zinc-800/80 space-y-3">
-                    <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                  <div className="p-4 rounded-2xl bg-secondary/30 border border-border/80 space-y-2.5">
+                    <h4 className="text-[11px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">
                       Contact Information
                     </h4>
                     <div className="space-y-2 text-xs">
                       <div>
-                        <span className="text-zinc-500 block">Name:</span>
-                        <span className="text-white font-medium text-sm">
+                        <span className="text-muted-foreground block text-[11px]">Name:</span>
+                        <span className="text-foreground font-semibold text-sm">
                           {selectedInquiry.name || 'Not provided'}
                         </span>
                       </div>
                       <div>
-                        <span className="text-zinc-500 block">Email:</span>
+                        <span className="text-muted-foreground block text-[11px]">Email:</span>
                         <div className="flex items-center gap-2">
-                          <span className="text-purple-400 font-mono font-medium">
+                          <span className="text-foreground font-mono font-medium">
                             {selectedInquiry.email}
                           </span>
                           <button
                             onClick={() =>
                               handleCopy(selectedInquiry.email, 'email', 'modal-email')
                             }
-                            className="text-zinc-500 hover:text-zinc-300"
+                            className="text-muted-foreground hover:text-foreground cursor-pointer"
                           >
                             {copiedId === 'modal-email' ? (
-                              <Check className="w-3.5 h-3.5 text-emerald-400" />
+                              <Check className="w-3.5 h-3.5 text-emerald-600" />
                             ) : (
                               <Copy className="w-3.5 h-3.5" />
                             )}
@@ -728,35 +996,35 @@ export default function AdminInquiriesPage() {
                         </div>
                       </div>
                       <div>
-                        <span className="text-zinc-500 block">Company:</span>
-                        <span className="text-zinc-300">
+                        <span className="text-muted-foreground block text-[11px]">Company:</span>
+                        <span className="text-foreground font-medium">
                           {selectedInquiry.company || 'Not provided'}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="p-4 rounded-xl bg-zinc-950/50 border border-zinc-800/80 space-y-3">
-                    <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                  <div className="p-4 rounded-2xl bg-secondary/30 border border-border/80 space-y-2.5">
+                    <h4 className="text-[11px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">
                       Submission Metadata
                     </h4>
                     <div className="space-y-2 text-xs">
                       <div>
-                        <span className="text-zinc-500 block">Source Channel:</span>
-                        <span className="text-zinc-300">
+                        <span className="text-muted-foreground block text-[11px]">Source Channel:</span>
+                        <span className="text-foreground font-medium">
                           {selectedInquiry.source || 'Website'}
                         </span>
                       </div>
                       <div>
-                        <span className="text-zinc-500 block">Region / Timezone:</span>
-                        <span className="text-zinc-300">
+                        <span className="text-muted-foreground block text-[11px]">Region / Timezone:</span>
+                        <span className="text-foreground font-medium">
                           {selectedInquiry.region || 'Global'} /{' '}
                           {selectedInquiry.timeZone || 'UTC'}
                         </span>
                       </div>
                       <div>
-                        <span className="text-zinc-500 block">Notification Status:</span>
-                        <span className="text-emerald-400">
+                        <span className="text-muted-foreground block text-[11px]">Notification Status:</span>
+                        <span className="text-emerald-600 dark:text-emerald-400 font-medium">
                           Team: {selectedInquiry.teamEmailStatus || 'Sent'} | Visitor:{' '}
                           {selectedInquiry.clientEmailStatus || 'Sent'}
                         </span>
@@ -766,31 +1034,31 @@ export default function AdminInquiriesPage() {
                 </div>
 
                 {/* Scope & Requirement */}
-                <div className="p-4 rounded-xl bg-zinc-950/50 border border-zinc-800/80 space-y-3">
-                  <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                <div className="p-4 rounded-2xl bg-secondary/30 border border-border/80 space-y-3">
+                  <h4 className="text-[11px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">
                     Project Request
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                     {selectedInquiry.service && (
                       <div>
-                        <span className="text-zinc-500 block">Service Requested:</span>
-                        <span className="text-white font-medium">
+                        <span className="text-muted-foreground block text-[11px]">Service Requested:</span>
+                        <span className="text-foreground font-semibold">
                           {selectedInquiry.service}
                         </span>
                       </div>
                     )}
                     {selectedInquiry.budget && (
                       <div>
-                        <span className="text-zinc-500 block">Target Budget:</span>
-                        <span className="text-emerald-400 font-semibold">
+                        <span className="text-muted-foreground block text-[11px]">Target Budget:</span>
+                        <span className="text-emerald-600 dark:text-emerald-400 font-semibold font-mono">
                           {selectedInquiry.budget}
                         </span>
                       </div>
                     )}
                     {selectedInquiry.slot && (
                       <div>
-                        <span className="text-zinc-500 block">Preferred Discovery Slot:</span>
-                        <span className="text-purple-300 font-semibold">
+                        <span className="text-muted-foreground block text-[11px]">Preferred Discovery Slot:</span>
+                        <span className="text-butter-foreground font-semibold font-mono bg-butter/30 px-2 py-0.5 rounded-md">
                           {selectedInquiry.slot}
                         </span>
                       </div>
@@ -798,24 +1066,24 @@ export default function AdminInquiriesPage() {
                   </div>
 
                   {selectedInquiry.message && (
-                    <div className="pt-2 border-t border-zinc-800">
-                      <span className="text-zinc-500 text-xs block mb-1">Message:</span>
-                      <p className="text-sm text-zinc-200 bg-zinc-900/90 p-3 rounded-lg leading-relaxed whitespace-pre-wrap">
+                    <div className="pt-2 border-t border-border">
+                      <span className="text-muted-foreground text-[11px] block mb-1">Message:</span>
+                      <p className="text-xs sm:text-sm text-foreground bg-card p-3.5 rounded-xl leading-relaxed whitespace-pre-wrap border border-border">
                         {selectedInquiry.message}
                       </p>
                     </div>
                   )}
 
                   {selectedInquiry.quote?.bundled && (
-                    <div className="pt-2 border-t border-zinc-800">
-                      <span className="text-zinc-500 text-xs block mb-1">
+                    <div className="pt-2 border-t border-border">
+                      <span className="text-muted-foreground text-[11px] block mb-1">
                         Bundled Services:
                       </span>
                       <div className="flex flex-wrap gap-1.5">
                         {selectedInquiry.quote.bundled.map((b: string, idx: number) => (
                           <span
                             key={idx}
-                            className="px-2 py-0.5 rounded-md bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs"
+                            className="px-2.5 py-0.5 rounded-md bg-butter/30 border border-butter/50 text-butter-foreground text-xs font-medium"
                           >
                             {b}
                           </span>
@@ -826,12 +1094,12 @@ export default function AdminInquiriesPage() {
                 </div>
 
                 {/* Internal Agency Notes */}
-                <div className="p-4 rounded-xl bg-zinc-950/50 border border-zinc-800/80 space-y-2">
+                <div className="p-4 rounded-2xl bg-secondary/30 border border-border/80 space-y-2">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                    <h4 className="text-[11px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">
                       Internal Studio Notes
                     </h4>
-                    <span className="text-[10px] text-zinc-500 font-mono">Persisted to MongoDB</span>
+                    <span className="text-[10px] text-muted-foreground font-mono">Saved to MongoDB</span>
                   </div>
                   <textarea
                     key={selectedInquiry.id}
@@ -842,15 +1110,15 @@ export default function AdminInquiriesPage() {
                       handleSaveNote(selectedInquiry.id, e.target.value);
                     }}
                     rows={3}
-                    className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700/80 rounded-lg text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-purple-500"
+                    className="w-full px-3.5 py-2.5 bg-card border border-border rounded-xl text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-foreground resize-none"
                   />
                   <div className="flex justify-end">
                     <button
                       type="button"
                       onClick={() => handleSaveNote(selectedInquiry.id, inquiryNoteText || selectedInquiry.notes || '')}
-                      className="px-3 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer"
+                      className="px-3 py-1.5 rounded-xl bg-butter text-butter-foreground text-xs font-semibold shadow-2xs hover:scale-102 transition-all flex items-center gap-1.5 cursor-pointer"
                     >
-                      <Save className="w-3.5 h-3.5 text-purple-400" />
+                      <Save className="w-3.5 h-3.5" />
                       <span>Save Notes</span>
                     </button>
                   </div>
@@ -858,10 +1126,10 @@ export default function AdminInquiriesPage() {
               </div>
 
               {/* Modal Footer */}
-              <div className="p-4 border-t border-zinc-800 bg-zinc-950/50 flex justify-between items-center">
+              <div className="p-4 border-t border-border bg-secondary/30 flex justify-between items-center">
                 <button
                   onClick={() => handleDelete(selectedInquiry.id, selectedInquiry.name || selectedInquiry.email)}
-                  className="px-3 py-1.5 text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5"
+                  className="px-3 py-2 text-xs text-destructive hover:bg-destructive/10 rounded-xl transition-colors cursor-pointer flex items-center gap-1.5"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   <span>Delete Inquiry</span>
@@ -869,7 +1137,7 @@ export default function AdminInquiriesPage() {
 
                 <button
                   onClick={() => setSelectedInquiry(null)}
-                  className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg text-xs font-medium transition-colors cursor-pointer"
+                  className="px-4 py-2 bg-secondary hover:bg-secondary/80 text-foreground border border-border rounded-xl text-xs font-medium transition-colors cursor-pointer"
                 >
                   Close
                 </button>
