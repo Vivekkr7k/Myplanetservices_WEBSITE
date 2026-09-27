@@ -1,7 +1,14 @@
 import { useState, useEffect, useMemo } from 'react';
 import { AdminLayout } from '../../components/admin/admin-layout';
-import { ClientRecord, getClientRecords } from '../../lib/client-records';
+import {
+  ClientRecord,
+  ClientDocument,
+  getClientRecords,
+  saveClientRecordAsync,
+  syncClientsWithBackend,
+} from '../../lib/client-records';
 import { QuotationModal } from '../../components/admin/quotation-modal';
+import { DocumentModal } from '../../components/admin/document-modal';
 import { AdminPagination } from '../../components/admin/admin-pagination';
 import {
   FileText,
@@ -13,6 +20,9 @@ import {
   Copy,
   Check,
   FolderOpen,
+  Plus,
+  Edit3,
+  Trash2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -24,6 +34,10 @@ export default function AdminQuotationsPage() {
   const [sortBy, setSortBy] = useState<'newest' | 'title' | 'company'>('newest');
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
 
+  // Modal states for Document CRUD
+  const [isDocModalOpen, setIsDocModalOpen] = useState(false);
+  const [editingDocInfo, setEditingDocInfo] = useState<{ client: ClientRecord; doc: ClientDocument } | null>(null);
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(6);
@@ -33,7 +47,61 @@ export default function AdminQuotationsPage() {
 
   useEffect(() => {
     setClients(getClientRecords());
+    syncClientsWithBackend().then((res) => {
+      setClients(res.clients);
+    });
   }, []);
+
+  const handleSaveDocument = async (clientId: string, doc: ClientDocument) => {
+    const targetClient = clients.find((c) => c.id === clientId);
+    if (!targetClient) {
+      toast.error('Client record not found');
+      return;
+    }
+
+    let updatedDocs: ClientDocument[];
+    if (editingDocInfo) {
+      updatedDocs = targetClient.documents.map((d) => (d.id === doc.id ? doc : d));
+    } else {
+      updatedDocs = [doc, ...targetClient.documents];
+    }
+
+    const updatedClient: ClientRecord = {
+      ...targetClient,
+      documents: updatedDocs,
+      updatedAt: new Date().toISOString(),
+    };
+
+    const res = await saveClientRecordAsync(updatedClient);
+    if (res.success) {
+      setClients((prev) => prev.map((c) => (c.id === clientId ? updatedClient : c)));
+      toast.success(res.persistedToMongo ? 'Document saved and synced to MongoDB!' : 'Document saved locally');
+    } else {
+      toast.error('Failed to save document');
+    }
+    setIsDocModalOpen(false);
+    setEditingDocInfo(null);
+  };
+
+  const handleDeleteDocument = async (clientId: string, docId: string, title: string) => {
+    if (!window.confirm(`Are you sure you want to delete "${title}"?`)) return;
+
+    const targetClient = clients.find((c) => c.id === clientId);
+    if (!targetClient) return;
+
+    const updatedDocs = targetClient.documents.filter((d) => d.id !== docId);
+    const updatedClient: ClientRecord = {
+      ...targetClient,
+      documents: updatedDocs,
+      updatedAt: new Date().toISOString(),
+    };
+
+    const res = await saveClientRecordAsync(updatedClient);
+    if (res.success) {
+      setClients((prev) => prev.map((c) => (c.id === clientId ? updatedClient : c)));
+      toast.success('Document deleted from MongoDB');
+    }
+  };
 
   const handleCopy = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -167,6 +235,19 @@ export default function AdminQuotationsPage() {
                   <List className="w-4 h-4" />
                 </button>
               </div>
+
+              {/* Add Document Action */}
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingDocInfo(null);
+                  setIsDocModalOpen(true);
+                }}
+                className="px-3.5 py-2 rounded-xl sm:rounded-2xl bg-butter text-butter-foreground text-xs font-semibold hover:scale-102 transition-all shadow-xs flex items-center gap-1.5 cursor-pointer shrink-0"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add Document</span>
+              </button>
             </div>
           </div>
 
@@ -291,8 +372,30 @@ export default function AdminQuotationsPage() {
                     Date: <span className="font-medium text-foreground">{doc.dateAdded}</span> • {doc.fileSize || 'PDF'}
                   </span>
 
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-1.5 shrink-0">
                     <button
+                      type="button"
+                      onClick={() => {
+                        setEditingDocInfo({ client: doc.client, doc });
+                        setIsDocModalOpen(true);
+                      }}
+                      className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors cursor-pointer"
+                      title="Edit Document Details"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteDocument(doc.client.id, doc.id, doc.title)}
+                      className="p-1.5 rounded-lg text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
+                      title="Delete Document"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+
+                    <button
+                      type="button"
                       onClick={() => setSelectedQuoteClient(doc.client)}
                       className="px-3 py-1.5 rounded-xl bg-butter text-butter-foreground text-xs font-semibold hover:scale-102 transition-all shadow-2xs inline-flex items-center gap-1.5 cursor-pointer"
                     >
@@ -340,13 +443,35 @@ export default function AdminQuotationsPage() {
                       <td className="p-4 font-mono text-muted-foreground">{doc.dateAdded}</td>
                       <td className="p-4 font-mono text-muted-foreground">{doc.fileSize || 'PDF'}</td>
                       <td className="p-4 text-right">
-                        <button
-                          onClick={() => setSelectedQuoteClient(doc.client)}
-                          className="px-3 py-1 rounded-lg bg-butter text-butter-foreground text-xs font-semibold hover:scale-105 transition-all inline-flex items-center gap-1"
-                        >
-                          <span>Inspect</span>
-                          <ExternalLink className="w-3 h-3" />
-                        </button>
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingDocInfo({ client: doc.client, doc });
+                              setIsDocModalOpen(true);
+                            }}
+                            className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors cursor-pointer"
+                            title="Edit Document"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteDocument(doc.client.id, doc.id, doc.title)}
+                            className="p-1.5 rounded-lg text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
+                            title="Delete Document"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setSelectedQuoteClient(doc.client)}
+                            className="px-3 py-1 rounded-lg bg-butter text-butter-foreground text-xs font-semibold hover:scale-105 transition-all inline-flex items-center gap-1 cursor-pointer"
+                          >
+                            <span>Inspect</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -376,6 +501,19 @@ export default function AdminQuotationsPage() {
         <QuotationModal
           client={selectedQuoteClient}
           onClose={() => setSelectedQuoteClient(null)}
+        />
+      )}
+
+      {isDocModalOpen && (
+        <DocumentModal
+          clients={clients}
+          initialClient={editingDocInfo?.client}
+          document={editingDocInfo?.doc}
+          onClose={() => {
+            setIsDocModalOpen(false);
+            setEditingDocInfo(null);
+          }}
+          onSave={handleSaveDocument}
         />
       )}
     </AdminLayout>

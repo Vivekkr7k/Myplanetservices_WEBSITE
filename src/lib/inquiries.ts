@@ -170,14 +170,26 @@ export async function fetchInquiries(filter?: {
     const body = await res.json();
 
     if (body.configured && Array.isArray(body.data)) {
-      // If MongoDB is connected and has records, cache them locally as well
-      saveLocalInquiries(body.data);
-      return {
-        configured: true,
-        source: 'mongodb',
-        count: body.data.length,
-        data: body.data,
-      };
+      if (body.data.length > 0) {
+        // If MongoDB is connected and has records, cache them locally as well
+        saveLocalInquiries(body.data);
+        return {
+          configured: true,
+          source: 'mongodb',
+          count: body.data.length,
+          data: body.data,
+        };
+      } else {
+        // Connected to MongoDB, but collection is empty! Seed with demo inquiries
+        await seedInquiriesToBackendAsync(DEMO_INQUIRIES);
+        saveLocalInquiries(DEMO_INQUIRIES);
+        return {
+          configured: true,
+          source: 'mongodb',
+          count: DEMO_INQUIRIES.length,
+          data: DEMO_INQUIRIES,
+        };
+      }
     }
 
     // Unconfigured or empty
@@ -263,4 +275,112 @@ export async function deleteInquiry(id: string): Promise<boolean> {
     console.warn('[Inquiries] Backend delete failed, local cache removed:', err);
     return true;
   }
+}
+
+/**
+ * Updates any field(s) of an inquiry record and persists to MongoDB.
+ */
+export async function updateInquiryRecord(
+  id: string,
+  updates: Partial<InquiryRecord>
+): Promise<boolean> {
+  const local = getLocalInquiries();
+  const index = local.findIndex((i) => i.id === id);
+  const now = new Date().toISOString();
+  if (index >= 0) {
+    local[index] = {
+      ...local[index],
+      ...updates,
+      updatedAt: now,
+    };
+    saveLocalInquiries(local);
+  }
+
+  try {
+    const res = await fetch(`/api/inquiries?id=${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, ...updates }),
+    });
+    return res.ok;
+  } catch (err) {
+    console.warn('[Inquiries] Backend patch failed, local cache updated:', err);
+    return true;
+  }
+}
+
+/**
+ * Seeds inquiries to backend MongoDB collection.
+ */
+export async function seedInquiriesToBackendAsync(inquiries: InquiryRecord[]): Promise<boolean> {
+  try {
+    const res = await fetch('/api/inquiries?action=seed', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'seed', inquiries }),
+    });
+    return res.ok;
+  } catch (err) {
+    console.warn('[Inquiries] Failed to seed inquiries to MongoDB:', err);
+    return false;
+  }
+}
+
+/**
+ * Saves a single inquiry to backend MongoDB collection.
+ */
+export async function saveInquiryAsync(inquiry: Partial<InquiryRecord>): Promise<{
+  success: boolean;
+  persistedToMongo: boolean;
+  data: InquiryRecord;
+}> {
+  const now = new Date().toISOString();
+  const id = inquiry.id || `inq-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`;
+  const record: InquiryRecord = {
+    id,
+    type: inquiry.type || 'lead',
+    name: inquiry.name || '',
+    email: inquiry.email || '',
+    company: inquiry.company || '',
+    service: inquiry.service || '',
+    budget: inquiry.budget || '',
+    message: inquiry.message || '',
+    slot: inquiry.slot || '',
+    source: inquiry.source || 'Admin Lead Entry',
+    pageUrl: inquiry.pageUrl || (typeof window !== 'undefined' ? window.location.href : ''),
+    region: inquiry.region || 'Global',
+    timeZone: inquiry.timeZone || (typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'UTC'),
+    currency: inquiry.currency || 'USD',
+    status: inquiry.status || 'new',
+    notes: inquiry.notes || '',
+    createdAt: inquiry.createdAt || now,
+    updatedAt: now,
+  };
+
+  const local = getLocalInquiries();
+  const updated = [record, ...local.filter((i) => i.id !== id)];
+  saveLocalInquiries(updated);
+
+  try {
+    const res = await fetch('/api/inquiries', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ inquiry: record }),
+    });
+    if (res.ok) {
+      const result = await res.json();
+      return {
+        success: true,
+        persistedToMongo: Boolean(result.configured),
+        data: result.data || record,
+      };
+    }
+  } catch (err) {
+    console.warn('[Inquiries] Failed to persist inquiry to backend API:', err);
+  }
+  return {
+    success: true,
+    persistedToMongo: false,
+    data: record,
+  };
 }

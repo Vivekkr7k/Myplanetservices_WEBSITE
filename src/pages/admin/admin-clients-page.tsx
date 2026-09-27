@@ -631,6 +631,7 @@ export default function AdminClientsPage() {
           onViewQuotation={(c) => {
             setSelectedClientForQuote(c);
           }}
+          onDelete={handleDeleteClient}
         />
       )}
 

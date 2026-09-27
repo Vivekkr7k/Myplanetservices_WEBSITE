@@ -6,6 +6,8 @@ import {
   InquiryType,
   fetchInquiries,
   updateInquiryStatus,
+  updateInquiryRecord,
+  saveInquiryAsync,
   deleteInquiry,
 } from '../../lib/inquiries';
 import {
@@ -14,11 +16,15 @@ import {
   ClientRecord,
 } from '../../lib/client-records';
 import { ClientModal } from '../../components/admin/client-modal';
+import { InquiryModal } from '../../components/admin/inquiry-modal';
 import { AdminPagination } from '../../components/admin/admin-pagination';
 import {
   Inbox,
   Search,
   RefreshCw,
+  Plus,
+  Edit3,
+  Save,
   UserPlus,
   Mail,
   Calendar,
@@ -44,10 +50,56 @@ export default function AdminInquiriesPage() {
   const [selectedInquiry, setSelectedInquiry] = useState<InquiryRecord | null>(null);
   const [convertingLead, setConvertingLead] = useState<Partial<ClientRecord> | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [isInquiryModalOpen, setIsInquiryModalOpen] = useState(false);
+  const [editingInquiry, setEditingInquiry] = useState<InquiryRecord | null>(null);
+  const [inquiryNoteText, setInquiryNoteText] = useState('');
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(6);
+
+  const handleSaveInquiry = async (formData: Partial<InquiryRecord>) => {
+    if (editingInquiry) {
+      const success = await updateInquiryRecord(editingInquiry.id, formData);
+      if (success) {
+        setInquiries((prev) =>
+          prev.map((i) => (i.id === editingInquiry.id ? { ...i, ...formData } : i))
+        );
+        if (selectedInquiry?.id === editingInquiry.id) {
+          setSelectedInquiry((prev) => (prev ? { ...prev, ...formData } : null));
+        }
+        toast.success('Inquiry updated in MongoDB');
+      } else {
+        toast.error('Failed to update inquiry');
+      }
+    } else {
+      const res = await saveInquiryAsync(formData);
+      if (res.success) {
+        setInquiries((prev) => [res.data, ...prev]);
+        toast.success(res.persistedToMongo ? 'Lead created and saved to MongoDB!' : 'Lead saved locally');
+      } else {
+        toast.error('Failed to save inquiry');
+      }
+    }
+  };
+
+  const handleEditInquiry = (inq: InquiryRecord) => {
+    setEditingInquiry(inq);
+    setIsInquiryModalOpen(true);
+  };
+
+  const handleSaveNote = async (id: string, noteText: string) => {
+    const success = await updateInquiryRecord(id, { notes: noteText });
+    if (success) {
+      setInquiries((prev) =>
+        prev.map((i) => (i.id === id ? { ...i, notes: noteText } : i))
+      );
+      if (selectedInquiry?.id === id) {
+        setSelectedInquiry((prev) => (prev ? { ...prev, notes: noteText } : null));
+      }
+      toast.success('Notes saved to MongoDB');
+    }
+  };
 
   const loadData = async () => {
     setLoading(true);
@@ -210,7 +262,18 @@ export default function AdminInquiriesPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 relative z-10">
+          <div className="flex flex-wrap items-center gap-3 relative z-10">
+            <button
+              onClick={() => {
+                setEditingInquiry(null);
+                setIsInquiryModalOpen(true);
+              }}
+              className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold transition-all cursor-pointer shadow-md hover:shadow-purple-500/25"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Add Lead / Inquiry</span>
+            </button>
+
             <button
               onClick={loadData}
               disabled={loading}
@@ -491,6 +554,14 @@ export default function AdminInquiriesPage() {
                     </button>
 
                     <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => handleEditInquiry(inq)}
+                        className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
+                        title="Edit inquiry details"
+                      >
+                        <Edit3 className="w-4 h-4" />
+                      </button>
+
                       {inq.status !== 'converted' && (
                         <button
                           onClick={() => handleConvertToClient(inq)}
@@ -589,7 +660,16 @@ export default function AdminInquiriesPage() {
                     </select>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleEditInquiry(selectedInquiry)}
+                      className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <Edit3 className="w-3.5 h-3.5 text-purple-400" />
+                      <span>Edit Inquiry</span>
+                    </button>
+
                     <a
                       href={`mailto:${selectedInquiry.email}?subject=Re: Your Project with My Planet Services`}
                       className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium transition-colors flex items-center gap-1.5"
@@ -747,19 +827,33 @@ export default function AdminInquiriesPage() {
 
                 {/* Internal Agency Notes */}
                 <div className="p-4 rounded-xl bg-zinc-950/50 border border-zinc-800/80 space-y-2">
-                  <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
-                    Internal Studio Notes
-                  </h4>
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                      Internal Studio Notes
+                    </h4>
+                    <span className="text-[10px] text-zinc-500 font-mono">Persisted to MongoDB</span>
+                  </div>
                   <textarea
+                    key={selectedInquiry.id}
                     defaultValue={selectedInquiry.notes || ''}
                     placeholder="Add private team notes regarding this lead, discovery call outcomes, or quotation notes..."
+                    onChange={(e) => setInquiryNoteText(e.target.value)}
                     onBlur={(e) => {
-                      updateInquiryStatus(selectedInquiry.id, selectedInquiry.status, e.target.value);
-                      toast.success('Notes saved');
+                      handleSaveNote(selectedInquiry.id, e.target.value);
                     }}
                     rows={3}
                     className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700/80 rounded-lg text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-purple-500"
                   />
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => handleSaveNote(selectedInquiry.id, inquiryNoteText || selectedInquiry.notes || '')}
+                      className="px-3 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <Save className="w-3.5 h-3.5 text-purple-400" />
+                      <span>Save Notes</span>
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -790,6 +884,18 @@ export default function AdminInquiriesPage() {
             client={convertingLead as ClientRecord}
             onClose={() => setConvertingLead(null)}
             onSave={handleSaveConvertedClient}
+          />
+        )}
+
+        {/* Create / Edit Inquiry Modal */}
+        {isInquiryModalOpen && (
+          <InquiryModal
+            inquiry={editingInquiry}
+            onClose={() => {
+              setIsInquiryModalOpen(false);
+              setEditingInquiry(null);
+            }}
+            onSave={handleSaveInquiry}
           />
         )}
       </div>

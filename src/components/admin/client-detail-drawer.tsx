@@ -2,6 +2,7 @@ import { ClientRecord } from '../../lib/client-records';
 import {
   X,
   Edit3,
+  Trash2,
   FileText,
   Calendar,
   DollarSign,
@@ -15,9 +16,10 @@ interface ClientDetailDrawerProps {
   onClose: () => void;
   onEdit: (client: ClientRecord) => void;
   onViewQuotation: (client: ClientRecord) => void;
+  onDelete?: (id: string, name: string) => void;
 }
 
-export function ClientDetailDrawer({ client, onClose, onEdit, onViewQuotation }: ClientDetailDrawerProps) {
+export function ClientDetailDrawer({ client, onClose, onEdit, onViewQuotation, onDelete }: ClientDetailDrawerProps) {
   const isFixed = client.engagementType === 'fixed';
   const currSym = client.currency === 'USD' ? '$' : '₹';
 
@@ -71,6 +73,16 @@ export function ClientDetailDrawer({ client, onClose, onEdit, onViewQuotation }:
               <Edit3 className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Edit</span>
             </button>
+            {onDelete && (
+              <button
+                onClick={() => onDelete(client.id, client.companyName)}
+                className="p-2 sm:px-3 sm:py-2 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white text-xs font-semibold border border-red-500/20 transition-colors flex items-center gap-1.5 cursor-pointer"
+                title="Delete Client Record"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Delete</span>
+              </button>
+            )}
             <button
               onClick={onClose}
               className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors cursor-pointer"

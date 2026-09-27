@@ -1,4 +1,12 @@
+import dns from 'node:dns';
 import { MongoClient, Db, Collection, ObjectId } from 'mongodb';
+
+// Configure public DNS resolvers to prevent Windows / local network "querySrv ECONNREFUSED" on MongoDB Atlas SRV records
+try {
+  dns.setServers(['8.8.8.8', '1.1.1.1']);
+} catch {
+  // Silent fallback in environments where setServers is restricted
+}
 
 /**
  * MongoDB Serverless Connection Manager
@@ -8,36 +16,11 @@ import { MongoClient, Db, Collection, ObjectId } from 'mongodb';
  * invocations reuse the established connection pool without exceeding Atlas limits.
  */
 
-const uri = process.env.MONGODB_URI?.trim();
-const dbName = process.env.MONGODB_DB_NAME?.trim() || 'myplanet_admin';
-
 interface GlobalMongo {
   _mongoClientPromise?: Promise<MongoClient>;
 }
 
 const globalWithMongo = global as typeof globalThis & GlobalMongo;
-
-let clientPromise: Promise<MongoClient> | null = null;
-
-if (uri) {
-  if (process.env.NODE_ENV === 'development') {
-    if (!globalWithMongo._mongoClientPromise) {
-      const client = new MongoClient(uri, {
-        serverSelectionTimeoutMS: 5000,
-        connectTimeoutMS: 10000,
-      });
-      globalWithMongo._mongoClientPromise = client.connect();
-    }
-    clientPromise = globalWithMongo._mongoClientPromise;
-  } else {
-    // In production container lifecycle
-    const client = new MongoClient(uri, {
-      serverSelectionTimeoutMS: 5000,
-      connectTimeoutMS: 10000,
-    });
-    clientPromise = client.connect();
-  }
-}
 
 /** Check if MONGODB_URI is provided in environment */
 export function isMongoConfigured(): boolean {
@@ -47,30 +30,24 @@ export function isMongoConfigured(): boolean {
 /** Get connected MongoDB Database instance (returns null if unconfigured or unreachable) */
 export async function getDb(): Promise<Db | null> {
   const currentUri = process.env.MONGODB_URI?.trim();
+  const currentDbName = process.env.MONGODB_DB_NAME?.trim() || 'myplanet_admin';
   if (!currentUri) return null;
 
-  // If clientPromise was not initialized (e.g. env var added after initial module load), initialize it now
-  if (!clientPromise) {
+  if (!globalWithMongo._mongoClientPromise) {
     const client = new MongoClient(currentUri, {
-      serverSelectionTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 8000,
       connectTimeoutMS: 10000,
     });
-    clientPromise = client.connect();
-    if (process.env.NODE_ENV === 'development') {
-      globalWithMongo._mongoClientPromise = clientPromise;
-    }
+    globalWithMongo._mongoClientPromise = client.connect();
   }
 
   try {
-    const client = await clientPromise;
-    return client.db(dbName);
+    const client = await globalWithMongo._mongoClientPromise;
+    return client.db(currentDbName);
   } catch (err) {
     console.error('[MongoDB] Connection error:', err);
-    // Reset so subsequent attempts can retry if connection parameters changed
-    clientPromise = null;
-    if (globalWithMongo._mongoClientPromise) {
-      delete globalWithMongo._mongoClientPromise;
-    }
+    // Reset so subsequent attempts can retry if connection parameters changed or network was down
+    delete globalWithMongo._mongoClientPromise;
     return null;
   }
 }
@@ -231,11 +208,13 @@ export async function checkMongoHealth(): Promise<{
   inquiriesCount?: number;
   error?: string;
 }> {
+  const currentDbName = process.env.MONGODB_DB_NAME?.trim() || 'myplanet_admin';
+
   if (!isMongoConfigured()) {
     return {
       configured: false,
       connected: false,
-      dbName,
+      dbName: currentDbName,
       error: 'MONGODB_URI environment variable is not configured',
     };
   }
@@ -247,7 +226,7 @@ export async function checkMongoHealth(): Promise<{
       return {
         configured: true,
         connected: false,
-        dbName,
+        dbName: currentDbName,
         error: 'Failed to obtain database handle',
       };
     }
@@ -267,7 +246,7 @@ export async function checkMongoHealth(): Promise<{
     return {
       configured: true,
       connected: true,
-      dbName,
+      dbName: currentDbName,
       latencyMs,
       clientsCount,
       inquiriesCount,
@@ -276,7 +255,7 @@ export async function checkMongoHealth(): Promise<{
     return {
       configured: true,
       connected: false,
-      dbName,
+      dbName: currentDbName,
       error: err?.message || 'Connection ping failed',
     };
   }

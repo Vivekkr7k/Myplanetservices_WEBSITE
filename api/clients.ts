@@ -72,9 +72,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     }
 
     // -------------------------------------------------------------
-    // POST: Upsert client record or bulk seed
+    // POST / PUT / PATCH: Upsert client record or bulk seed
     // -------------------------------------------------------------
-    if (method === 'POST') {
+    if (method === 'POST' || method === 'PUT' || method === 'PATCH') {
       const body = req.body || {};
       const action = req.query?.action || body.action;
 

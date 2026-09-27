@@ -5,6 +5,9 @@ import {
   ClientRecord,
   getClientRecords,
   saveClientRecord,
+  saveClientRecordAsync,
+  deleteClientRecord,
+  deleteClientRecordAsync,
   resetToDemoClients,
   syncClientsWithBackend,
 } from '../../lib/client-records';
@@ -57,6 +60,17 @@ export default function AdminDashboardPage() {
     setIsClientModalOpen(false);
     setEditingClient(null);
     toast.success('Client record saved successfully');
+    saveClientRecordAsync(record).catch(() => {});
+  };
+
+  const handleDeleteClient = async (id: string, name: string) => {
+    if (window.confirm(`Are you sure you want to delete client record for "${name}"?`)) {
+      const updated = deleteClientRecord(id);
+      setClients(updated);
+      setSelectedClientForDrawer(null);
+      toast.success('Client record deleted');
+      deleteClientRecordAsync(id).catch(() => {});
+    }
   };
 
   const handleResetDemo = () => {
@@ -519,6 +533,7 @@ export default function AdminDashboardPage() {
           onViewQuotation={(c) => {
             setSelectedClientForQuote(c);
           }}
+          onDelete={handleDeleteClient}
         />
       )}
 

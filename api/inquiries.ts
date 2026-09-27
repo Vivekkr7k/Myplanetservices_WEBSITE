@@ -78,6 +78,81 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     }
 
     // -------------------------------------------------------------
+    // POST: Create/Upsert inquiry or bulk seed
+    // -------------------------------------------------------------
+    if (method === 'POST') {
+      const body = req.body || {};
+      const action = req.query?.action || body.action;
+
+      if (action === 'seed') {
+        const seedData: any[] = Array.isArray(body.inquiries) ? body.inquiries : [];
+        if (!seedData.length) {
+          return res.status(400).json({
+            success: false,
+            error: 'No seed inquiries provided in body.inquiries',
+          });
+        }
+
+        let insertedCount = 0;
+        let updatedCount = 0;
+
+        for (const item of seedData) {
+          if (!item.id && !item.email) continue;
+          const { _id, ...cleanDoc } = item;
+          const id = cleanDoc.id || `inq-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`;
+          const result = await collection.updateOne(
+            { id },
+            { $set: { ...cleanDoc, id } },
+            { upsert: true }
+          );
+          if (result.upsertedCount > 0) insertedCount++;
+          else if (result.modifiedCount > 0) updatedCount++;
+        }
+
+        return res.status(200).json({
+          success: true,
+          action: 'seed',
+          insertedCount,
+          updatedCount,
+          totalSeed: seedData.length,
+        });
+      }
+
+      // Single inquiry upsert
+      const inquiry = body.inquiry || body;
+      if (!inquiry || typeof inquiry !== 'object' || (!inquiry.email && !inquiry.id)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid inquiry payload',
+        });
+      }
+
+      const now = new Date().toISOString();
+      const id = inquiry.id || `inq-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`;
+      const { _id, ...docWithoutMongoId } = inquiry;
+      const recordToSave = {
+        ...docWithoutMongoId,
+        id,
+        status: inquiry.status || 'new',
+        updatedAt: now,
+        createdAt: inquiry.createdAt || now,
+      };
+
+      await collection.updateOne(
+        { id },
+        { $set: recordToSave },
+        { upsert: true }
+      );
+
+      return res.status(200).json({
+        success: true,
+        configured: true,
+        source: 'mongodb',
+        data: recordToSave,
+      });
+    }
+
+    // -------------------------------------------------------------
     // PATCH / PUT: Update status or notes
     // -------------------------------------------------------------
     if (method === 'PATCH' || method === 'PUT') {
@@ -95,9 +170,15 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         updatedAt: new Date().toISOString(),
       };
 
-      if (body.status) updates.status = body.status;
-      if (body.notes !== undefined) updates.notes = body.notes;
-      if (body.convertedClientId) updates.convertedClientId = body.convertedClientId;
+      const updatableFields = [
+        'status', 'notes', 'convertedClientId', 'name', 'email', 'company',
+        'service', 'budget', 'message', 'slot', 'source', 'currency', 'region', 'timeZone', 'type'
+      ];
+      for (const field of updatableFields) {
+        if (body[field] !== undefined) {
+          updates[field] = body[field];
+        }
+      }
 
       const result = await collection.updateOne({ id }, { $set: updates });
 
