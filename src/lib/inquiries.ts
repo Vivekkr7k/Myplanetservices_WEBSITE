@@ -34,107 +34,24 @@ export interface InquiryRecord {
 
 const INQUIRIES_STORAGE_KEY = 'mps_inquiries_cache_v1';
 
-export const DEMO_INQUIRIES: InquiryRecord[] = [
-  {
-    id: 'inq-demo-01',
-    type: 'brief',
-    name: 'Aarav Mehta',
-    email: 'aarav@finflow.sg',
-    company: 'FinFlow Global (Singapore)',
-    service: 'AI Agents & Copilots, Custom Web Applications',
-    budget: '$15,000 – $30,000',
-    message: 'We are seeking an engineering squad to architect an autonomous financial reconciliation copilot with bank-grade audit logs and sub-second anomaly detection.',
-    source: 'Project Brief Modal',
-    pageUrl: 'https://myplanetservices.com/#contact',
-    region: 'APAC',
-    timeZone: 'Asia/Singapore',
-    currency: 'USD',
-    quote: {
-      total: 24500,
-      timeline: '8-10 Weeks',
-      bundled: ['AI Copilot Core', 'Multi-tenant Dashboard', 'Real-time WebSocket Alerts'],
-    },
-    teamEmailStatus: 'Sent',
-    clientEmailStatus: 'Sent',
-    status: 'new',
-    notes: 'High priority enterprise prospect. Booked initial discovery review.',
-    createdAt: new Date(Date.now() - 1000 * 60 * 45).toISOString(), // 45 mins ago
-    updatedAt: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
-  },
-  {
-    id: 'inq-demo-02',
-    type: 'booking',
-    name: 'Sarah Jenkins',
-    email: 'sarah.j@luminahealth.co',
-    company: 'Lumina Health Technologies',
-    service: 'Mobile App Development',
-    slot: 'Tomorrow, 4:30 PM (IST) / 7:00 AM (EST)',
-    message: 'Need React Native + Swift health metrics telemetry app syncing with wearable devices.',
-    source: 'Discovery Call Scheduler',
-    pageUrl: 'https://myplanetservices.com/#book-call',
-    region: 'US-East',
-    timeZone: 'America/New_York',
-    currency: 'USD',
-    teamEmailStatus: 'Sent',
-    clientEmailStatus: 'Sent',
-    status: 'contacted',
-    notes: 'Calendar invite confirmed. Discovery deck sent.',
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(), // 5 hours ago
-    updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(),
-  },
-  {
-    id: 'inq-demo-03',
-    type: 'lead',
-    email: 'marcus@nordicsynth.io',
-    source: 'Homepage Instant Estimate Bar',
-    pageUrl: 'https://myplanetservices.com/',
-    region: 'EU-North',
-    timeZone: 'Europe/Stockholm',
-    currency: 'USD',
-    teamEmailStatus: 'Sent',
-    clientEmailStatus: 'Sent',
-    status: 'new',
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 18).toISOString(), // 18 hours ago
-    updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 18).toISOString(),
-  },
-  {
-    id: 'inq-demo-04',
-    type: 'brief',
-    name: 'Devendra Patel',
-    email: 'd.patel@omnicloud.in',
-    company: 'OmniCloud Logistics',
-    service: 'Cloud & Multi-Tenant SaaS',
-    budget: '₹12,00,000 – ₹18,00,000',
-    message: 'Fleet dispatch route optimization portal with GPS live tracking across 400+ hubs.',
-    source: 'Interactive Estimate Calculator',
-    pageUrl: 'https://myplanetservices.com/pricing',
-    region: 'IN-West',
-    timeZone: 'Asia/Kolkata',
-    currency: 'INR',
-    quote: {
-      total: 1450000,
-      timeline: '12 Weeks',
-      bundled: ['Route Engine', 'Driver PWA', 'Fleet Dispatch Telemetry'],
-    },
-    teamEmailStatus: 'Sent',
-    clientEmailStatus: 'Sent',
-    status: 'converted',
-    notes: 'Converted to active client record (ARiqA / OmniCloud).',
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
-    updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-  },
-];
+export const DEMO_INQUIRIES: InquiryRecord[] = [];
 
 export function getLocalInquiries(): InquiryRecord[] {
   try {
     const raw = localStorage.getItem(INQUIRIES_STORAGE_KEY);
     if (!raw) {
-      localStorage.setItem(INQUIRIES_STORAGE_KEY, JSON.stringify(DEMO_INQUIRIES));
-      return DEMO_INQUIRIES;
+      return [];
     }
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    // Strip any mock demo items that may have been cached previously in localStorage
+    const clean = parsed.filter((item: InquiryRecord) => !item.id?.startsWith('inq-demo-'));
+    if (clean.length !== parsed.length) {
+      localStorage.setItem(INQUIRIES_STORAGE_KEY, JSON.stringify(clean));
+    }
+    return clean;
   } catch {
-    return DEMO_INQUIRIES;
+    return [];
   }
 }
 
