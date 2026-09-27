@@ -30,6 +30,12 @@ export function isMongoConfigured(): boolean {
   return Boolean(process.env.MONGODB_URI && process.env.MONGODB_URI.trim().length > 0);
 }
 
+let lastConnectionError: string | null = null;
+
+export function getLastConnectionError(): string | null {
+  return lastConnectionError;
+}
+
 /** Get connected MongoDB Database instance (returns null if unconfigured or unreachable) */
 export async function getDb(): Promise<Db | null> {
   const currentUri = process.env.MONGODB_URI?.trim();
@@ -38,10 +44,11 @@ export async function getDb(): Promise<Db | null> {
 
   if (!globalWithMongo._mongoClientPromise) {
     const client = new MongoClient(currentUri, {
-      serverSelectionTimeoutMS: 5000,
-      connectTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 15000,
+      connectTimeoutMS: 15000,
     });
     globalWithMongo._mongoClientPromise = client.connect().catch((err) => {
+      lastConnectionError = err?.message || String(err);
       console.error('[MongoDB] Initial connection error:', err);
       delete globalWithMongo._mongoClientPromise;
       return null as any;
@@ -52,7 +59,8 @@ export async function getDb(): Promise<Db | null> {
     const client = await globalWithMongo._mongoClientPromise;
     if (!client) return null;
     return client.db(currentDbName);
-  } catch (err) {
+  } catch (err: any) {
+    lastConnectionError = err?.message || String(err);
     console.error('[MongoDB] Connection error:', err);
     delete globalWithMongo._mongoClientPromise;
     return null;
@@ -169,7 +177,7 @@ export async function saveInquiryToMongo(payload: {
   try {
     const col = await getInquiriesCollection();
     if (!col) {
-      return { success: false, error: 'MongoDB is not configured' };
+      return { success: false, error: lastConnectionError || 'MongoDB connection unavailable' };
     }
 
     const now = new Date().toISOString();
@@ -234,7 +242,7 @@ export async function checkMongoHealth(): Promise<{
         configured: true,
         connected: false,
         dbName: currentDbName,
-        error: 'Failed to obtain database handle',
+        error: lastConnectionError || 'Failed to obtain database handle',
       };
     }
 

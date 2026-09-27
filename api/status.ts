@@ -19,10 +19,15 @@ export default async function handler(_req: ApiRequest, res: ApiResponse) {
 
   try {
     const health = await checkMongoHealth();
+    const uri = process.env.MONGODB_URI?.trim();
+    const masked = uri ? uri.replace(/:\/\/[^:]+:[^@]+@/, '://***:***@') : null;
     return res.status(200).json({
       success: true,
       timestamp: new Date().toISOString(),
-      database: health,
+      database: {
+        ...health,
+        cluster: masked,
+      },
     });
   } catch (err: any) {
     console.error('status check error:', err);
