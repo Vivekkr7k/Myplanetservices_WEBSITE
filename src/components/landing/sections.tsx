@@ -18,11 +18,13 @@ import {
   Star,
   Zap,
   Lock,
+  Loader2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { BrandLogo } from '../common/brand-logo';
 import { SocialLinks } from '../common/social-icons';
 import { SERVICE_PRICING, currentQuarterLabel } from '../../lib/service-pricing';
+import { useSubmissionProgress } from '../../hooks/use-submission-progress';
 
 import {
   QUOTE_DRAFT_EVENT,
@@ -541,6 +543,15 @@ export function ContactCta() {
   const [message, setMessage] = useState('');
   const [quote, setQuote] = useState<QuoteSnapshot | undefined>(undefined);
 
+  const intakeProgress = useSubmissionProgress(loading, {
+    steps: [
+      'Submitting project brief...',
+      'Sending confirmation emails...',
+      'Securing inquiry in database...',
+    ],
+    intervalMs: 1100,
+  });
+
   // Receive a scope configured in the estimator above, so the visitor never
   // retypes it. Reads any draft left from an earlier scroll, then stays live.
   useEffect(() => {
@@ -757,10 +768,39 @@ export function ContactCta() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-butter text-butter-foreground rounded-full py-4 text-sm font-semibold hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200 mt-2 flex items-center justify-center gap-2 cursor-pointer shadow-lg disabled:opacity-70"
+                  aria-busy={loading}
+                  className={`w-full bg-butter text-butter-foreground rounded-full py-4 px-6 text-sm font-semibold transition-all duration-200 mt-2 relative overflow-hidden flex items-center justify-center gap-2.5 shadow-lg ${
+                    loading
+                      ? 'opacity-95 cursor-wait scale-[0.99] ring-2 ring-white/30'
+                      : 'hover:scale-[1.02] active:scale-[0.98] cursor-pointer'
+                  }`}
                 >
-                  <span>{loading ? 'Submitting brief...' : 'Submit project brief'}</span>
-                  <ArrowRight className="w-4 h-4" />
+                  {/* Animated indeterminate progress sweep along the bottom */}
+                  {loading && (
+                    <div className="absolute bottom-0 inset-x-0 h-1 bg-black/15 overflow-hidden">
+                      <div
+                        className="h-full bg-ink animate-submit-sweep transition-all duration-500 rounded-full"
+                        style={{ width: `${intakeProgress.progressPercent}%` }}
+                      />
+                    </div>
+                  )}
+
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin text-butter-foreground shrink-0" />
+                      <span className="font-medium tracking-wide animate-pulse">
+                        {intakeProgress.currentStep}
+                      </span>
+                      <span className="text-[11px] font-mono text-butter-foreground/90 font-semibold shrink-0">
+                        {intakeProgress.progressPercent}%
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Submit project brief</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
                 </button>
               </form>
             </div>

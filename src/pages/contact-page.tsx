@@ -11,6 +11,7 @@ import {
   Sparkles,
   Calendar,
   CheckCircle2,
+  Loader2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { sendProjectBrief, sendCallRequest } from '../lib/send-email';
@@ -19,6 +20,7 @@ import { SocialLinks } from '../components/common/social-icons';
 import { useCurrency } from '../lib/currency-context';
 import { describeSlot, type Slot } from '../lib/booking-slots';
 import { SERVICE_OPTIONS } from '../lib/service-options';
+import { useSubmissionProgress } from '../hooks/use-submission-progress';
 
 /**
  * Budget bands in INR, converted to the visitor's currency for display.
@@ -44,6 +46,24 @@ export function ContactPage() {
   const [loading, setLoading] = useState(false);
   const [booking, setBooking] = useState(false);
   const [slot, setSlot] = useState<Slot | null>(null);
+
+  const briefProgress = useSubmissionProgress(loading, {
+    steps: [
+      'Sending project brief...',
+      'Delivering confirmation emails...',
+      'Securing inquiry in database...',
+    ],
+    intervalMs: 1100,
+  });
+
+  const bookingProgress = useSubmissionProgress(booking, {
+    steps: [
+      'Reserving calendar slot...',
+      'Sending calendar invite & emails...',
+      'Securing booking in database...',
+    ],
+    intervalMs: 1100,
+  });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -319,10 +339,39 @@ export function ContactPage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-ink text-ink-foreground rounded-full py-3.5 text-sm font-semibold hover:scale-[1.02] transition-transform duration-200 mt-1 flex items-center justify-center gap-2 cursor-pointer shadow-soft disabled:opacity-70"
+                    aria-busy={loading}
+                    className={`w-full bg-ink text-ink-foreground rounded-full py-3.5 px-6 text-sm font-semibold transition-all duration-200 mt-1 relative overflow-hidden flex items-center justify-center gap-2.5 shadow-soft ${
+                      loading
+                        ? 'opacity-95 cursor-wait scale-[0.99] ring-2 ring-butter/50'
+                        : 'hover:scale-[1.02] cursor-pointer'
+                    }`}
                   >
-                    <span>{loading ? 'Sending brief...' : 'Send project brief'}</span>
-                    <ArrowRight className="w-4 h-4" />
+                    {/* Animated indeterminate progress sweep along the bottom */}
+                    {loading && (
+                      <div className="absolute bottom-0 inset-x-0 h-1 bg-white/15 overflow-hidden">
+                        <div
+                          className="h-full bg-butter animate-submit-sweep transition-all duration-500 rounded-full"
+                          style={{ width: `${briefProgress.progressPercent}%` }}
+                        />
+                      </div>
+                    )}
+
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin text-butter shrink-0" />
+                        <span className="font-medium tracking-wide animate-pulse">
+                          {briefProgress.currentStep}
+                        </span>
+                        <span className="text-[11px] font-mono text-butter/90 font-semibold shrink-0">
+                          {briefProgress.progressPercent}%
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Send project brief</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    )}
                   </button>
 
                   <div className="text-center pt-1">
@@ -377,9 +426,38 @@ export function ContactPage() {
                   type="button"
                   onClick={handleBooking}
                   disabled={booking || !slot}
-                  className="w-full bg-butter text-butter-foreground rounded-full py-3.5 text-sm font-semibold hover:scale-[1.02] transition-transform cursor-pointer shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-busy={booking}
+                  className={`w-full bg-butter text-butter-foreground rounded-full py-3.5 px-6 text-sm font-semibold transition-all relative overflow-hidden flex items-center justify-center gap-2.5 shadow-sm ${
+                    booking
+                      ? 'opacity-95 cursor-wait scale-[0.99] ring-2 ring-ink/30'
+                      : slot
+                      ? 'hover:scale-[1.02] cursor-pointer'
+                      : 'opacity-50 cursor-not-allowed'
+                  }`}
                 >
-                  {booking ? 'Sending request…' : slot ? 'Request this slot' : 'Pick a time slot above'}
+                  {/* Animated indeterminate progress sweep along the bottom */}
+                  {booking && (
+                    <div className="absolute bottom-0 inset-x-0 h-1 bg-black/15 overflow-hidden">
+                      <div
+                        className="h-full bg-ink animate-submit-sweep transition-all duration-500 rounded-full"
+                        style={{ width: `${bookingProgress.progressPercent}%` }}
+                      />
+                    </div>
+                  )}
+
+                  {booking ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin text-butter-foreground shrink-0" />
+                      <span className="font-medium tracking-wide animate-pulse">
+                        {bookingProgress.currentStep}
+                      </span>
+                      <span className="text-[11px] font-mono text-butter-foreground/90 font-semibold shrink-0">
+                        {bookingProgress.progressPercent}%
+                      </span>
+                    </>
+                  ) : (
+                    <span>{slot ? 'Request this slot' : 'Pick a time slot above'}</span>
+                  )}
                 </button>
 
                 <div className="text-center pt-3">

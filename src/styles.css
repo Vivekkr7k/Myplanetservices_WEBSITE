@@ -629,3 +629,21 @@ html.lenis body {
   background: rgba(255, 255, 255, 0.4);
 }
 
+/* Form submission button indeterminate progress sweep */
+@keyframes submit-sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(35%);
+  }
+  100% {
+    transform: translateX(170%);
+  }
+}
+
+@utility animate-submit-sweep {
+  animation: submit-sweep 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+

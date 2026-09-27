@@ -8,6 +8,7 @@ import {
   User,
   RotateCcw,
   ArrowUpRight,
+  Loader2,
 } from 'lucide-react';
 
 interface Message {
@@ -412,7 +413,11 @@ export function ChatBot() {
               aria-label="Send message"
               className="w-8 h-8 rounded-xl bg-butter text-butter-foreground flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed hover:scale-105 active:scale-95 transition-all shrink-0 cursor-pointer"
             >
-              <Send className="w-3.5 h-3.5" />
+              {isLoading ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Send className="w-3.5 h-3.5" />
+              )}
             </button>
           </form>
         </div>

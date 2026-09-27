@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { ArrowRight, ArrowUpRight, Play, Pause, RotateCcw, Sun, Zap, Sunset, Moon } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Play, Pause, RotateCcw, Sun, Zap, Sunset, Moon, Loader2 } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { MILESTONE_SERVICES } from './road-services-signboard';
@@ -7,6 +7,7 @@ import { SystemTourModal } from './system-tour-modal';
 import { useSmoothScroll } from '../../lib/lenis-scroll';
 import { toast } from 'sonner';
 import { sendLeadCapture } from '../../lib/send-email';
+import { useSubmissionProgress } from '../../hooks/use-submission-progress';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -228,6 +229,10 @@ export function Hero() {
   const [emailInput, setEmailInput] = useState('');
 
   const [emailSending, setEmailSending] = useState(false);
+  const heroEmailProgress = useSubmissionProgress(emailSending, {
+    steps: ['Connecting...', 'Sending...', 'Securing...'],
+    intervalMs: 800,
+  });
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -388,10 +393,33 @@ export function Hero() {
                 <button
                   type="submit"
                   disabled={emailSending}
-                  className="bg-zinc-950 hover:bg-black text-white dark:bg-butter dark:text-butter-foreground dark:hover:bg-butter/90 px-3.5 py-1.5 sm:px-4.5 sm:py-2 rounded-full text-[11px] sm:text-xs font-semibold tracking-wide inline-flex items-center gap-1 transition-all duration-300 shadow-md hover:scale-102 active:scale-95 cursor-pointer shrink-0 disabled:opacity-60"
+                  aria-busy={emailSending}
+                  className={`bg-zinc-950 hover:bg-black text-white dark:bg-butter dark:text-butter-foreground dark:hover:bg-butter/90 px-3.5 py-1.5 sm:px-4.5 sm:py-2 rounded-full text-[11px] sm:text-xs font-semibold tracking-wide inline-flex items-center gap-1.5 transition-all duration-300 shadow-md shrink-0 relative overflow-hidden ${
+                    emailSending
+                      ? 'opacity-90 cursor-wait scale-[0.98]'
+                      : 'hover:scale-102 active:scale-95 cursor-pointer'
+                  }`}
                 >
-                  <span>{emailSending ? 'Sending…' : 'Get Started'}</span>
-                  <ArrowUpRight className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                  {emailSending && (
+                    <div className="absolute bottom-0 inset-x-0 h-0.5 bg-white/20 dark:bg-black/20 overflow-hidden">
+                      <div
+                        className="h-full bg-butter dark:bg-ink animate-submit-sweep transition-all duration-300"
+                        style={{ width: `${heroEmailProgress.progressPercent}%` }}
+                      />
+                    </div>
+                  )}
+
+                  {emailSending ? (
+                    <>
+                      <Loader2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 animate-spin shrink-0 text-butter dark:text-butter-foreground" />
+                      <span>{heroEmailProgress.currentStep}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Get Started</span>
+                      <ArrowUpRight className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                    </>
+                  )}
                 </button>
               </form>
             </div>
