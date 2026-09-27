@@ -292,7 +292,7 @@ export default function AdminInquiriesPage() {
               }`}
             >
               <Database className="w-3.5 h-3.5" />
-              <span>{dbConfigured ? 'MongoDB: Connected' : 'Storage: Local Cache'}</span>
+              <span>{dbConfigured ? 'MongoDB: Connected' : 'Cloud Database'}</span>
             </div>
           </div>
         </div>

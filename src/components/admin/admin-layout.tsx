@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '../../lib/admin-auth';
 import { useCurrency } from '../../lib/currency-context';
@@ -8,7 +8,6 @@ import {
   Users,
   FileText,
   Inbox,
-  Database,
   LogOut,
   ExternalLink,
   Sun,
@@ -32,24 +31,6 @@ export function AdminLayout({ children, title, subtitle, actions }: AdminLayoutP
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [dbStatus, setDbStatus] = useState<{
-    configured: boolean;
-    connected: boolean;
-    latencyMs?: number;
-  } | null>(null);
-
-  useEffect(() => {
-    fetch('/api/status')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data?.database) {
-          setDbStatus(data.database);
-        }
-      })
-      .catch(() => {
-        setDbStatus({ configured: false, connected: false });
-      });
-  }, []);
 
   const handleLogout = () => {
     logout();
@@ -230,27 +211,6 @@ export function AdminLayout({ children, title, subtitle, actions }: AdminLayoutP
               <LogOut className="w-4 h-4" />
             </button>
           </div>
-
-          <div className="mt-2 px-2 py-1.5 rounded-lg bg-secondary/50 border border-border/60 flex items-center justify-between text-[11px]">
-            <div className="flex items-center gap-1.5">
-              <Database className="w-3 h-3 text-muted-foreground" />
-              <span className="text-muted-foreground font-mono">Storage:</span>
-            </div>
-            {dbStatus?.connected ? (
-              <span className="inline-flex items-center gap-1 text-emerald-500 font-medium">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                MongoDB Live
-              </span>
-            ) : (
-              <span
-                className="inline-flex items-center gap-1 text-amber-500 font-medium cursor-help"
-                title="Add MONGODB_URI to .env.local to persist directly to MongoDB cluster"
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                Local Cache
-              </span>
-            )}
-          </div>
         </div>
       </aside>
 
@@ -275,26 +235,6 @@ export function AdminLayout({ children, title, subtitle, actions }: AdminLayoutP
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Live Database status pill */}
-            <div
-              className={`hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-mono border transition-all ${
-                dbStatus?.connected
-                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500'
-                  : 'bg-amber-500/10 border-amber-500/30 text-amber-500'
-              }`}
-              title={
-                dbStatus?.connected
-                  ? `MongoDB Atlas connected (${dbStatus.latencyMs ?? 50}ms latency)`
-                  : 'Operating in Local Storage fallback mode. Set MONGODB_URI in .env.local to persist data in MongoDB.'
-              }
-            >
-              <Database className="w-3.5 h-3.5" />
-              <span>{dbStatus?.connected ? 'MongoDB Live' : 'Storage: Local Cache'}</span>
-              {dbStatus?.connected && (
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              )}
-            </div>
-
             {/* Currency switcher */}
             <div className="flex items-center bg-secondary rounded-full p-0.5 border border-border text-xs font-medium">
               <button
