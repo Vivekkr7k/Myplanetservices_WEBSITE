@@ -1,4 +1,4 @@
-import { getClientsCollection, isMongoConfigured, ClientRecordDoc } from './_lib/mongodb';
+import { getClientsCollection, isMongoConfigured, ClientRecordDoc } from './_lib/mongodb.js';
 
 interface ApiRequest {
   method?: string;
@@ -39,7 +39,16 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
   const collection = await getClientsCollection();
   if (!collection) {
-    return res.status(500).json({
+    if (method === 'GET') {
+      return res.status(200).json({
+        success: true,
+        configured: true,
+        source: 'local_storage_fallback',
+        message: 'MongoDB connection is currently unavailable. Using local fallback.',
+        data: [],
+      });
+    }
+    return res.status(503).json({
       success: false,
       configured: true,
       error: 'Failed to connect to MongoDB client_records collection',

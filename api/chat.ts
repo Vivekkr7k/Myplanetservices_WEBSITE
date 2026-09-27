@@ -159,7 +159,7 @@ export default async function handler(req: any, res: any) {
       throw new Error('NO_STREAM_OUTPUT');
     }
 
-    const usage = await result.usage.catch(() => null);
+    const usage = await (result.usage as Promise<any>).catch?.(() => null);
     res.write(`data: ${JSON.stringify({ done: true, usage })}\n\n`);
     res.end();
   } catch (err: any) {

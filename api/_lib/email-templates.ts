@@ -410,7 +410,7 @@ export function clientBookingReceiptEmail(data: BookingData) {
   };
 }
 
-export function clientLeadWelcomeEmail(data: LeadData) {
+export function clientLeadWelcomeEmail(_data: LeadData) {
   const body = `
             <p style="margin:0 0 16px;font-size:16px;">Hi there,</p>
             <p style="margin:0 0 16px;">

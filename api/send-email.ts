@@ -11,9 +11,9 @@ import {
   type BookingData,
   type QuoteSnapshot,
   serviceLabel,
-} from './_lib/email-templates';
-import { appendLeadRow, sheetTimestamp, type LeadRow } from './_lib/sheets';
-import { saveInquiryToMongo } from './_lib/mongodb';
+} from './_lib/email-templates.js';
+import { appendLeadRow, sheetTimestamp, type LeadRow } from './_lib/sheets.js';
+import { saveInquiryToMongo } from './_lib/mongodb.js';
 
 /**
  * Serverless handler for every outbound email the site sends.
@@ -173,19 +173,24 @@ export default async function handler(req: any, res: any) {
     let teamEmailStatus = 'Sent';
 
     if (resend && internal) {
-      const { data: sendResult, error } = await resend.emails.send({
-        from: FROM,
-        to: TEAM_INBOX,
-        replyTo,
-        subject: internal.subject,
-        html: internal.html,
-      });
+      try {
+        const { data: sendResult, error } = await resend.emails.send({
+          from: FROM,
+          to: TEAM_INBOX,
+          replyTo,
+          subject: internal.subject,
+          html: internal.html,
+        });
 
-      if (error) {
-        console.error('Resend error (team notification):', error);
-        teamEmailStatus = `Failed: ${error.message ?? 'unknown'}`;
-      } else {
-        sent = sendResult as { id: string };
+        if (error) {
+          console.error('Resend error (team notification):', error);
+          teamEmailStatus = `Failed: ${error.message ?? 'unknown'}`;
+        } else {
+          sent = sendResult as { id: string };
+        }
+      } catch (sendErr: any) {
+        console.error('Resend throw (team notification):', sendErr);
+        teamEmailStatus = `Failed: ${sendErr?.message ?? 'exception'}`;
       }
     } else if (!resend) {
       console.warn('RESEND_API_KEY not configured; proceeding with database record');
@@ -229,25 +234,29 @@ export default async function handler(req: any, res: any) {
     });
 
     // Save to MongoDB backend database (safely awaited, never breaks response or emails if DB unconfigured)
-    await saveInquiryToMongo({
-      type: (type as 'brief' | 'lead' | 'booking') || 'brief',
-      name: (sheet.name as string) || str(raw.name, MAX.name),
-      email: (sheet.email as string) || str(raw.email, MAX.email),
-      company: (sheet.company as string) || str(raw.company, MAX.company),
-      service: (sheet.service as string) || str(raw.service, MAX.service),
-      budget: (sheet.budget as string) || str(raw.budget, MAX.budget),
-      message: (sheet.message as string) || str(raw.message, MAX.message),
-      slot: (sheet.callSlot as string) || str(raw.slot, MAX.slot),
-      source: source || 'Website',
-      pageUrl,
-      region: str(raw.region, 12),
-      timeZone: str(raw.timeZone, 60),
-      currency: str(raw.currency, 8),
-      quote: parseQuote(raw.quote) as Record<string, unknown> | undefined,
-      teamEmailStatus,
-      clientEmailStatus,
-      resendId: sent?.id ?? '',
-    });
+    try {
+      await saveInquiryToMongo({
+        type: (type as 'brief' | 'lead' | 'booking') || 'brief',
+        name: (sheet.name as string) || str(raw.name, MAX.name),
+        email: (sheet.email as string) || str(raw.email, MAX.email),
+        company: (sheet.company as string) || str(raw.company, MAX.company),
+        service: (sheet.service as string) || str(raw.service, MAX.service),
+        budget: (sheet.budget as string) || str(raw.budget, MAX.budget),
+        message: (sheet.message as string) || str(raw.message, MAX.message),
+        slot: (sheet.callSlot as string) || str(raw.slot, MAX.slot),
+        source: source || 'Website',
+        pageUrl,
+        region: str(raw.region, 12),
+        timeZone: str(raw.timeZone, 60),
+        currency: str(raw.currency, 8),
+        quote: parseQuote(raw.quote) as unknown as Record<string, unknown> | undefined,
+        teamEmailStatus,
+        clientEmailStatus,
+        resendId: sent?.id ?? '',
+      });
+    } catch (mongoErr) {
+      console.error('[send-email] MongoDB save caught error:', mongoErr);
+    }
 
     return res.status(200).json({
       success: true,
@@ -258,6 +267,6 @@ export default async function handler(req: any, res: any) {
     });
   } catch (err: any) {
     console.error('send-email failed:', err);
-    return res.status(500).json({ error: 'Something went wrong sending your message.' });
+    return res.status(500).json({ error: err?.message || 'Something went wrong sending your message.' });
   }
 }

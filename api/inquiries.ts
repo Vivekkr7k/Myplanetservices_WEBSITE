@@ -1,4 +1,4 @@
-import { getInquiriesCollection, isMongoConfigured } from './_lib/mongodb';
+import { getInquiriesCollection, isMongoConfigured } from './_lib/mongodb.js';
 
 interface ApiRequest {
   method?: string;
@@ -38,7 +38,16 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
   const collection = await getInquiriesCollection();
   if (!collection) {
-    return res.status(500).json({
+    if (method === 'GET') {
+      return res.status(200).json({
+        success: true,
+        configured: true,
+        source: 'fallback',
+        message: 'MongoDB connection is currently unavailable.',
+        data: [],
+      });
+    }
+    return res.status(503).json({
       success: false,
       configured: true,
       error: 'Failed to connect to MongoDB inquiries collection',

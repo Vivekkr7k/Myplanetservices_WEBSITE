@@ -1,11 +1,14 @@
-import dns from 'node:dns';
+import * as dns from 'node:dns';
 import { MongoClient, Db, Collection, ObjectId } from 'mongodb';
 
-// Configure public DNS resolvers to prevent Windows / local network "querySrv ECONNREFUSED" on MongoDB Atlas SRV records
-try {
-  dns.setServers(['8.8.8.8', '1.1.1.1']);
-} catch {
-  // Silent fallback in environments where setServers is restricted
+// Configure public DNS resolvers ONLY on Windows local environments where ISP DNS causes "querySrv ECONNREFUSED"
+// Never execute on Vercel / Linux where AWS Lambda VPC manages internal DNS resolution.
+if (typeof process !== 'undefined' && process.platform === 'win32' && !process.env.VERCEL) {
+  try {
+    dns.setServers(['8.8.8.8', '1.1.1.1']);
+  } catch {
+    // Fallback silently if restricted
+  }
 }
 
 /**
@@ -35,18 +38,22 @@ export async function getDb(): Promise<Db | null> {
 
   if (!globalWithMongo._mongoClientPromise) {
     const client = new MongoClient(currentUri, {
-      serverSelectionTimeoutMS: 8000,
-      connectTimeoutMS: 10000,
+      serverSelectionTimeoutMS: 5000,
+      connectTimeoutMS: 5000,
     });
-    globalWithMongo._mongoClientPromise = client.connect();
+    globalWithMongo._mongoClientPromise = client.connect().catch((err) => {
+      console.error('[MongoDB] Initial connection error:', err);
+      delete globalWithMongo._mongoClientPromise;
+      return null as any;
+    });
   }
 
   try {
     const client = await globalWithMongo._mongoClientPromise;
+    if (!client) return null;
     return client.db(currentDbName);
   } catch (err) {
     console.error('[MongoDB] Connection error:', err);
-    // Reset so subsequent attempts can retry if connection parameters changed or network was down
     delete globalWithMongo._mongoClientPromise;
     return null;
   }

@@ -1,4 +1,4 @@
-import { checkMongoHealth } from './_lib/mongodb';
+import { checkMongoHealth } from './_lib/mongodb.js';
 
 interface ApiRequest {
   method?: string;
@@ -14,7 +14,7 @@ interface ApiResponse {
   setHeader: (k: string, v: string) => ApiResponse;
 }
 
-export default async function handler(req: ApiRequest, res: ApiResponse) {
+export default async function handler(_req: ApiRequest, res: ApiResponse) {
   res.setHeader('Content-Type', 'application/json');
 
   try {
@@ -25,10 +25,15 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       database: health,
     });
   } catch (err: any) {
-    return res.status(500).json({
+    console.error('status check error:', err);
+    return res.status(200).json({
       success: false,
       timestamp: new Date().toISOString(),
-      error: err?.message || 'Failed to check database health',
+      database: {
+        configured: Boolean(process.env.MONGODB_URI),
+        connected: false,
+        error: err?.message || 'Database check failed',
+      },
     });
   }
 }
