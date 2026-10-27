@@ -29,8 +29,15 @@ export function getOrganizationSchema() {
     image: DEFAULT_OG_IMAGE,
     description:
       'High-velocity SaaS, web, and AI automation engineering studio building custom web applications, mobile platforms, headless e-commerce, and generative AI systems for scaling enterprises.',
-    email: 'hello@myplanetservices.com',
+    email: 'vivek@myplanetservices.com',
     telephone: '+91-78081-58221',
+    founder: {
+      '@type': 'Person',
+      name: 'Vivek',
+      jobTitle: 'Founder & CEO',
+      email: 'vivek@myplanetservices.com',
+      telephone: '+91-78081-58221',
+    },
     address: {
       '@type': 'PostalAddress',
       addressLocality: 'Bengaluru',

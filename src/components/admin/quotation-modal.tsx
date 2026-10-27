@@ -69,7 +69,7 @@ export function QuotationModal({ client, onClose }: QuotationModalProps) {
                 </div>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Bengaluru, Karnataka, India • hello@myplanetservices.com • +91-78081-58221<br />
+                Bengaluru, Karnataka, India • vivek@myplanetservices.com • +91-78081-58221<br />
                 <span className="font-mono text-[11px]">https://myplanetservices.com</span>
               </p>
             </div>
